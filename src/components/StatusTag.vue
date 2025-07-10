@@ -5,6 +5,8 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+
 interface Props {
   status: string
   type?: 'process' | 'round'
@@ -14,15 +16,20 @@ const props = withDefaults(defineProps<Props>(), {
   type: 'process'
 })
 
+const { t } = useI18n()
+
 const getStatusColor = (status: string) => {
   if (props.type === 'process') {
     const colors = {
       applied: 'blue',
+      evaluating: 'processing',
       screening: 'orange', 
       interviewing: 'processing',
       offer: 'green',
+      offered: 'green',
       rejected: 'red',
-      withdrawn: 'default'
+      withdrawn: 'default',
+      closed: 'default'
     }
     return colors[status as keyof typeof colors] || 'default'
   } else {
@@ -38,23 +45,9 @@ const getStatusColor = (status: string) => {
 
 const getStatusText = (status: string) => {
   if (props.type === 'process') {
-    const texts = {
-      applied: '已投递',
-      screening: '筛选中',
-      interviewing: '面试中', 
-      offer: '已录用',
-      rejected: '已拒绝',
-      withdrawn: '已撤回'
-    }
-    return texts[status as keyof typeof texts] || status
+    return t(`status.${status}`)
   } else {
-    const texts = {
-      pending: '待面试',
-      passed: '通过',
-      failed: '未通过',
-      cancelled: '已取消'
-    }
-    return texts[status as keyof typeof texts] || status
+    return t(`roundResult.${status}`)
   }
 }
 </script>

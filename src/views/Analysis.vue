@@ -105,7 +105,7 @@
               <a-checkbox :value="offer.id">
                 {{ offer.companyName }} - {{ offer.position }}
                 <span class="salary-badge">
-                  ¥{{ formatSalary(offer.salary.total) }}
+                  {{ getSalaryDisplayText(offer.salary) }}
                 </span>
               </a-checkbox>
             </a-col>
@@ -191,6 +191,7 @@ import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue';
 import { useAnalyticsStore } from '@/stores/analytics';
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
+import { SalaryCalculator } from '@/utils/salary';
 import type { VirtualOffer, YearlyIncomeAnalysis } from '@/types';
 
 const analyticsStore = useAnalyticsStore();
@@ -291,10 +292,17 @@ const incomeColumns = [
 
 // 工具函数
 const formatSalary = (amount: number) => {
-  if (amount >= 10000) {
-    return `${(amount / 10000).toFixed(1)}万`;
+  return SalaryCalculator.formatSalary(amount);
+};
+
+const getSalaryDisplayText = (salary: any) => {
+  if (salary.base) {
+    // 新格式薪资
+    return SalaryCalculator.getSalaryRangeText(salary);
+  } else {
+    // 旧格式薪资兼容
+    return `¥${formatSalary(salary.total || salary)}`;
   }
-  return amount.toLocaleString();
 };
 
 // 初始化薪资对比图表
@@ -331,7 +339,16 @@ const initSalaryChart = () => {
       {
         name: '年度总包',
         type: 'bar',
-        data: filteredSalaryData.value.map(item => item.salary.total),
+        data: filteredSalaryData.value.map(item => {
+          const salary = item.salary;
+          if (salary.base) {
+            // 使用典型值作为图表显示
+            return SalaryCalculator.calculateTypicalTotal(salary);
+          } else {
+            // 兼容旧格式
+            return salary.total || 0;
+          }
+        }),
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: '#83bff6' },

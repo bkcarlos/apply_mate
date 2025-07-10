@@ -82,46 +82,11 @@
       <!-- Offer 薪资详情 -->
       <template v-if="formData.status === '已发Offer'">
         <a-divider>Offer 薪资详情</a-divider>
-        <a-row :gutter="16">
-          <a-col :span="6">
-            <a-form-item label="基本工资" name="offeredSalary.base">
-              <a-input-number
-                v-model:value="formData.offeredSalary.base"
-                placeholder="基本工资"
-                style="width: 100%"
-                :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-                :parser="value => value.replace(/\$\s?|(,*)/g, '')"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="奖金" name="offeredSalary.bonus">
-              <a-input-number
-                v-model:value="formData.offeredSalary.bonus"
-                placeholder="奖金"
-                style="width: 100%"
-                :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-                :parser="value => value.replace(/\$\s?|(,*)/g, '')"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="期权" name="offeredSalary.options">
-              <a-input v-model:value="formData.offeredSalary.options" placeholder="期权信息" />
-            </a-form-item>
-          </a-col>
-          <a-col :span="6">
-            <a-form-item label="年度总包" name="offeredSalary.total">
-              <a-input-number
-                v-model:value="formData.offeredSalary.total"
-                placeholder="年度总包"
-                style="width: 100%"
-                :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-                :parser="value => value.replace(/\$\s?|(,*)/g, '')"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
+        <SalaryEditor
+          v-model="formData.offeredSalary"
+          :show-actions="false"
+          @change="handleSalaryChange"
+        />
       </template>
 
       <a-form-item label="备注" name="remarks">
@@ -140,7 +105,9 @@ import { ref, reactive, watch, computed } from 'vue';
 import { message } from 'ant-design-vue';
 import type { FormInstance } from 'ant-design-vue';
 import { useInterviewStore } from '@/stores/interview';
+import { SalaryCalculator } from '@/utils/salary';
 import type { InterviewProcess } from '@/types';
+import SalaryEditor from './SalaryEditor.vue';
 
 interface Props {
   visible: boolean;
@@ -213,16 +180,16 @@ watch(() => props.process, (process) => {
       conclusion: process.conclusion,
       sourceChannel: process.sourceChannel,
       expectedSalary: { ...process.expectedSalary },
-      offeredSalary: process.offeredSalary ? { ...process.offeredSalary } : {
-        base: 0,
-        bonus: 0,
-        options: '',
-        total: 0,
-      },
+      offeredSalary: process.offeredSalary ? { ...process.offeredSalary } : SalaryCalculator.createDefault(),
       remarks: process.remarks || '',
     });
   }
 }, { immediate: true });
+
+// 处理薪资变化
+const handleSalaryChange = (salary: any) => {
+  formData.offeredSalary = salary;
+};
 
 // 提交表单
 const handleSubmit = async () => {

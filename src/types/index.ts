@@ -18,10 +18,14 @@ export type InterviewConclusion = '未开始' | '进行中' | '通过' | '未通
 
 // 薪资信息
 export interface SalaryInfo {
-  base: number; // 基本工资
-  bonus: number; // 奖金
-  options: string; // 期权信息
-  total: number; // 年度总包
+  base: number; // 基础月薪
+  yearEndMonths: number; // 年终奖几个月
+  guaranteedMonths: number; // 保底几个月 (包含年终)
+  typicalMonths: number; // 过去大多数情况几个月 (包含年终)
+  // 计算属性在运行时生成：
+  // minTotal = base * (12 + guaranteedMonths)
+  // typicalTotal = base * (12 + typicalMonths) 
+  // maxTotal = base * (12 + yearEndMonths)
 }
 
 // 面试流程
@@ -35,9 +39,9 @@ export interface InterviewProcess {
   sourceChannel: string; // 邀约/投递渠道，如 "Boss直聘", "内推", "LinkedIn"
   expectedSalary: { min: number; max: number }; // 期望薪资范围
   offeredSalary?: SalaryInfo; // 如果有Offer，记录薪资详情
-  createTime: Date; // 创建时间
-  updateTime: Date; // 最后更新时间
-  remarks?: string; // 备注
+  appliedAt: Date; // 投递时间
+  updatedAt: Date; // 最后更新时间
+  notes?: string; // 备注
 }
 
 // 面试轮次状态

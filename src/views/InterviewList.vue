@@ -150,12 +150,12 @@
 
           <!-- 薪资列 -->
           <template v-else-if="column.key === 'salary'">
-            <div v-if="record.offeredSalary">
-              <div class="salary-amount">
-                ¥{{ formatSalary(record.offeredSalary.total) }}
+            <div v-if="record.offeredSalary" class="salary-display">
+              <div class="salary-range">
+                {{ getSalaryRangeText(record.offeredSalary) }}
               </div>
               <div class="salary-detail">
-                总包/年
+                基础: ¥{{ formatSalary(record.offeredSalary.base) }}/月
               </div>
             </div>
             <span v-else class="no-salary">暂无</span>
@@ -213,6 +213,7 @@ import { message, Modal } from 'ant-design-vue';
 
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
+import { SalaryCalculator } from '@/utils/salary';
 import type { InterviewProcess } from '@/types';
 import EditProcessModal from '@/components/EditProcessModal.vue';
 import StatusTag from '@/components/StatusTag.vue';
@@ -345,10 +346,11 @@ const getConclusionColor = (conclusion: string) => {
 };
 
 const formatSalary = (amount: number) => {
-  if (amount >= 10000) {
-    return `${(amount / 10000).toFixed(1)}万`;
-  }
-  return amount.toLocaleString();
+  return SalaryCalculator.formatSalary(amount);
+};
+
+const getSalaryRangeText = (salary: any) => {
+  return SalaryCalculator.getSalaryRangeText(salary);
 };
 
 const formatDate = (date: Date) => {
@@ -525,14 +527,21 @@ onMounted(() => {
   font-weight: 500;
 }
 
-.salary-amount {
+.salary-display {
+  min-width: 120px;
+}
+
+.salary-range {
   font-weight: 600;
-  color: #52c41a;
+  color: #1890ff;
+  font-size: 13px;
+  line-height: 1.2;
 }
 
 .salary-detail {
-  font-size: 12px;
+  font-size: 11px;
   color: #999;
+  margin-top: 2px;
 }
 
 .no-salary {

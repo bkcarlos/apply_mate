@@ -3,21 +3,21 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-left">
-        <h2>新建面试流程</h2>
+        <h2>{{ $t('pages.interviews.new') }}</h2>
         <a-breadcrumb>
           <a-breadcrumb-item>
-            <router-link to="/dashboard">首页</router-link>
+            <router-link to="/dashboard">{{ $t('nav.dashboard') }}</router-link>
           </a-breadcrumb-item>
           <a-breadcrumb-item>
-            <router-link to="/interviews">面试管理</router-link>
+            <router-link to="/interviews">{{ $t('nav.interviews') }}</router-link>
           </a-breadcrumb-item>
-          <a-breadcrumb-item>新建面试流程</a-breadcrumb-item>
+          <a-breadcrumb-item>{{ $t('pages.interviews.new') }}</a-breadcrumb-item>
         </a-breadcrumb>
       </div>
     </div>
 
     <!-- 表单卡片 -->
-    <a-card title="基本信息">
+    <a-card :title="$t('pages.interviews.basicInfo')">
       <a-form
         ref="formRef"
         :model="formData"
@@ -26,10 +26,10 @@
         @finish="handleSubmit"
       >
         <!-- 公司选择 -->
-        <a-form-item label="选择公司" name="companyId">
+        <a-form-item :label="$t('form.company')" name="companyId">
           <a-select
             v-model:value="formData.companyId"
-            placeholder="选择或创建公司"
+            :placeholder="$t('interview.selectOrCreateCompany')"
             show-search
             :filter-option="filterCompany"
             :dropdown-render="dropdownRender"
@@ -60,13 +60,13 @@
         <!-- 岗位信息 -->
         <a-row :gutter="16">
           <a-col :span="12">
-            <a-form-item label="岗位名称" name="position">
-              <a-input v-model:value="formData.position" placeholder="如：前端开发工程师" />
+            <a-form-item :label="$t('form.position')" name="position">
+              <a-input v-model:value="formData.position" :placeholder="$t('interview.positionPlaceholder')" />
             </a-form-item>
           </a-col>
           <a-col :span="12">
-            <a-form-item label="工作城市" name="city">
-              <a-input v-model:value="formData.city" placeholder="如：北京、上海、深圳" />
+            <a-form-item :label="$t('form.city')" name="city">
+              <a-input v-model:value="formData.city" :placeholder="$t('interview.cityPlaceholder')" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -74,50 +74,50 @@
         <!-- 状态信息 -->
         <a-row :gutter="16">
           <a-col :span="8">
-            <a-form-item label="当前状态" name="status">
-              <a-select v-model:value="formData.status" placeholder="选择状态">
-                <a-select-option value="投递中">投递中</a-select-option>
-                <a-select-option value="评估中">评估中</a-select-option>
-                <a-select-option value="面试中">面试中</a-select-option>
-                <a-select-option value="已发Offer">已发Offer</a-select-option>
-                <a-select-option value="已拒绝">已拒绝</a-select-option>
-                <a-select-option value="已结束">已结束</a-select-option>
+            <a-form-item :label="$t('form.status')" name="status">
+              <a-select v-model:value="formData.status" :placeholder="$t('interview.statusPlaceholder')">
+                <a-select-option value="applied">{{ $t('status.applied') }}</a-select-option>
+                <a-select-option value="evaluating">{{ $t('status.evaluating') }}</a-select-option>
+                <a-select-option value="interviewing">{{ $t('status.interviewing') }}</a-select-option>
+                <a-select-option value="offered">{{ $t('status.offered') }}</a-select-option>
+                <a-select-option value="rejected">{{ $t('status.rejected') }}</a-select-option>
+                <a-select-option value="closed">{{ $t('status.closed') }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="8">
-            <a-form-item label="当前结论" name="conclusion">
-              <a-select v-model:value="formData.conclusion" placeholder="选择结论">
-                <a-select-option value="未开始">未开始</a-select-option>
-                <a-select-option value="进行中">进行中</a-select-option>
-                <a-select-option value="通过">通过</a-select-option>
-                <a-select-option value="未通过">未通过</a-select-option>
-                <a-select-option value="待定">待定</a-select-option>
+            <a-form-item :label="$t('form.conclusion')" name="conclusion">
+              <a-select v-model:value="formData.conclusion" :placeholder="$t('interview.conclusionPlaceholder')">
+                <a-select-option value="not_started">{{ $t('conclusion.notStarted') }}</a-select-option>
+                <a-select-option value="in_progress">{{ $t('conclusion.inProgress') }}</a-select-option>
+                <a-select-option value="passed">{{ $t('conclusion.passed') }}</a-select-option>
+                <a-select-option value="failed">{{ $t('conclusion.failed') }}</a-select-option>
+                <a-select-option value="pending">{{ $t('conclusion.pending') }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :span="8">
-            <a-form-item label="投递渠道" name="sourceChannel">
-              <a-select v-model:value="formData.sourceChannel" placeholder="选择或输入渠道">
-                <a-select-option value="Boss直聘">Boss直聘</a-select-option>
-                <a-select-option value="拉勾网">拉勾网</a-select-option>
-                <a-select-option value="智联招聘">智联招聘</a-select-option>
-                <a-select-option value="前程无忧">前程无忧</a-select-option>
-                <a-select-option value="猎聘">猎聘</a-select-option>
-                <a-select-option value="内推">内推</a-select-option>
-                <a-select-option value="LinkedIn">LinkedIn</a-select-option>
-                <a-select-option value="公司官网">公司官网</a-select-option>
+            <a-form-item :label="$t('form.sourceChannel')" name="sourceChannel">
+              <a-select v-model:value="formData.sourceChannel" :placeholder="$t('interview.channelPlaceholder')">
+                <a-select-option value="boss">{{ $t('sourceChannels.boss') }}</a-select-option>
+                <a-select-option value="lagou">{{ $t('sourceChannels.lagou') }}</a-select-option>
+                <a-select-option value="zhilian">{{ $t('sourceChannels.zhilian') }}</a-select-option>
+                <a-select-option value="qianchengwuyou">{{ $t('sourceChannels.qianchengwuyou') }}</a-select-option>
+                <a-select-option value="liepin">{{ $t('sourceChannels.liepin') }}</a-select-option>
+                <a-select-option value="referral">{{ $t('sourceChannels.referral') }}</a-select-option>
+                <a-select-option value="linkedin">{{ $t('sourceChannels.linkedin') }}</a-select-option>
+                <a-select-option value="official">{{ $t('sourceChannels.official') }}</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
         </a-row>
 
         <!-- 期望薪资 -->
-        <a-form-item label="期望薪资范围 (年薪)" name="expectedSalary">
+        <a-form-item :label="$t('interview.salaryRangePlaceholder')" name="expectedSalary">
           <a-input-group compact>
             <a-input-number
               v-model:value="formData.expectedSalary.min"
-              placeholder="最低薪资"
+              :placeholder="$t('interview.minSalaryPlaceholder')"
               style="width: 45%"
               :min="0"
               :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
@@ -126,7 +126,7 @@
             <span style="width: 10%; text-align: center; line-height: 32px;">-</span>
             <a-input-number
               v-model:value="formData.expectedSalary.max"
-              placeholder="最高薪资"
+              :placeholder="$t('interview.maxSalaryPlaceholder')"
               style="width: 45%"
               :min="0"
               :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
@@ -136,10 +136,10 @@
         </a-form-item>
 
         <!-- 备注 -->
-        <a-form-item label="备注信息" name="remarks">
+        <a-form-item :label="$t('form.notes')" name="notes">
           <a-textarea
-            v-model:value="formData.remarks"
-            placeholder="记录相关的备注信息，如职位要求、公司情况等"
+            v-model:value="formData.notes"
+            :placeholder="$t('interview.remarksPlaceholder')"
             :rows="3"
           />
         </a-form-item>
@@ -148,10 +148,10 @@
         <a-form-item>
           <a-space>
             <a-button type="primary" html-type="submit" :loading="submitting">
-              创建面试流程
+              {{ $t('interview.createProcess') }}
             </a-button>
             <a-button @click="goBack">
-              取消
+              {{ $t('interview.cancel') }}
             </a-button>
           </a-space>
         </a-form-item>
@@ -169,6 +169,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { message } from 'ant-design-vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import type { FormInstance, SelectProps } from 'ant-design-vue';
@@ -179,6 +180,7 @@ import type { Company, InterviewProcess } from '@/types';
 import NewCompanyModal from '@/components/NewCompanyModal.vue';
 
 const router = useRouter();
+const { t } = useI18n();
 const companyStore = useCompanyStore();
 const interviewStore = useInterviewStore();
 
@@ -191,14 +193,14 @@ const formData = reactive({
   companyId: '',
   position: '',
   city: '',
-  status: '投递中' as any,
-  conclusion: '未开始' as any,
+  status: 'applied' as any,
+  conclusion: 'not_started' as any,
   sourceChannel: '',
   expectedSalary: {
     min: 0,
     max: 0,
   },
-  remarks: '',
+  notes: '',
 });
 
 // 表单验证规则
@@ -268,7 +270,9 @@ const handleSubmit = async () => {
       conclusion: formData.conclusion,
       sourceChannel: formData.sourceChannel,
       expectedSalary: { ...formData.expectedSalary },
-      remarks: formData.remarks,
+      appliedAt: new Date(),
+      updatedAt: new Date(),
+      notes: formData.notes,
     };
 
     const newProcess = await interviewStore.addProcess(processData);

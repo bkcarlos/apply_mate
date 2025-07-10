@@ -2,16 +2,16 @@
   <div class="not-found">
     <a-result
       status="404"
-      title="404"
-      sub-title="抱歉，您访问的页面不存在。"
+      :title="$t('pages.notFound.title')"
+      :sub-title="$t('pages.notFound.subtitle')"
     >
       <template #extra>
         <a-space>
           <a-button type="primary" @click="goHome">
-            返回首页
+            {{ $t('pages.notFound.backHome') }}
           </a-button>
           <a-button @click="goBack">
-            返回上一页
+            {{ $t('pages.notFound.goBack') }}
           </a-button>
         </a-space>
       </template>
@@ -20,25 +20,26 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 
-const router = useRouter()
+const router = useRouter();
+const { t } = useI18n();
 
 const goHome = () => {
-  router.push('/')
-}
+  router.push('/');
+};
 
 const goBack = () => {
-  router.back()
-}
+  router.back();
+};
 </script>
 
 <style scoped>
 .not-found {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   min-height: 60vh;
-  padding: 40px;
 }
 </style>

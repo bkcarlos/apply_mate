@@ -32,7 +32,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
       const stats = channelMap.get(channel) || { total: 0, success: 0 };
       stats.total++;
       
-      if (process.status === '已发Offer' || process.conclusion === '通过') {
+      if (process.status === 'offered' || process.conclusion === 'passed') {
         stats.success++;
       }
       
@@ -95,7 +95,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
       const process = interviewStore.getProcessById(processId);
       if (process?.offeredSalary) {
         const company = companyStore.getCompanyById(process.companyId);
-        const newMonthlyBase = process.offeredSalary.total / 12;
+        const newMonthlyBase = process.offeredSalary.base;
         const estimatedYearlyIncome = 
           (currentMonthlySalary * monthsInOldJob) + 
           (newMonthlyBase * monthsInNewJob);
@@ -105,7 +105,7 @@ export const useAnalyticsStore = defineStore('analytics', () => {
 
         results.push({
           companyName: company?.name || 'Unknown',
-          yearlyTotal: process.offeredSalary.total,
+          yearlyTotal: process.offeredSalary.base * (12 + process.offeredSalary.typicalMonths),
           estimatedYearlyIncome,
           monthlyIncrease,
           increasePercentage,

@@ -1,8 +1,9 @@
 <template>
   <a-modal
     v-model:open="visible"
-    title="编辑面试流程"
-    width="800px"
+    :title="$t('interview.editProcess')"
+    :ok-text="$t('common.save')"
+    :cancel-text="$t('common.cancel')"
     @ok="handleSubmit"
     @cancel="handleCancel"
   >
@@ -14,65 +15,68 @@
     >
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-item label="岗位" name="position">
-            <a-input v-model:value="formData.position" placeholder="请输入岗位名称" />
+          <a-form-item :label="$t('form.position')" name="position">
+            <a-input v-model:value="formData.position" :placeholder="$t('interview.positionPlaceholder')" />
           </a-form-item>
         </a-col>
+        
         <a-col :span="12">
-          <a-form-item label="工作城市" name="city">
-            <a-input v-model:value="formData.city" placeholder="请输入工作城市" />
+          <a-form-item :label="$t('form.city')" name="city">
+            <a-input v-model:value="formData.city" :placeholder="$t('interview.cityPlaceholder')" />
           </a-form-item>
         </a-col>
       </a-row>
 
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-item label="状态" name="status">
-            <a-select v-model:value="formData.status" placeholder="选择状态">
-              <a-select-option value="投递中">投递中</a-select-option>
-              <a-select-option value="评估中">评估中</a-select-option>
-              <a-select-option value="面试中">面试中</a-select-option>
-              <a-select-option value="已发Offer">已发Offer</a-select-option>
-              <a-select-option value="已拒绝">已拒绝</a-select-option>
-              <a-select-option value="已结束">已结束</a-select-option>
+          <a-form-item :label="$t('form.status')" name="status">
+            <a-select v-model:value="formData.status" :placeholder="$t('interview.statusPlaceholder')">
+              <a-select-option value="applied">{{ $t('status.applied') }}</a-select-option>
+              <a-select-option value="evaluating">{{ $t('status.evaluating') }}</a-select-option>
+              <a-select-option value="interviewing">{{ $t('status.interviewing') }}</a-select-option>
+              <a-select-option value="offered">{{ $t('status.offered') }}</a-select-option>
+              <a-select-option value="rejected">{{ $t('status.rejected') }}</a-select-option>
+              <a-select-option value="closed">{{ $t('status.closed') }}</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
+
         <a-col :span="12">
-          <a-form-item label="结论" name="conclusion">
-            <a-select v-model:value="formData.conclusion" placeholder="选择结论">
-              <a-select-option value="未开始">未开始</a-select-option>
-              <a-select-option value="进行中">进行中</a-select-option>
-              <a-select-option value="通过">通过</a-select-option>
-              <a-select-option value="未通过">未通过</a-select-option>
-              <a-select-option value="待定">待定</a-select-option>
+          <a-form-item :label="$t('form.conclusion')" name="conclusion">
+            <a-select v-model:value="formData.conclusion" :placeholder="$t('interview.conclusionPlaceholder')">
+              <a-select-option value="not_started">{{ $t('conclusion.notStarted') }}</a-select-option>
+              <a-select-option value="in_progress">{{ $t('conclusion.inProgress') }}</a-select-option>
+              <a-select-option value="passed">{{ $t('conclusion.passed') }}</a-select-option>
+              <a-select-option value="failed">{{ $t('conclusion.failed') }}</a-select-option>
+              <a-select-option value="pending">{{ $t('conclusion.pending') }}</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
       </a-row>
 
-      <a-form-item label="投递渠道" name="sourceChannel">
-        <a-input v-model:value="formData.sourceChannel" placeholder="如：Boss直聘、内推、LinkedIn等" />
+      <a-form-item :label="$t('form.sourceChannel')" name="sourceChannel">
+        <a-input v-model:value="formData.sourceChannel" :placeholder="$t('interview.channelPlaceholder')" />
       </a-form-item>
 
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-item label="期望薪资范围" name="expectedSalary">
+          <a-form-item :label="$t('form.expectedSalary')" name="expectedSalary">
             <a-input-group compact>
               <a-input-number
                 v-model:value="formData.expectedSalary.min"
-                placeholder="最低"
-                style="width: 45%"
-                :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-                :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+                :placeholder="$t('interview.minSalary')"
+                style="width: 50%"
+                :min="0"
+                :formatter="(value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                :parser="(value: string) => value.replace(/\$\s?|(,*)/g, '')"
               />
-              <span style="width: 10%; text-align: center; line-height: 32px;">-</span>
               <a-input-number
                 v-model:value="formData.expectedSalary.max"
-                placeholder="最高"
-                style="width: 45%"
-                :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-                :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+                :placeholder="$t('interview.maxSalary')"
+                style="width: 50%"
+                :min="0"
+                :formatter="(value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                :parser="(value: string) => value.replace(/\$\s?|(,*)/g, '')"
               />
             </a-input-group>
           </a-form-item>
@@ -80,19 +84,19 @@
       </a-row>
 
       <!-- Offer 薪资详情 -->
-      <template v-if="formData.status === '已发Offer'">
-        <a-divider>Offer 薪资详情</a-divider>
+      <template v-if="formData.status === 'offered'">
+        <a-divider>{{ $t('interview.offerSalaryDetails') }}</a-divider>
         <SalaryEditor
           v-model="formData.offeredSalary"
-          :show-actions="false"
-          @change="handleSalaryChange"
+          :show-buttons="false"
+          :show-calculation="true"
         />
       </template>
 
-      <a-form-item label="备注" name="remarks">
+      <a-form-item :label="$t('form.notes')" name="remarks">
         <a-textarea
           v-model:value="formData.remarks"
-          placeholder="记录面试相关的备注信息"
+          :placeholder="$t('interview.remarksPlaceholder')"
           :rows="3"
         />
       </a-form-item>
@@ -101,124 +105,90 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed } from 'vue';
-import { message } from 'ant-design-vue';
+import { ref, reactive, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import type { FormInstance } from 'ant-design-vue';
-import { useInterviewStore } from '@/stores/interview';
-import { SalaryCalculator } from '@/utils/salary';
-import type { InterviewProcess } from '@/types';
 import SalaryEditor from './SalaryEditor.vue';
+import type { InterviewProcess } from '@/types';
 
 interface Props {
-  visible: boolean;
+  open: boolean;
   process: InterviewProcess | null;
 }
 
-interface Emits {
-  (e: 'update:visible', value: boolean): void;
-  (e: 'updated'): void;
-}
-
 const props = defineProps<Props>();
-const emit = defineEmits<Emits>();
 
-const interviewStore = useInterviewStore();
+const emit = defineEmits<{
+  'update:open': [value: boolean];
+  'save': [process: InterviewProcess];
+}>();
+
+const { t } = useI18n();
 const formRef = ref<FormInstance>();
+
+const visible = ref(false);
 
 // 表单数据
 const formData = reactive({
+  id: '',
+  companyId: '',
   position: '',
   city: '',
-  status: '投递中' as any,
-  conclusion: '未开始' as any,
+  status: 'applied' as any,
+  conclusion: 'not_started' as any,
   sourceChannel: '',
+  appliedAt: new Date(),
+  updatedAt: new Date(),
   expectedSalary: {
     min: 0,
     max: 0,
   },
-  offeredSalary: {
-    base: 0,
-    bonus: 0,
-    options: '',
-    total: 0,
-  },
+  offeredSalary: null as any,
   remarks: '',
 });
 
 // 表单验证规则
 const rules = {
   position: [
-    { required: true, message: '请输入岗位名称', trigger: 'blur' },
+    { required: true, message: t('validation.required'), trigger: 'blur' },
   ],
   city: [
-    { required: true, message: '请输入工作城市', trigger: 'blur' },
+    { required: true, message: t('validation.required'), trigger: 'blur' },
   ],
   status: [
-    { required: true, message: '请选择状态', trigger: 'change' },
+    { required: true, message: t('validation.required'), trigger: 'change' },
   ],
   conclusion: [
-    { required: true, message: '请选择结论', trigger: 'change' },
+    { required: true, message: t('validation.required'), trigger: 'change' },
   ],
   sourceChannel: [
-    { required: true, message: '请输入投递渠道', trigger: 'blur' },
+    { required: true, message: t('validation.required'), trigger: 'change' },
   ],
 };
 
-// 监听 visible 变化
-const visible = computed({
-  get: () => props.visible,
-  set: (value) => emit('update:visible', value),
-});
-
-// 监听 process 变化，初始化表单数据
-watch(() => props.process, (process) => {
-  if (process) {
+// 监听props变化
+watch(() => props.open, (newVal) => {
+  visible.value = newVal;
+  if (newVal && props.process) {
     Object.assign(formData, {
-      position: process.position,
-      city: process.city,
-      status: process.status,
-      conclusion: process.conclusion,
-      sourceChannel: process.sourceChannel,
-      expectedSalary: { ...process.expectedSalary },
-      offeredSalary: process.offeredSalary ? { ...process.offeredSalary } : SalaryCalculator.createDefault(),
-      remarks: process.remarks || '',
+      ...props.process,
+      expectedSalary: props.process.expectedSalary || { min: 0, max: 0 },
     });
   }
-}, { immediate: true });
+});
 
-// 处理薪资变化
-const handleSalaryChange = (salary: any) => {
-  formData.offeredSalary = salary;
-};
+watch(visible, (newVal) => {
+  emit('update:open', newVal);
+});
 
 // 提交表单
 const handleSubmit = async () => {
-  if (!formRef.value || !props.process) return;
-
   try {
-    await formRef.value.validate();
-    
-    const updates: Partial<InterviewProcess> = {
-      position: formData.position,
-      city: formData.city,
-      status: formData.status,
-      conclusion: formData.conclusion,
-      sourceChannel: formData.sourceChannel,
-      expectedSalary: { ...formData.expectedSalary },
-      remarks: formData.remarks,
-    };
-
-    // 如果状态是已发Offer，包含薪资信息
-    if (formData.status === '已发Offer') {
-      updates.offeredSalary = { ...formData.offeredSalary };
-    }
-
-    await interviewStore.updateProcess(props.process.id, updates);
-    message.success('更新成功');
-    emit('updated');
+    await formRef.value?.validate();
+    emit('save', { ...formData } as InterviewProcess);
+    visible.value = false;
   } catch (error) {
-    console.error('Failed to update process:', error);
-    message.error('更新失败');
+    console.log('Validation failed:', error);
   }
 };
 

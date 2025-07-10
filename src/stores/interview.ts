@@ -22,17 +22,17 @@ export const useInterviewStore = defineStore('interview', () => {
   });
 
   const getOfferedProcesses = computed(() => {
-    return processes.value.filter((p: InterviewProcess) => p.status === '已发Offer');
+    return processes.value.filter((p: InterviewProcess) => p.status === 'offered');
   });
 
   const getOngoingProcesses = computed(() => {
     return processes.value.filter((p: InterviewProcess) => 
-      ['投递中', '评估中', '面试中'].includes(p.status)
+      ['applied', 'evaluating', 'interviewing'].includes(p.status)
     );
   });
 
   const getPendingRounds = computed(() => {
-    return rounds.value.filter((r: InterviewRound) => r.status === '待安排');
+    return rounds.value.filter((r: InterviewRound) => r.result === 'pending');
   });
 
   // Actions

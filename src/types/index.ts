@@ -11,10 +11,10 @@ export interface Company {
 }
 
 // 面试流程状态
-export type InterviewStatus = '投递中' | '评估中' | '面试中' | '已发Offer' | '已拒绝' | '已结束';
+export type InterviewStatus = 'applied' | 'evaluating' | 'interviewing' | 'offered' | 'rejected' | 'closed';
 
 // 面试结论
-export type InterviewConclusion = '未开始' | '进行中' | '通过' | '未通过' | '待定';
+export type InterviewConclusion = 'not_started' | 'in_progress' | 'passed' | 'failed' | 'pending';
 
 // 薪资信息
 export interface SalaryInfo {

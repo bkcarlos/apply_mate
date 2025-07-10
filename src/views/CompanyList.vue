@@ -3,16 +3,16 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-left">
-        <h2>公司库</h2>
+        <h2>{{ $t('pages.companies.title') }}</h2>
         <a-breadcrumb>
-          <a-breadcrumb-item>首页</a-breadcrumb-item>
-          <a-breadcrumb-item>公司库</a-breadcrumb-item>
+          <a-breadcrumb-item>{{ $t('nav.dashboard') }}</a-breadcrumb-item>
+          <a-breadcrumb-item>{{ $t('pages.companies.title') }}</a-breadcrumb-item>
         </a-breadcrumb>
       </div>
       <div class="header-right">
         <a-button type="primary" @click="showNewCompanyModal">
           <PlusOutlined />
-          新建公司
+          {{ $t('pages.companies.new') }}
         </a-button>
       </div>
     </div>
@@ -20,45 +20,45 @@
     <!-- 筛选条件 -->
     <a-card class="filter-card" size="small">
       <a-form layout="inline" :model="filters">
-        <a-form-item label="行业">
+        <a-form-item :label="$t('form.industry')">
           <a-select
             v-model:value="filters.industry"
-            placeholder="选择行业"
+            :placeholder="$t('filter.selectIndustry')"
             style="width: 150px"
             allow-clear
           >
-            <a-select-option value="">全部</a-select-option>
+            <a-select-option value="">{{ $t('common.all') }}</a-select-option>
             <a-select-option v-for="industry in industries" :key="industry" :value="industry">
-              {{ industry }}
+              {{ $t(`industry.${industry}`) }}
             </a-select-option>
           </a-select>
         </a-form-item>
 
-        <a-form-item label="规模">
+        <a-form-item :label="$t('form.scale')">
           <a-select
             v-model:value="filters.scale"
-            placeholder="选择规模"
+            :placeholder="$t('filter.selectScale')"
             style="width: 150px"
             allow-clear
           >
-            <a-select-option value="">全部</a-select-option>
+            <a-select-option value="">{{ $t('common.all') }}</a-select-option>
             <a-select-option v-for="scale in scales" :key="scale" :value="scale">
-              {{ scale }}
+              {{ $t(`companyScale.${scale}`) }}
             </a-select-option>
           </a-select>
         </a-form-item>
 
-        <a-form-item label="公司名称">
+        <a-form-item :label="$t('form.companyName')">
           <a-input
             v-model:value="filters.name"
-            placeholder="搜索公司名称"
+            :placeholder="$t('filter.searchCompany')"
             style="width: 200px"
             allow-clear
           />
         </a-form-item>
 
         <a-form-item>
-          <a-button @click="resetFilters">重置</a-button>
+          <a-button @click="resetFilters">{{ $t('common.reset') }}</a-button>
         </a-form-item>
       </a-form>
     </a-card>
@@ -94,7 +94,7 @@
           <template #actions>
             <EditOutlined @click.stop="editCompany(company)" />
             <a-popconfirm
-              title="确定要删除这个公司吗？"
+              :title="$t('confirm.deleteCompany')"
               @confirm="deleteCompany(company)"
               @click.stop
             >
@@ -112,16 +112,16 @@
               <div class="company-info">
                 <div v-if="company.industry" class="info-item">
                   <BankOutlined />
-                  <span>{{ company.industry }}</span>
+                  <span>{{ $t(`industry.${company.industry}`) }}</span>
                 </div>
                 <div v-if="company.scale" class="info-item">
                   <TeamOutlined />
-                  <span>{{ company.scale }}</span>
+                  <span>{{ $t(`companyScale.${company.scale}`) }}</span>
                 </div>
                 <div v-if="company.website" class="info-item">
                   <LinkOutlined />
                   <a :href="company.website" target="_blank" @click.stop>
-                    访问官网
+                    {{ $t('company.visitWebsite') }}
                   </a>
                 </div>
                 <div class="info-item">
@@ -133,7 +133,7 @@
               <!-- 面试流程统计 -->
               <div class="interview-stats">
                 <a-tag color="blue">
-                  {{ getInterviewCount(company.id) }} 个面试流程
+                  {{ $t('company.interviewProcessCount', { count: getInterviewCount(company.id) }) }}
                 </a-tag>
               </div>
             </template>
@@ -143,9 +143,9 @@
     </a-row>
 
     <!-- 空状态 -->
-    <a-empty v-if="filteredCompanies.length === 0" description="暂无公司数据">
+    <a-empty v-if="filteredCompanies.length === 0" :description="$t('empty.companies')">
       <a-button type="primary" @click="showNewCompanyModal">
-        立即创建
+        {{ $t('empty.createNow') }}
       </a-button>
     </a-empty>
 
@@ -161,6 +161,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
 import { message } from 'ant-design-vue';
 import {
@@ -179,6 +180,7 @@ import type { Company } from '@/types';
 import CompanyModal from '@/components/CompanyModal.vue';
 
 const router = useRouter();
+const { t } = useI18n();
 const companyStore = useCompanyStore();
 const interviewStore = useInterviewStore();
 
@@ -195,8 +197,40 @@ const filters = ref({
 });
 
 // 行业和规模选项
-const industries = ['互联网', '金融', '电商', '游戏', '教育', '医疗', '汽车', '房地产', '制造业', '咨询', '其他'];
-const scales = ['0-20人', '20-100人', '100-500人', '500-1000人', '1000-5000人', '5000-10000人', '10000人以上'];
+const industries = ['internet', 'finance', 'ecommerce', 'gaming', 'education', 'healthcare', 'automotive', 'realestate', 'manufacturing', 'consulting', 'other'];
+const scales = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge'];
+
+// 辅助函数 - 获取行业键值
+const getIndustryKey = (industry: string) => {
+  const industryMap: Record<string, string> = {
+    '互联网': 'internet',
+    '金融': 'finance',
+    '电商': 'ecommerce',
+    '游戏': 'gaming',
+    '教育': 'education',
+    '医疗': 'healthcare',
+    '汽车': 'automotive',
+    '房地产': 'realestate',
+    '制造业': 'manufacturing',
+    '咨询': 'consulting',
+    '其他': 'other'
+  };
+  return industryMap[industry] || 'other';
+};
+
+// 辅助函数 - 获取规模键值
+const getScaleKey = (scale: string) => {
+  const scaleMap: Record<string, string> = {
+    '0-20人': 'small',
+    '20-100人': 'medium',
+    '100-500人': 'large',
+    '500-1000人': 'xlarge',
+    '1000-5000人': 'xxlarge',
+    '5000-10000人': 'xxxlarge',
+    '10000人以上': 'huge'
+  };
+  return scaleMap[scale] || 'small';
+};
 
 // 计算属性
 const filteredCompanies = computed(() => {
@@ -237,16 +271,16 @@ const editCompany = (company: Company) => {
 const deleteCompany = async (company: Company) => {
   try {
     await companyStore.deleteCompany(company.id);
-    message.success('删除成功');
+    message.success(t('company.deleteSuccess'));
   } catch (error: any) {
-    message.error(error.message || '删除失败');
+    message.error(error.message || t('company.deleteError'));
     console.error('Failed to delete company:', error);
   }
 };
 
 const viewCompanyDetail = (company: Company) => {
   // 可以跳转到公司详情页或显示详情弹窗
-  message.info(`查看 ${company.name} 的详细信息`);
+  message.info(t('company.viewDetail', { name: company.name }));
 };
 
 const resetFilters = () => {
@@ -271,7 +305,7 @@ const loadData = async () => {
       interviewStore.loadProcesses(),
     ]);
   } catch (error) {
-    message.error('加载数据失败');
+    message.error(t('message.error.load'));
     console.error('Failed to load data:', error);
   } finally {
     loading.value = false;

@@ -91,7 +91,7 @@
             type="primary" 
             :icon="h(PlusOutlined)"
             @click="showAddRoundModal = true"
-            :disabled="process.status === 'rejected' || process.status === 'offer'"
+            :disabled="process.status === 'rejected' || process.status === 'offered'"
           >
             {{ $t('pages.interviews.addRound') }}
           </a-button>
@@ -102,7 +102,7 @@
             <a-button 
               type="primary" 
               @click="showAddRoundModal = true"
-              :disabled="process.status === 'rejected' || process.status === 'offer'"
+              :disabled="process.status === 'rejected' || process.status === 'offered'"
             >
               {{ $t('empty.addFirstInterview') }}
             </a-button>
@@ -184,9 +184,9 @@
 
     <!-- 编辑流程弹窗 -->
     <EditProcessModal
-      v-model:visible="showEditModal"
+      v-model:open="showEditModal"
       :process="process"
-      @success="loadProcess"
+      @save="loadProcess"
     />
 
     <!-- 添加轮次弹窗 -->
@@ -411,7 +411,7 @@ const getStatusColor = (status: string) => {
 }
 
 const getStatusText = (status: string) => {
-  return t(`interviewStatus.${status}`)
+  return t(`status.${status}`)
 }
 
 // 轮次相关方法

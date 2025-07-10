@@ -50,12 +50,12 @@
                 allow-clear
               >
                 <a-select-option value="">{{ $t('common.all') }}</a-select-option>
-                <a-select-option value="applied">{{ $t('interviewStatus.applied') }}</a-select-option>
-                <a-select-option value="screening">{{ $t('interviewStatus.screening') }}</a-select-option>
-                <a-select-option value="interviewing">{{ $t('interviewStatus.interviewing') }}</a-select-option>
-                <a-select-option value="offer">{{ $t('interviewStatus.offer') }}</a-select-option>
-                <a-select-option value="rejected">{{ $t('interviewStatus.rejected') }}</a-select-option>
-                <a-select-option value="withdrawn">{{ $t('interviewStatus.withdrawn') }}</a-select-option>
+                <a-select-option value="applied">{{ $t('status.applied') }}</a-select-option>
+                <a-select-option value="evaluating">{{ $t('status.evaluating') }}</a-select-option>
+                <a-select-option value="interviewing">{{ $t('status.interviewing') }}</a-select-option>
+                <a-select-option value="offered">{{ $t('status.offered') }}</a-select-option>
+                <a-select-option value="rejected">{{ $t('status.rejected') }}</a-select-option>
+                <a-select-option value="closed">{{ $t('status.closed') }}</a-select-option>
               </a-select>
             </a-form-item>
 
@@ -75,22 +75,22 @@
         </a-col>
         <a-col :span="6" class="text-right">
           <a-space>
-            <a-tooltip title="刷新数据">
+            <a-tooltip :title="$t('interview.refreshData')">
               <a-button :icon="h(ReloadOutlined)" @click="loadData" :loading="loading" />
             </a-tooltip>
             <a-dropdown>
               <a-button :icon="h(DownOutlined)">
-                批量操作
+                {{ $t('interview.batchActions') }}
               </a-button>
               <template #overlay>
                 <a-menu>
                   <a-menu-item key="export" @click="exportSelectedData">
                     <FileExcelOutlined />
-                    导出数据
+                    {{ $t('interview.exportData') }}
                   </a-menu-item>
                   <a-menu-item key="delete" @click="batchDelete" :disabled="selectedRowKeys.length === 0">
                     <DeleteOutlined />
-                    批量删除
+                    {{ $t('interview.batchDelete') }}
                   </a-menu-item>
                 </a-menu>
               </template>
@@ -131,7 +131,7 @@
                 {{ getCompany(record.companyId)?.name?.charAt(0) || '?' }}
               </a-avatar>
               <span class="company-name">
-                {{ getCompany(record.companyId)?.name || 'Unknown' }}
+                {{ getCompany(record.companyId)?.name || $t('interview.unknownCompany') }}
               </span>
             </div>
           </template>
@@ -144,7 +144,7 @@
           <!-- 结论列 -->
           <template v-else-if="column.key === 'conclusion'">
             <a-tag :color="getConclusionColor(record.conclusion)">
-              {{ record.conclusion }}
+              {{ $t(`conclusion.${record.conclusion}`) }}
             </a-tag>
           </template>
 
@@ -155,10 +155,10 @@
                 {{ getSalaryRangeText(record.offeredSalary) }}
               </div>
               <div class="salary-detail">
-                基础: ¥{{ formatSalary(record.offeredSalary.base) }}/月
+                {{ $t('interview.baseSalaryFormat', { amount: formatSalary(record.offeredSalary.base) }) }}
               </div>
             </div>
-            <span v-else class="no-salary">暂无</span>
+            <span v-else class="no-salary">{{ $t('interview.noSalary') }}</span>
           </template>
 
           <!-- 更新时间列 -->
@@ -170,17 +170,17 @@
           <template v-else-if="column.key === 'actions'">
             <a-space>
               <a-button type="text" size="small" @click="viewDetail(record)">
-                查看
+                {{ $t('interview.view') }}
               </a-button>
               <a-button type="text" size="small" @click="editProcess(record)">
-                编辑
+                {{ $t('interview.edit') }}
               </a-button>
               <a-popconfirm
-                title="确定要删除这个面试流程吗？"
+                :title="$t('interview.confirmDelete')"
                 @confirm="deleteProcess(record)"
               >
                 <a-button type="text" size="small" danger>
-                  删除
+                  {{ $t('interview.delete') }}
                 </a-button>
               </a-popconfirm>
             </a-space>
@@ -191,9 +191,9 @@
 
     <!-- 编辑弹窗 -->
     <EditProcessModal
-      v-model:visible="editModalVisible"
+      v-model:open="editModalVisible"
       :process="editingProcess"
-      @updated="handleProcessUpdated"
+      @save="handleProcessUpdated"
     />
   </div>
 </template>
@@ -249,57 +249,57 @@ const rowSelection = {
 };
 
 // 表格列配置
-const columns = [
+const columns = computed(() => [
   {
-    title: '公司',
+    title: t('form.company'),
     key: 'company',
     width: 150,
   },
   {
-    title: '岗位',
+    title: t('form.position'),
     dataIndex: 'position',
     key: 'position',
     width: 200,
   },
   {
-    title: '城市',
+    title: t('form.city'),
     dataIndex: 'city',
     key: 'city',
     width: 100,
   },
   {
-    title: '状态',
+    title: t('form.status'),
     key: 'status',
     width: 100,
   },
   {
-    title: '结论',
+    title: t('form.conclusion'),
     key: 'conclusion',
     width: 100,
   },
   {
-    title: '渠道',
+    title: t('form.sourceChannel'),
     dataIndex: 'sourceChannel',
     key: 'sourceChannel',
     width: 120,
   },
   {
-    title: '薪资',
+    title: t('form.salary'),
     key: 'salary',
     width: 120,
   },
   {
-    title: '更新时间',
+    title: t('form.updatedAt'),
     key: 'updateTime',
     width: 120,
   },
   {
-    title: '操作',
+    title: t('common.actions'),
     key: 'actions',
     width: 150,
     fixed: 'right' as const,
   },
-];
+]);
 
 // 计算属性
 const companies = computed(() => companyStore.companies);
@@ -326,23 +326,23 @@ const getCompany = (companyId: string) => {
 
 const getStatusColor = (status: string) => {
   const colorMap: Record<string, string> = {
-    '投递中': 'blue',
-    '评估中': 'processing',
-    '面试中': 'orange',
-    '已发Offer': 'success',
-    '已拒绝': 'error',
-    '已结束': 'default',
+    'applied': 'blue',
+    'evaluating': 'processing',
+    'interviewing': 'orange',
+    'offered': 'success',
+    'rejected': 'error',
+    'closed': 'default',
   };
   return colorMap[status] || 'default';
 };
 
 const getConclusionColor = (conclusion: string) => {
   const colorMap: Record<string, string> = {
-    '未开始': 'default',
-    '进行中': 'processing',
-    '通过': 'success',
-    '未通过': 'error',
-    '待定': 'warning',
+    'not_started': 'default',
+    'in_progress': 'processing',
+    'passed': 'success',
+    'failed': 'error',
+    'pending': 'warning',
   };
   return colorMap[conclusion] || 'default';
 };
@@ -376,9 +376,9 @@ const editProcess = (record: InterviewProcess) => {
 const deleteProcess = async (record: InterviewProcess) => {
   try {
     await interviewStore.deleteProcess(record.id);
-    message.success('删除成功');
+    message.success(t('interview.deleteSuccess'));
   } catch (error) {
-    message.error('删除失败');
+    message.error(t('interview.deleteError'));
     console.error('Failed to delete process:', error);
   }
 };

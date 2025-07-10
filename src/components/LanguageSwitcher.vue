@@ -1,70 +1,53 @@
 <template>
-  <a-dropdown placement="bottomRight">
-    <a-button type="text" :icon="h(GlobalOutlined)">
-      {{ currentLanguage.label }}
-    </a-button>
+  <a-dropdown placement="bottomRight" trigger="hover">
+    <a class="language-switcher" @click.prevent>
+      <global-outlined />
+      <span class="current-lang">{{ currentLanguage }}</span>
+      <down-outlined />
+    </a>
     <template #overlay>
-      <a-menu :selected-keys="[locale]" @click="handleLanguageChange">
-        <a-menu-item 
-          v-for="lang in languages" 
-          :key="lang.value"
-          :class="{ 'ant-menu-item-selected': locale === lang.value }"
-        >
-          <span class="language-item">
-            <span class="flag">{{ lang.flag }}</span>
-            <span class="label">{{ lang.label }}</span>
-          </span>
-        </a-menu-item>
+      <a-menu @click="handleMenuClick">
+        <a-menu-item key="zh">{{ $t('language.chinese') }}</a-menu-item>
+        <a-menu-item key="en">{{ $t('language.english') }}</a-menu-item>
       </a-menu>
     </template>
   </a-dropdown>
 </template>
 
 <script setup lang="ts">
-import { computed, h } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { GlobalOutlined } from '@ant-design/icons-vue'
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { GlobalOutlined, DownOutlined } from '@ant-design/icons-vue';
 
-const { locale } = useI18n()
-
-const languages = [
-  {
-    value: 'zh',
-    label: '中文',
-    flag: '🇨🇳'
-  },
-  {
-    value: 'en',
-    label: 'English',
-    flag: '🇺🇸'
-  }
-]
+const { locale, t } = useI18n();
 
 const currentLanguage = computed(() => {
-  return languages.find(lang => lang.value === locale.value) || languages[0]
-})
+  return locale.value === 'zh' ? t('language.chinese') : t('language.english');
+});
 
-const handleLanguageChange = ({ key }: { key: string }) => {
-  locale.value = key
-  localStorage.setItem('locale', key)
-  
-  // 重新加载页面以确保所有组件都使用新语言
-  window.location.reload()
-}
+const handleMenuClick = ({ key }: { key: string }) => {
+  locale.value = key;
+  localStorage.setItem('language', key);
+};
 </script>
 
 <style scoped>
-.language-item {
+.language-switcher {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.3s;
+  /* color: rgba(255, 255, 255, 0.85); */
 }
 
-.flag {
-  font-size: 16px;
+.language-switcher:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  /* color: #fff; */
 }
 
-.label {
+.current-lang {
   font-size: 14px;
 }
 </style>

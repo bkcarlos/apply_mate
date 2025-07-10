@@ -1,130 +1,117 @@
 <template>
   <div class="salary-editor">
-    <a-form layout="vertical" :model="salaryData" @finish="handleSubmit">
-      
+    <a-form :model="salaryData" layout="vertical" @finish="handleSubmit">
       <!-- 基础月薪 -->
-      <a-form-item 
-        label="基础月薪" 
+      <a-form-item
+        :label="$t('form.baseSalary')"
         name="base"
-        :rules="[{ required: true, message: '请输入基础月薪' }]"
+        :rules="[{ required: true, message: $t('validation.required') }]"
       >
         <a-input-number
           v-model:value="salaryData.base"
+          style="width: 100%"
           :min="0"
           :step="1000"
-          :formatter="value => `¥ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-          :parser="value => value.replace(/¥\s?|(,*)/g, '')"
-          placeholder="请输入基础月薪"
-          style="width: 100%"
-          @change="calculateTotals"
+          :formatter="(value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+          :parser="(value: string) => value.replace(/\$\s?|(,*)/g, '')"
+          :placeholder="$t('salaryEditor.baseSalaryPlaceholder')"
         />
       </a-form-item>
 
       <!-- 年终奖月数 -->
-      <a-form-item 
-        label="年终奖月数" 
+      <a-form-item
+        :label="$t('form.yearEndMonths')"
         name="yearEndMonths"
-        :rules="[{ required: true, message: '请输入年终奖月数' }]"
+        :rules="[{ required: true, message: $t('validation.required') }]"
       >
         <a-input-number
           v-model:value="salaryData.yearEndMonths"
+          style="width: 100%"
           :min="0"
           :max="24"
           :step="0.5"
-          :precision="1"
-          placeholder="理想情况下年终奖月数"
-          style="width: 100%"
-          @change="calculateTotals"
+          :placeholder="$t('salaryEditor.yearEndMonthsPlaceholder')"
         />
-        <div class="field-description">
-          公司最高年终奖或理想情况下的月数
+        <div class="form-help">
+          {{ $t('salaryEditor.yearEndMonthsHelp') }}
         </div>
       </a-form-item>
 
       <!-- 过去大多数月数 -->
-      <a-form-item 
-        label="过去大多数月数" 
+      <a-form-item
+        :label="$t('form.typicalMonths')"
         name="typicalMonths"
         :rules="[
-          { required: true, message: '请输入过去大多数月数' },
+          { required: true, message: $t('validation.required') },
           { validator: validateTypicalMonths }
         ]"
       >
         <a-input-number
           v-model:value="salaryData.typicalMonths"
-          :min="0"
-          :max="salaryData.yearEndMonths || 24"
-          :step="0.5"
-          :precision="1"
-          placeholder="过去大多数员工拿到的年终月数"
           style="width: 100%"
-          @change="calculateTotals"
+          :min="0"
+          :max="24"
+          :step="0.5"
+          :placeholder="$t('salaryEditor.typicalMonthsPlaceholder')"
         />
-        <div class="field-description">
-          根据了解到的情况，大多数员工实际拿到的年终月数
+        <div class="form-help">
+          {{ $t('salaryEditor.typicalMonthsHelp') }}
         </div>
       </a-form-item>
 
       <!-- 保底月数 -->
-      <a-form-item 
-        label="保底月数" 
+      <a-form-item
+        :label="$t('form.guaranteedMonths')"
         name="guaranteedMonths"
         :rules="[
-          { required: true, message: '请输入保底月数' },
+          { required: true, message: $t('validation.required') },
           { validator: validateGuaranteedMonths }
         ]"
       >
         <a-input-number
           v-model:value="salaryData.guaranteedMonths"
-          :min="0"
-          :max="salaryData.typicalMonths || 24"
-          :step="0.5"
-          :precision="1"
-          placeholder="公司承诺的保底年终月数"
           style="width: 100%"
-          @change="calculateTotals"
+          :min="0"
+          :max="24"
+          :step="0.5"
+          :placeholder="$t('salaryEditor.guaranteedMonthsPlaceholder')"
         />
-        <div class="field-description">
-          公司明确承诺或合同规定的最低年终月数
+        <div class="form-help">
+          {{ $t('salaryEditor.guaranteedMonthsHelp') }}
         </div>
       </a-form-item>
 
       <!-- 计算结果展示 -->
-      <a-card v-if="showCalculation" title="薪资计算结果" size="small" class="calculation-card">
+      <a-card v-if="showCalculation" :title="$t('salaryEditor.calculationResult')" size="small" class="calculation-card">
         <a-descriptions :column="1" size="small">
-          <a-descriptions-item label="年包最小值 (保底)">
-            <span class="salary-amount min">¥{{ formatSalary(calculatedSalary.minTotal) }}</span>
-            <span class="salary-formula">{{ salaryData.base }} × (12 + {{ salaryData.guaranteedMonths }})</span>
+          <a-descriptions-item :label="$t('salaryEditor.minPackage')">
+            <span class="amount">{{ formatSalary(calculationResult.minimum) }}</span>
           </a-descriptions-item>
-          
-          <a-descriptions-item label="年包典型值 (大多数)">
-            <span class="salary-amount typical">¥{{ formatSalary(calculatedSalary.typicalTotal) }}</span>
-            <span class="salary-formula">{{ salaryData.base }} × (12 + {{ salaryData.typicalMonths }})</span>
+          <a-descriptions-item :label="$t('salaryEditor.typicalPackage')">
+            <span class="amount">{{ formatSalary(calculationResult.typical) }}</span>
           </a-descriptions-item>
-          
-          <a-descriptions-item label="年包最大值 (理想)">
-            <span class="salary-amount max">¥{{ formatSalary(calculatedSalary.maxTotal) }}</span>
-            <span class="salary-formula">{{ salaryData.base }} × (12 + {{ salaryData.yearEndMonths }})</span>
+          <a-descriptions-item :label="$t('salaryEditor.maxPackage')">
+            <span class="amount">{{ formatSalary(calculationResult.maximum) }}</span>
           </a-descriptions-item>
         </a-descriptions>
         
         <div class="salary-range">
-          <strong>薪资范围：</strong>
-          <span class="range-text">{{ getSalaryRangeText() }}</span>
+          <strong>{{ $t('salaryEditor.salaryRange') }}：</strong>
+          {{ getSalaryRangeText() }}
         </div>
       </a-card>
 
       <!-- 操作按钮 -->
-      <a-form-item v-if="showActions" class="action-buttons">
+      <a-form-item v-if="showButtons">
         <a-space>
-          <a-button type="primary" html-type="submit" :loading="loading">
+          <a-button @click="handleReset">
+            {{ $t('common.reset') }}
+          </a-button>
+          <a-button @click="handleCancel">
+            {{ $t('common.cancel') }}
+          </a-button>
+          <a-button type="primary" html-type="submit">
             {{ submitText }}
-          </a-button>
-          <a-button @click="handleReset" v-if="showReset">
-            重置
-          </a-button>
-          <a-button @click="handleCancel" v-if="showCancel">
-            取消
           </a-button>
         </a-space>
       </a-form-item>
@@ -133,208 +120,154 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
-import { SalaryCalculator } from '../utils/salary'
-import type { SalaryInfo } from '../types'
+import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { SalaryCalculator } from '@/utils/salary';
+import type { SalaryInfo } from '@/types';
 
+// Props
 interface Props {
-  modelValue?: SalaryInfo
-  readonly?: boolean
-  showActions?: boolean
-  showReset?: boolean
-  showCancel?: boolean
-  submitText?: string
-  loading?: boolean
-}
-
-interface Emits {
-  (e: 'update:modelValue', value: SalaryInfo): void
-  (e: 'submit', value: SalaryInfo): void
-  (e: 'cancel'): void
-  (e: 'change', value: SalaryInfo): void
+  modelValue?: SalaryInfo | null;
+  showButtons?: boolean;
+  showCalculation?: boolean;
+  submitText?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  readonly: false,
-  showActions: true,
-  showReset: true,
-  showCancel: false,
-  submitText: '确定',
-  loading: false
-})
+  modelValue: null,
+  showButtons: true,
+  showCalculation: true,
+  submitText: '',
+});
 
-const emit = defineEmits<Emits>()
+// Emits
+const emit = defineEmits<{
+  'update:modelValue': [value: SalaryInfo];
+  'submit': [value: SalaryInfo];
+  'cancel': [];
+  'reset': [];
+}>();
+
+const { t } = useI18n();
+
+// 动态计算 submitText
+const submitText = computed(() => {
+  return props.submitText || t('common.confirm');
+});
 
 // 薪资数据
-const salaryData = ref<SalaryInfo>({
+const salaryData = reactive<SalaryInfo>({
   base: 0,
-  yearEndMonths: 3,
-  guaranteedMonths: 1,
-  typicalMonths: 2
-})
+  yearEndMonths: 0,
+  guaranteedMonths: 0,
+  typicalMonths: 0,
+});
 
 // 计算结果
-const calculatedSalary = ref({
-  minTotal: 0,
-  typicalTotal: 0,
-  maxTotal: 0
-})
+const calculationResult = computed(() => {
+  const calc = SalaryCalculator.getFullCalculation(salaryData);
+  return {
+    minimum: calc.minTotal,
+    typical: calc.typicalTotal,
+    maximum: calc.maxTotal,
+  };
+});
 
-// 是否显示计算结果
-const showCalculation = computed(() => {
-  return salaryData.value.base > 0
-})
-
-// 初始化数据
-onMounted(() => {
-  if (props.modelValue) {
-    salaryData.value = { ...props.modelValue }
-    calculateTotals()
-  }
-})
-
-// 监听外部数据变化
+// 监听modelValue变化
 watch(() => props.modelValue, (newValue) => {
   if (newValue) {
-    salaryData.value = { ...newValue }
-    calculateTotals()
+    Object.assign(salaryData, newValue);
   }
-}, { deep: true })
+}, { immediate: true });
 
 // 计算年包
-const calculateTotals = () => {
-  if (salaryData.value.base > 0) {
-    calculatedSalary.value = {
-      minTotal: SalaryCalculator.calculateMinTotal(salaryData.value),
-      typicalTotal: SalaryCalculator.calculateTypicalTotal(salaryData.value),
-      maxTotal: SalaryCalculator.calculateMaxTotal(salaryData.value)
-    }
-    
-    // 发出变化事件
-    emit('update:modelValue', salaryData.value)
-    emit('change', salaryData.value)
-  }
-}
+watch(salaryData, () => {
+  emit('update:modelValue', { ...salaryData });
+}, { deep: true });
+
+// 发出变化事件
+const emitChange = () => {
+  emit('update:modelValue', { ...salaryData });
+};
 
 // 格式化薪资
 const formatSalary = (amount: number) => {
-  return SalaryCalculator.formatSalary(amount)
-}
+  return SalaryCalculator.formatSalary(amount);
+};
 
 // 获取薪资范围文本
 const getSalaryRangeText = () => {
-  return SalaryCalculator.getSalaryRangeText(salaryData.value)
-}
+  return SalaryCalculator.getSalaryRangeText(salaryData);
+};
 
 // 验证函数
-const validateTypicalMonths = async (_rule: any, value: number) => {
-  if (value < salaryData.value.guaranteedMonths) {
-    return Promise.reject('大多数月数不能小于保底月数')
+const validateTypicalMonths = (rule: any, value: number) => {
+  if (value < salaryData.guaranteedMonths) {
+    return Promise.reject(t('salaryEditor.typicalLessThanGuaranteed'));
   }
-  if (value > salaryData.value.yearEndMonths) {
-    return Promise.reject('大多数月数不能大于年终奖月数')
+  if (value > salaryData.yearEndMonths) {
+    return Promise.reject(t('salaryEditor.typicalMoreThanYearEnd'));
   }
-  return Promise.resolve()
-}
+  return Promise.resolve();
+};
 
-const validateGuaranteedMonths = async (_rule: any, value: number) => {
-  if (value > salaryData.value.typicalMonths) {
-    return Promise.reject('保底月数不能大于大多数月数')
+const validateGuaranteedMonths = (rule: any, value: number) => {
+  if (value > salaryData.typicalMonths) {
+    return Promise.reject(t('salaryEditor.guaranteedMoreThanTypical'));
   }
-  return Promise.resolve()
-}
+  return Promise.resolve();
+};
 
 // 事件处理
 const handleSubmit = () => {
-  const validation = SalaryCalculator.validate(salaryData.value)
-  if (validation.valid) {
-    emit('submit', salaryData.value)
-  }
-}
+  emit('submit', { ...salaryData });
+};
 
 const handleReset = () => {
-  salaryData.value = SalaryCalculator.createDefault()
-  calculateTotals()
-}
+  Object.assign(salaryData, {
+    base: 0,
+    yearEndMonths: 0,
+    guaranteedMonths: 0,
+    typicalMonths: 0,
+  });
+  emit('reset');
+};
 
 const handleCancel = () => {
-  emit('cancel')
-}
+  emit('cancel');
+};
 
 // 监听数据变化，自动计算
-watch(salaryData, () => {
-  calculateTotals()
-}, { deep: true })
+watch(salaryData, emitChange, { deep: true });
 </script>
 
 <style scoped>
 .salary-editor {
-  max-width: 500px;
-}
-
-.field-description {
-  font-size: 12px;
-  color: #666;
-  margin-top: 4px;
-  line-height: 1.4;
+  width: 100%;
 }
 
 .calculation-card {
-  margin: 16px 0;
+  margin-top: 16px;
   background: #f8f9fa;
 }
 
-.salary-amount {
+.amount {
   font-weight: 600;
-  font-size: 16px;
-  margin-right: 12px;
-}
-
-.salary-amount.min {
-  color: #fa8c16;
-}
-
-.salary-amount.typical {
-  color: #1890ff;
-}
-
-.salary-amount.max {
   color: #52c41a;
-}
-
-.salary-formula {
-  font-size: 12px;
-  color: #999;
-  background: #f0f0f0;
-  padding: 2px 6px;
-  border-radius: 4px;
 }
 
 .salary-range {
   margin-top: 12px;
-  padding: 8px 12px;
+  padding: 8px;
   background: #e6f7ff;
-  border-left: 3px solid #1890ff;
   border-radius: 4px;
+  font-size: 14px;
 }
 
-.range-text {
-  font-family: monospace;
-  font-weight: 600;
-  color: #1890ff;
-}
-
-.action-buttons {
-  margin-top: 24px;
-  text-align: center;
-}
-
-:deep(.ant-descriptions-item-label) {
-  color: #666;
-  font-weight: 500;
-}
-
-:deep(.ant-input-number) {
-  width: 100%;
+.form-help {
+  margin-top: 4px;
+  color: #999;
+  font-size: 12px;
+  line-height: 1.4;
 }
 </style>

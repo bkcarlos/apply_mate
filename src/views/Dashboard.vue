@@ -5,7 +5,7 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card>
           <a-statistic
-            title="进行中的面试"
+            :title="$t('pages.dashboard.activeInterviews')"
             :value="dashboardStats.ongoingInterviews"
             :value-style="{ color: '#1890ff' }"
           >
@@ -19,7 +19,7 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card>
           <a-statistic
-            title="待安排的面试"
+            :title="$t('pages.dashboard.pendingInterviews')"
             :value="dashboardStats.pendingInterviews"
             :value-style="{ color: '#fa8c16' }"
           >
@@ -33,7 +33,7 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card>
           <a-statistic
-            title="已收到 Offer"
+            :title="$t('pages.dashboard.receivedOffers')"
             :value="dashboardStats.receivedOffers"
             :value-style="{ color: '#52c41a' }"
           >
@@ -47,7 +47,7 @@
       <a-col :xs="24" :sm="12" :lg="6">
         <a-card>
           <a-statistic
-            title="总投递数"
+            :title="$t('pages.dashboard.totalApplications')"
             :value="dashboardStats.totalApplications"
             :value-style="{ color: '#722ed1' }"
           >
@@ -62,48 +62,29 @@
     <a-row :gutter="[16, 16]" style="margin-top: 16px;">
       <!-- 近期面试 -->
       <a-col :xs="24" :lg="12">
-        <a-card title="近期面试安排" size="small">
+        <a-card :title="$t('pages.dashboard.recentInterviews')" size="small">
           <template #extra>
             <a-button type="text" size="small" @click="goToInterviews">
-              查看全部
+                              {{ $t('pages.dashboard.viewAll') }}
             </a-button>
           </template>
           
-          <a-list
-            :data-source="upcomingInterviews"
-            :locale="{ emptyText: '暂无安排的面试' }"
+          <a-table
+            :columns="interviewColumns"
+            :data-source="recentInterviews"
+            :pagination="false"
             size="small"
-          >
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-list-item-meta>
-                  <template #title>
-                    <span>{{ item.roundName }} - {{ item.companyName }}</span>
-                  </template>
-                  <template #description>
-                    <a-space>
-                      <CalendarOutlined />
-                      {{ formatDate(item.scheduledTime) }}
-                    </a-space>
-                  </template>
-                </a-list-item-meta>
-                <template #actions>
-                  <a-tag :color="getStatusColor(item.status)">
-                    {{ item.status }}
-                  </a-tag>
-                </template>
-              </a-list-item>
-            </template>
-          </a-list>
+            :locale="{ emptyText: $t('pages.dashboard.noScheduledInterviews') }"
+          />
         </a-card>
       </a-col>
 
       <!-- Offer 薪资对比 -->
       <a-col :xs="24" :lg="12">
-        <a-card title="Offer 薪资对比" size="small">
+        <a-card :title="$t('pages.dashboard.offerSalaryComparison')" size="small">
           <template #extra>
             <a-button type="text" size="small" @click="goToAnalysis">
-              详细分析
+              {{ $t('pages.dashboard.detailedAnalysis') }}
             </a-button>
           </template>
           
@@ -115,21 +96,16 @@
     <!-- 快速操作 -->
     <a-row style="margin-top: 16px;">
       <a-col :span="24">
-        <a-card title="快速操作" size="small">
+        <a-card :title="$t('pages.dashboard.quickActions')" size="small">
           <a-space wrap>
-            <a-button type="primary" @click="goToNewInterview">
-              <PlusOutlined />
-              新建面试流程
+            <a-button block type="primary" @click="goToNewInterview">
+              {{ $t('pages.dashboard.newInterviewProcess') }}
             </a-button>
-            
-            <a-button @click="goToCompanies">
-              <BankOutlined />
-              管理公司库
+            <a-button block @click="goToCompanies">
+              {{ $t('pages.dashboard.manageCompanies') }}
             </a-button>
-            
-            <a-button @click="goToAnalysis">
-              <BarChartOutlined />
-              查看统计
+            <a-button block @click="goToAnalysis">
+              {{ $t('pages.dashboard.viewStatistics') }}
             </a-button>
           </a-space>
         </a-card>
@@ -139,8 +115,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 import {
@@ -159,6 +136,7 @@ import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
 
 const router = useRouter();
+const { t, locale } = useI18n();
 const analyticsStore = useAnalyticsStore();
 const interviewStore = useInterviewStore();
 const companyStore = useCompanyStore();
@@ -168,29 +146,48 @@ const salaryChartRef = ref<HTMLElement>();
 // 仪表盘统计数据
 const dashboardStats = computed(() => analyticsStore.dashboardStats);
 
+// 表格列定义
+const interviewColumns = computed(() => [
+  {
+    title: t('form.company'),
+    dataIndex: 'companyName',
+    key: 'companyName',
+  },
+  {
+    title: t('form.round'),
+    dataIndex: 'round',
+    key: 'round',
+  },
+  {
+    title: t('form.scheduledAt'),
+    dataIndex: 'scheduledAt',
+    key: 'scheduledAt',
+    customRender: ({ record }: any) => formatDate(record.scheduledAt),
+  },
+]);
+
 // 近期面试（7天内）
-const upcomingInterviews = computed(() => {
-  const sevenDaysLater = dayjs().add(7, 'day');
+const recentInterviews = computed(() => {
+  const now = new Date();
+  const oneWeek = 7 * 24 * 60 * 60 * 1000;
   
-  return interviewStore.rounds
-    .filter(round => {
-      return round.scheduledTime && 
-             round.status === '已安排' &&
-             dayjs(round.scheduledTime).isBefore(sevenDaysLater);
-    })
+  const allRoundsWithCompany = interviewStore.rounds
+    .filter(round => round.scheduledAt)
     .map(round => {
       const process = interviewStore.getProcessById(round.processId);
       const company = process ? companyStore.getCompanyById(process.companyId) : null;
-      
       return {
         ...round,
         companyName: company?.name || 'Unknown',
       };
-    })
-    .sort((a, b) => {
-      if (!a.scheduledTime || !b.scheduledTime) return 0;
-      return new Date(a.scheduledTime).getTime() - new Date(b.scheduledTime).getTime();
-    })
+    });
+  
+  return allRoundsWithCompany
+    .filter(round => 
+      round.scheduledAt &&
+      Math.abs(now.getTime() - round.scheduledAt.getTime()) <= oneWeek
+    )
+    .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
     .slice(0, 5); // 只显示前5个
 });
 
@@ -202,13 +199,13 @@ const formatDate = (date: Date | undefined) => {
 
 // 获取状态颜色
 const getStatusColor = (status: string) => {
-  const colorMap: Record<string, string> = {
-    '待安排': 'orange',
-    '已安排': 'blue',
-    '已完成': 'green',
-    '已取消': 'red',
+  const colors: Record<string, string> = {
+    [t('pages.dashboard.pendingStatus')]: 'orange',
+    [t('pages.dashboard.scheduledStatus')]: 'blue', 
+    [t('pages.dashboard.completedStatus')]: 'green',
+    [t('pages.dashboard.cancelledStatus')]: 'red',
   };
-  return colorMap[status] || 'default';
+  return colors[status] || 'default';
 };
 
 // 页面跳转
@@ -218,7 +215,7 @@ const goToCompanies = () => router.push('/companies');
 const goToAnalysis = () => router.push('/analysis');
 
 // 初始化薪资对比图表
-const initSalaryChart = async () => {
+const initSalaryChart = () => {
   if (!salaryChartRef.value) return;
   
   const chart = echarts.init(salaryChartRef.value);
@@ -239,16 +236,16 @@ const initSalaryChart = async () => {
     },
     yAxis: {
       type: 'value',
-      name: '年薪 (k)',
+      name: t('pages.dashboard.annualSalary'),
       axisLabel: {
         formatter: '¥{value}k'
       }
     },
     series: [
       {
-        name: '年度总包',
+        name: t('pages.dashboard.annualPackage'),
         type: 'bar',
-        data: salaryData.map(item => Math.round(item.salary.total / 1000)),
+        data: salaryData.map(item => Math.round((item.salary.base * 12 + item.salary.base * (item.salary.yearEndMonths || 0)) / 1000)),
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: '#83bff6' },
@@ -290,6 +287,13 @@ const loadData = async () => {
     console.error('Failed to load dashboard data:', error);
   }
 };
+
+// 监听语言变化，重新初始化图表
+watch(locale, () => {
+  nextTick(() => {
+    initSalaryChart();
+  });
+});
 
 onMounted(() => {
   loadData();

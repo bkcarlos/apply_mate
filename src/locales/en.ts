@@ -340,8 +340,8 @@ export default {
   },
 
   conclusion: {
-    notStarted: 'Not Started',
-    inProgress: 'In Progress',
+    not_started: 'Not Started',
+    in_progress: 'In Progress',
     passed: 'Passed',
     failed: 'Failed',
     pending: 'Pending'

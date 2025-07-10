@@ -88,8 +88,8 @@
           <a-col :span="8">
             <a-form-item :label="$t('form.conclusion')" name="conclusion">
               <a-select v-model:value="formData.conclusion" :placeholder="$t('interview.conclusionPlaceholder')">
-                <a-select-option value="not_started">{{ $t('conclusion.notStarted') }}</a-select-option>
-                <a-select-option value="in_progress">{{ $t('conclusion.inProgress') }}</a-select-option>
+                <a-select-option value="not_started">{{ $t('conclusion.not_started') }}</a-select-option>
+                <a-select-option value="in_progress">{{ $t('conclusion.in_progress') }}</a-select-option>
                 <a-select-option value="passed">{{ $t('conclusion.passed') }}</a-select-option>
                 <a-select-option value="failed">{{ $t('conclusion.failed') }}</a-select-option>
                 <a-select-option value="pending">{{ $t('conclusion.pending') }}</a-select-option>

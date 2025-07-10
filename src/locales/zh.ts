@@ -346,8 +346,8 @@ export default {
   },
 
   conclusion: {
-    notStarted: '未开始',
-    inProgress: '进行中',
+    not_started: '未开始',
+    in_progress: '进行中',
     passed: '通过',
     failed: '未通过',
     pending: '待定'

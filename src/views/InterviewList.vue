@@ -3,16 +3,16 @@
     <!-- 页面头部 -->
     <div class="page-header">
       <div class="header-left">
-        <h2>面试管理</h2>
+        <h2>{{ $t('pages.interviews.title') }}</h2>
         <a-breadcrumb>
-          <a-breadcrumb-item>首页</a-breadcrumb-item>
-          <a-breadcrumb-item>面试管理</a-breadcrumb-item>
+          <a-breadcrumb-item>{{ $t('nav.dashboard') }}</a-breadcrumb-item>
+          <a-breadcrumb-item>{{ $t('nav.interviews') }}</a-breadcrumb-item>
         </a-breadcrumb>
       </div>
       <div class="header-right">
         <a-button type="primary" @click="goToNewInterview">
           <PlusOutlined />
-          新建面试流程
+          {{ $t('pages.interviews.new') }}
         </a-button>
       </div>
     </div>
@@ -22,16 +22,16 @@
       <a-row :gutter="16">
         <a-col :span="18">
           <a-form layout="inline" :model="filters">
-            <a-form-item label="公司">
+            <a-form-item :label="$t('form.company')">
               <a-select
                 v-model:value="filters.companyId"
-                placeholder="选择公司"
+                :placeholder="$t('form.company')"
                 style="width: 150px"
                 allow-clear
                 show-search
                 :filter-option="filterCompanyOption"
               >
-                <a-select-option value="">全部</a-select-option>
+                <a-select-option value="">{{ $t('common.all') }}</a-select-option>
                 <a-select-option
                   v-for="company in companies"
                   :key="company.id"
@@ -42,34 +42,34 @@
               </a-select>
             </a-form-item>
 
-            <a-form-item label="状态">
+            <a-form-item :label="$t('form.status')">
               <a-select
                 v-model:value="filters.status"
-                placeholder="选择状态"
+                :placeholder="$t('form.status')"
                 style="width: 120px"
                 allow-clear
               >
-                <a-select-option value="">全部</a-select-option>
-                <a-select-option value="applied">已投递</a-select-option>
-                <a-select-option value="screening">筛选中</a-select-option>
-                <a-select-option value="interviewing">面试中</a-select-option>
-                <a-select-option value="offer">已录用</a-select-option>
-                <a-select-option value="rejected">已拒绝</a-select-option>
-                <a-select-option value="withdrawn">已撤回</a-select-option>
+                <a-select-option value="">{{ $t('common.all') }}</a-select-option>
+                <a-select-option value="applied">{{ $t('interviewStatus.applied') }}</a-select-option>
+                <a-select-option value="screening">{{ $t('interviewStatus.screening') }}</a-select-option>
+                <a-select-option value="interviewing">{{ $t('interviewStatus.interviewing') }}</a-select-option>
+                <a-select-option value="offer">{{ $t('interviewStatus.offer') }}</a-select-option>
+                <a-select-option value="rejected">{{ $t('interviewStatus.rejected') }}</a-select-option>
+                <a-select-option value="withdrawn">{{ $t('interviewStatus.withdrawn') }}</a-select-option>
               </a-select>
             </a-form-item>
 
-            <a-form-item label="岗位">
+            <a-form-item :label="$t('form.position')">
               <a-input
                 v-model:value="filters.position"
-                placeholder="搜索岗位"
+                :placeholder="$t('form.position')"
                 style="width: 150px"
                 allow-clear
               />
             </a-form-item>
 
             <a-form-item>
-              <a-button @click="resetFilters">重置</a-button>
+              <a-button @click="resetFilters">{{ $t('common.reset') }}</a-button>
             </a-form-item>
           </a-form>
         </a-col>
@@ -109,7 +109,7 @@
         :pagination="{
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total) => `共 ${total} 条记录`,
+          showTotal: (total: number) => `${t('stats.totalRecords', { total })}`,
           pageSize: pageSize,
           current: currentPage,
           total: filteredProcesses.length
@@ -213,6 +213,7 @@ import { message, Modal } from 'ant-design-vue';
 
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
+import { useI18n } from 'vue-i18n';
 import { SalaryCalculator } from '@/utils/salary';
 import type { InterviewProcess } from '@/types';
 import EditProcessModal from '@/components/EditProcessModal.vue';
@@ -220,6 +221,7 @@ import StatusTag from '@/components/StatusTag.vue';
 import DateDisplay from '@/components/DateDisplay.vue';
 
 const router = useRouter();
+const { t } = useI18n();
 const interviewStore = useInterviewStore();
 const companyStore = useCompanyStore();
 
@@ -424,7 +426,7 @@ const exportSelectedData = () => {
     状态: process.status,
     投递时间: dayjs(process.appliedAt).format('YYYY-MM-DD'),
     更新时间: dayjs(process.updatedAt).format('YYYY-MM-DD'),
-    薪资: process.offeredSalary ? `${process.offeredSalary.total}元` : '暂无',
+    薪资: process.offeredSalary ? getSalaryRangeText(process.offeredSalary) : '暂无',
     备注: process.notes || ''
   }));
   

@@ -1,7 +1,7 @@
 <template>
   <a-modal
     v-model:open="visible"
-    :title="isEdit ? '编辑公司' : '新建公司'"
+    :title="isEdit ? $t('pages.companies.edit') : $t('pages.companies.new')"
     width="600px"
     @ok="handleSubmit"
     @cancel="handleCancel"
@@ -12,49 +12,37 @@
       :rules="rules"
       layout="vertical"
     >
-      <a-form-item label="公司名称" name="name">
-        <a-input v-model:value="formData.name" placeholder="请输入公司名称" />
+      <a-form-item :label="$t('form.companyName')" name="name">
+        <a-input v-model:value="formData.name" :placeholder="$t('form.companyName')" />
       </a-form-item>
 
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-item label="所属行业" name="industry">
-            <a-select v-model:value="formData.industry" placeholder="选择行业" allow-clear>
-              <a-select-option value="互联网">互联网</a-select-option>
-              <a-select-option value="金融">金融</a-select-option>
-              <a-select-option value="电商">电商</a-select-option>
-              <a-select-option value="游戏">游戏</a-select-option>
-              <a-select-option value="教育">教育</a-select-option>
-              <a-select-option value="医疗">医疗</a-select-option>
-              <a-select-option value="汽车">汽车</a-select-option>
-              <a-select-option value="房地产">房地产</a-select-option>
-              <a-select-option value="制造业">制造业</a-select-option>
-              <a-select-option value="咨询">咨询</a-select-option>
-              <a-select-option value="其他">其他</a-select-option>
+          <a-form-item :label="$t('form.industry')" name="industry">
+            <a-select v-model:value="formData.industry" :placeholder="$t('form.industry')" allow-clear>
+              <a-select-option v-for="industry in industries" :key="industry" :value="industry">
+                {{ $t(`industry.${industry}`) }}
+              </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="公司规模" name="scale">
-            <a-select v-model:value="formData.scale" placeholder="选择规模" allow-clear>
-              <a-select-option value="0-20人">0-20人</a-select-option>
-              <a-select-option value="20-100人">20-100人</a-select-option>
-              <a-select-option value="100-500人">100-500人</a-select-option>
-              <a-select-option value="500-1000人">500-1000人</a-select-option>
-              <a-select-option value="1000-5000人">1000-5000人</a-select-option>
-              <a-select-option value="5000-10000人">5000-10000人</a-select-option>
-              <a-select-option value="10000人以上">10000人以上</a-select-option>
+          <a-form-item :label="$t('form.scale')" name="scale">
+            <a-select v-model:value="formData.scale" :placeholder="$t('form.scale')" allow-clear>
+              <a-select-option v-for="scale in scales" :key="scale" :value="scale">
+                {{ $t(`companyScale.${scale}`) }}
+              </a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
       </a-row>
 
-      <a-form-item label="公司官网" name="website">
+      <a-form-item :label="$t('form.website')" name="website">
         <a-input v-model:value="formData.website" placeholder="https://example.com" />
       </a-form-item>
 
-      <a-form-item label="公司Logo" name="logoUrl">
-        <a-input v-model:value="formData.logoUrl" placeholder="Logo图片URL" />
+      <a-form-item :label="$t('form.companyLogo')" name="logoUrl">
+        <a-input v-model:value="formData.logoUrl" :placeholder="$t('form.companyLogo')" />
         <div v-if="formData.logoUrl" class="logo-preview">
           <a-avatar :src="formData.logoUrl" :size="48" />
         </div>
@@ -65,6 +53,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { message } from 'ant-design-vue';
 import type { FormInstance } from 'ant-design-vue';
 import { useCompanyStore } from '@/stores/company';
@@ -83,8 +72,21 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+const { t } = useI18n();
 const companyStore = useCompanyStore();
 const formRef = ref<FormInstance>();
+
+// 行业选项
+const industries = [
+  'internet', 'finance', 'ecommerce', 'gaming', 'education', 
+  'healthcare', 'automotive', 'realestate', 'manufacturing', 
+  'consulting', 'other'
+];
+
+// 公司规模选项
+const scales = [
+  'small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge'
+];
 
 // 表单数据
 const formData = reactive({
@@ -101,12 +103,12 @@ const isEdit = computed(() => !!props.company);
 // 表单验证规则
 const rules = {
   name: [
-    { required: true, message: '请输入公司名称', trigger: 'blur' },
+    { required: true, message: t('validation.required'), trigger: 'blur' },
   ],
   website: [
     { 
       pattern: /^https?:\/\/.+/,
-      message: '请输入有效的网址，如 https://example.com',
+      message: t('validation.url'),
       trigger: 'blur'
     },
   ],
@@ -174,17 +176,17 @@ const handleSubmit = async () => {
     if (isEdit.value && props.company) {
       // 更新公司
       await companyStore.updateCompany(props.company.id, companyData);
-      message.success('公司信息更新成功');
+      message.success(t('message.success.update'));
     } else {
       // 创建公司
       await companyStore.addCompany(companyData);
-      message.success('公司创建成功');
+      message.success(t('message.success.add'));
     }
 
     emit('saved');
   } catch (error) {
     console.error('Failed to save company:', error);
-    message.error(isEdit.value ? '更新失败' : '创建失败');
+    message.error(isEdit.value ? t('message.error.update') : t('message.error.add'));
   }
 };
 

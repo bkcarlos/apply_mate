@@ -1,5 +1,5 @@
 <template>
-  <a-config-provider :locale="locale">
+  <a-config-provider :locale="antdLocale">
     <a-layout class="app-layout">
       <!-- 侧边栏 -->
       <a-layout-sider
@@ -21,27 +21,27 @@
         >
           <a-menu-item key="/dashboard">
             <DashboardOutlined />
-            <span>仪表盘</span>
+            <span>{{ $t('nav.dashboard') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/interviews">
             <TeamOutlined />
-            <span>面试管理</span>
+            <span>{{ $t('nav.interviews') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/companies">
             <BankOutlined />
-            <span>公司库</span>
+            <span>{{ $t('nav.companies') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/analysis">
             <BarChartOutlined />
-            <span>统计分析</span>
+            <span>{{ $t('nav.analysis') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/settings">
             <SettingOutlined />
-            <span>设置</span>
+            <span>{{ $t('nav.settings') }}</span>
           </a-menu-item>
         </a-menu>
       </a-layout-sider>
@@ -61,6 +61,7 @@
           />
           
           <div class="header-actions">
+            <LanguageSwitcher />
             <a-button type="text" @click="handleRefresh">
               <ReloadOutlined />
             </a-button>
@@ -81,7 +82,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import zhCN from 'ant-design-vue/es/locale/zh_CN';
+import enUS from 'ant-design-vue/es/locale/en_US';
 import {
   DashboardOutlined,
   TeamOutlined,
@@ -92,13 +95,19 @@ import {
   MenuFoldOutlined,
   ReloadOutlined,
 } from '@ant-design/icons-vue';
+import LanguageSwitcher from './components/LanguageSwitcher.vue';
 
 const route = useRoute();
 const router = useRouter();
+const { locale } = useI18n();
+
+// Ant Design Vue locale
+const antdLocale = computed(() => {
+  return locale.value === 'en' ? enUS : zhCN;
+});
 
 // 侧边栏状态
 const collapsed = ref(false);
-const locale = zhCN;
 
 // 当前选中的菜单项
 const selectedKeys = ref<string[]>([route.path]);

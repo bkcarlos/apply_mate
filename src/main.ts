@@ -5,6 +5,7 @@ import 'ant-design-vue/dist/reset.css';
 
 import App from './App.vue';
 import router from './router';
+import i18n from './locales';
 import { initDatabase } from './services/database';
 
 // 初始化应用
@@ -13,6 +14,7 @@ const pinia = createPinia();
 
 app.use(pinia);
 app.use(router);
+app.use(i18n);
 app.use(Antd);
 
 // 初始化数据库后挂载应用

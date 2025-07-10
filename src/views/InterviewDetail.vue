@@ -7,10 +7,10 @@
         @click="$router.back()"
         class="back-btn"
       >
-        返回
+        {{ $t('common.back') }}
       </a-button>
       <div class="header-content">
-        <h2>{{ process?.position || '加载中...' }}</h2>
+        <h2>{{ process?.position || $t('common.loading') }}</h2>
         <a-tag 
           v-if="process" 
           :color="getStatusColor(process.status)"
@@ -25,19 +25,19 @@
           @click="showEditModal = true"
           :disabled="!process"
         >
-          编辑
+          {{ $t('common.edit') }}
         </a-button>
         <a-dropdown>
-          <a-button :icon="h(MoreOutlined)">更多</a-button>
+          <a-button :icon="h(MoreOutlined)">{{ $t('common.more') }}</a-button>
           <template #overlay>
             <a-menu>
               <a-menu-item key="export" @click="exportData">
                 <FileOutlined />
-                导出数据
+                {{ $t('common.export') }}
               </a-menu-item>
               <a-menu-item key="delete" @click="showDeleteConfirm" danger>
                 <DeleteOutlined />
-                删除流程
+                {{ $t('common.delete') }}
               </a-menu-item>
             </a-menu>
           </template>
@@ -51,12 +51,12 @@
 
     <div v-else-if="process" class="detail-content">
       <!-- 基本信息 -->
-      <a-card title="基本信息" class="info-card">
+      <a-card :title="$t('pages.interviews.basicInfo')" class="info-card">
         <a-descriptions :column="2" bordered>
-          <a-descriptions-item label="职位">
+          <a-descriptions-item :label="$t('form.position')">
             {{ process.position }}
           </a-descriptions-item>
-          <a-descriptions-item label="公司">
+          <a-descriptions-item :label="$t('form.company')">
             <a-button 
               type="link" 
               @click="viewCompany" 
@@ -67,25 +67,25 @@
             </a-button>
             <span v-else>{{ process.companyId }}</span>
           </a-descriptions-item>
-          <a-descriptions-item label="投递时间">
+          <a-descriptions-item :label="$t('form.appliedAt')">
             {{ dayjs(process.appliedAt).format('YYYY-MM-DD') }}
           </a-descriptions-item>
-          <a-descriptions-item label="更新时间">
+          <a-descriptions-item :label="$t('form.updatedAt')">
             {{ dayjs(process.updatedAt).format('YYYY-MM-DD') }}
           </a-descriptions-item>
-          <a-descriptions-item label="状态" :span="2">
+          <a-descriptions-item :label="$t('form.status')" :span="2">
             <a-tag :color="getStatusColor(process.status)">
               {{ getStatusText(process.status) }}
             </a-tag>
           </a-descriptions-item>
-          <a-descriptions-item label="备注" :span="2" v-if="process.notes">
+          <a-descriptions-item :label="$t('form.notes')" :span="2" v-if="process.notes">
             <div class="notes-content">{{ process.notes }}</div>
           </a-descriptions-item>
         </a-descriptions>
       </a-card>
 
       <!-- 面试轮次 -->
-      <a-card title="面试轮次" class="rounds-card">
+      <a-card :title="$t('pages.interviews.rounds')" class="rounds-card">
         <template #extra>
           <a-button 
             type="primary" 
@@ -93,18 +93,18 @@
             @click="showAddRoundModal = true"
             :disabled="process.status === 'rejected' || process.status === 'offer'"
           >
-            添加轮次
+            {{ $t('pages.interviews.addRound') }}
           </a-button>
         </template>
 
         <div v-if="rounds.length === 0" class="empty-rounds">
-          <a-empty description="暂无面试轮次">
+          <a-empty :description="$t('empty.rounds')">
             <a-button 
               type="primary" 
               @click="showAddRoundModal = true"
               :disabled="process.status === 'rejected' || process.status === 'offer'"
             >
-              添加首轮面试
+              {{ $t('empty.addFirstInterview') }}
             </a-button>
           </a-empty>
         </div>
@@ -123,7 +123,7 @@
             </template>
             <div class="round-item">
               <div class="round-header">
-                <h4>{{ round.type }} - 第{{ round.round }}轮</h4>
+                <h4>{{ $t(`roundType.${round.type}`) }} - {{ $t('pages.interviews.roundNumber', { number: round.round }) }}</h4>
                 <div class="round-actions">
                   <a-button 
                     size="small" 
@@ -131,10 +131,10 @@
                     :icon="h(EditOutlined)"
                     @click="editRound(round)"
                   >
-                    编辑
+                    {{ $t('common.edit') }}
                   </a-button>
                   <a-popconfirm
-                    title="确定删除这轮面试吗？"
+                    :title="$t('confirm.deleteRound')"
                     @confirm="deleteRound(round.id)"
                   >
                     <a-button 
@@ -143,22 +143,22 @@
                       danger
                       :icon="h(DeleteOutlined)"
                     >
-                      删除
+                      {{ $t('common.delete') }}
                     </a-button>
                   </a-popconfirm>
                 </div>
               </div>
               <div class="round-details">
-                <p><strong>时间：</strong>{{ formatDateTime(round.scheduledAt) }}</p>
-                <p v-if="round.interviewer"><strong>面试官：</strong>{{ round.interviewer }}</p>
-                <p v-if="round.location"><strong>地点：</strong>{{ round.location }}</p>
-                <p><strong>结果：</strong>
+                <p><strong>{{ $t('form.scheduledAt') }}：</strong>{{ formatDateTime(round.scheduledAt) }}</p>
+                <p v-if="round.interviewer"><strong>{{ $t('form.interviewer') }}：</strong>{{ round.interviewer }}</p>
+                <p v-if="round.location"><strong>{{ $t('form.location') }}：</strong>{{ round.location }}</p>
+                <p><strong>{{ $t('form.result') }}：</strong>
                   <a-tag :color="getRoundResultColor(round.result)">
                     {{ getRoundResultText(round.result) }}
                   </a-tag>
                 </p>
                 <div v-if="round.feedback" class="round-feedback">
-                  <strong>反馈：</strong>
+                  <strong>{{ $t('form.feedback') }}：</strong>
                   <div class="feedback-content">{{ round.feedback }}</div>
                 </div>
               </div>
@@ -171,12 +171,12 @@
     <div v-else class="error-container">
       <a-result
         status="404"
-        title="面试流程不存在"
-        sub-title="该面试流程可能已被删除或不存在"
+        :title="$t('pages.interviews.notFound')"
+        :sub-title="$t('pages.interviews.notFoundDesc')"
       >
         <template #extra>
           <a-button type="primary" @click="$router.push('/interviews')">
-            返回面试管理
+            {{ $t('pages.interviews.backToList') }}
           </a-button>
         </template>
       </a-result>
@@ -192,7 +192,7 @@
     <!-- 添加轮次弹窗 -->
     <a-modal
       v-model:open="showAddRoundModal"
-      title="添加面试轮次"
+      :title="$t('pages.interviews.addRound')"
       @ok="addRound"
       :confirm-loading="addingRound"
     >
@@ -202,34 +202,34 @@
         :rules="roundRules"
         layout="vertical"
       >
-        <a-form-item label="面试类型" name="type">
-          <a-select v-model:value="roundForm.type" placeholder="选择面试类型">
-            <a-select-option value="phone">电话面试</a-select-option>
-            <a-select-option value="video">视频面试</a-select-option>
-            <a-select-option value="onsite">现场面试</a-select-option>
-            <a-select-option value="technical">技术面试</a-select-option>
-            <a-select-option value="hr">HR面试</a-select-option>
-            <a-select-option value="final">终面</a-select-option>
+        <a-form-item :label="$t('form.roundType')" name="type">
+          <a-select v-model:value="roundForm.type" :placeholder="$t('form.roundType')">
+            <a-select-option value="phone">{{ $t('roundType.phone') }}</a-select-option>
+            <a-select-option value="video">{{ $t('roundType.video') }}</a-select-option>
+            <a-select-option value="onsite">{{ $t('roundType.onsite') }}</a-select-option>
+            <a-select-option value="technical">{{ $t('roundType.technical') }}</a-select-option>
+            <a-select-option value="hr">{{ $t('roundType.hr') }}</a-select-option>
+            <a-select-option value="final">{{ $t('roundType.final') }}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="面试时间" name="scheduledAt">
+        <a-form-item :label="$t('form.scheduledAt')" name="scheduledAt">
           <a-date-picker
             v-model:value="roundForm.scheduledAt"
             format="YYYY-MM-DD"
-            placeholder="选择面试时间"
+            :placeholder="$t('form.scheduledAt')"
             style="width: 100%"
           />
         </a-form-item>
-        <a-form-item label="面试官" name="interviewer">
-          <a-input v-model:value="roundForm.interviewer" placeholder="面试官姓名" />
+        <a-form-item :label="$t('form.interviewer')" name="interviewer">
+          <a-input v-model:value="roundForm.interviewer" :placeholder="$t('form.interviewer')" />
         </a-form-item>
-        <a-form-item label="面试地点" name="location">
-          <a-input v-model:value="roundForm.location" placeholder="面试地点（线上面试可填会议室链接）" />
+        <a-form-item :label="$t('form.location')" name="location">
+          <a-input v-model:value="roundForm.location" :placeholder="$t('form.location')" />
         </a-form-item>
-        <a-form-item label="备注" name="notes">
+        <a-form-item :label="$t('form.notes')" name="notes">
           <a-textarea 
             v-model:value="roundForm.notes" 
-            placeholder="面试相关备注"
+            :placeholder="$t('form.notes')"
             :rows="3"
           />
         </a-form-item>
@@ -239,7 +239,7 @@
     <!-- 编辑轮次弹窗 -->
     <a-modal
       v-model:open="showEditRoundModal"
-      title="编辑面试轮次"
+      :title="$t('pages.interviews.editRound')"
       @ok="updateRound"
       :confirm-loading="updatingRound"
     >
@@ -249,49 +249,49 @@
         :rules="roundRules"
         layout="vertical"
       >
-        <a-form-item label="面试类型" name="type">
-          <a-select v-model:value="editRoundForm.type" placeholder="选择面试类型">
-            <a-select-option value="phone">电话面试</a-select-option>
-            <a-select-option value="video">视频面试</a-select-option>
-            <a-select-option value="onsite">现场面试</a-select-option>
-            <a-select-option value="technical">技术面试</a-select-option>
-            <a-select-option value="hr">HR面试</a-select-option>
-            <a-select-option value="final">终面</a-select-option>
+        <a-form-item :label="$t('form.roundType')" name="type">
+          <a-select v-model:value="editRoundForm.type" :placeholder="$t('form.roundType')">
+            <a-select-option value="phone">{{ $t('roundType.phone') }}</a-select-option>
+            <a-select-option value="video">{{ $t('roundType.video') }}</a-select-option>
+            <a-select-option value="onsite">{{ $t('roundType.onsite') }}</a-select-option>
+            <a-select-option value="technical">{{ $t('roundType.technical') }}</a-select-option>
+            <a-select-option value="hr">{{ $t('roundType.hr') }}</a-select-option>
+            <a-select-option value="final">{{ $t('roundType.final') }}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="面试时间" name="scheduledAt">
+        <a-form-item :label="$t('form.scheduledAt')" name="scheduledAt">
           <a-date-picker
             v-model:value="editRoundForm.scheduledAt"
             format="YYYY-MM-DD"
-            placeholder="选择面试时间"
+            :placeholder="$t('form.scheduledAt')"
             style="width: 100%"
           />
         </a-form-item>
-        <a-form-item label="面试官" name="interviewer">
-          <a-input v-model:value="editRoundForm.interviewer" placeholder="面试官姓名" />
+        <a-form-item :label="$t('form.interviewer')" name="interviewer">
+          <a-input v-model:value="editRoundForm.interviewer" :placeholder="$t('form.interviewer')" />
         </a-form-item>
-        <a-form-item label="面试地点" name="location">
-          <a-input v-model:value="editRoundForm.location" placeholder="面试地点" />
+        <a-form-item :label="$t('form.location')" name="location">
+          <a-input v-model:value="editRoundForm.location" :placeholder="$t('form.location')" />
         </a-form-item>
-        <a-form-item label="面试结果" name="result">
-          <a-select v-model:value="editRoundForm.result" placeholder="选择面试结果">
-            <a-select-option value="pending">待面试</a-select-option>
-            <a-select-option value="passed">通过</a-select-option>
-            <a-select-option value="failed">未通过</a-select-option>
-            <a-select-option value="cancelled">已取消</a-select-option>
+        <a-form-item :label="$t('form.result')" name="result">
+          <a-select v-model:value="editRoundForm.result" :placeholder="$t('form.result')">
+            <a-select-option value="pending">{{ $t('roundResult.pending') }}</a-select-option>
+            <a-select-option value="passed">{{ $t('roundResult.passed') }}</a-select-option>
+            <a-select-option value="failed">{{ $t('roundResult.failed') }}</a-select-option>
+            <a-select-option value="cancelled">{{ $t('roundResult.cancelled') }}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="面试反馈" name="feedback">
+        <a-form-item :label="$t('form.feedback')" name="feedback">
           <a-textarea 
             v-model:value="editRoundForm.feedback" 
-            placeholder="面试反馈和评价"
+            :placeholder="$t('form.feedback')"
             :rows="4"
           />
         </a-form-item>
-        <a-form-item label="备注" name="notes">
+        <a-form-item :label="$t('form.notes')" name="notes">
           <a-textarea 
             v-model:value="editRoundForm.notes" 
-            placeholder="其他备注"
+            :placeholder="$t('form.notes')"
             :rows="3"
           />
         </a-form-item>
@@ -303,6 +303,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { message, Modal } from 'ant-design-vue'
 import dayjs, { Dayjs } from 'dayjs'
 import { 
@@ -319,11 +320,12 @@ import {
 } from '@ant-design/icons-vue'
 import { useInterviewStore } from '../stores/interview'
 import { useCompanyStore } from '../stores/company'
-import type { InterviewProcess, InterviewRound, Company } from '../types'
+import type { InterviewProcess, InterviewRound, Company, RoundType, RoundResult } from '../types'
 import EditProcessModal from '../components/EditProcessModal.vue'
 
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
 
@@ -345,7 +347,7 @@ const editRoundFormRef = ref()
 
 // 添加轮次表单
 const roundForm = ref({
-  type: '',
+  type: '' as RoundType | '',
   scheduledAt: null as Dayjs | null,
   interviewer: '',
   location: '',
@@ -357,18 +359,18 @@ const editRoundForm = ref({
   id: '',
   processId: '',
   round: 0,
-  type: '',
+  type: '' as RoundType | '',
   scheduledAt: null as Dayjs | null,
   interviewer: '',
   location: '',
-  result: 'pending' as const,
+  result: 'pending' as RoundResult,
   feedback: '',
   notes: ''
 })
 
 const roundRules = {
-  type: [{ required: true, message: '请选择面试类型' }],
-  scheduledAt: [{ required: true, message: '请选择面试时间' }]
+  type: [{ required: true, message: t('validation.required'), trigger: 'blur' }],
+  scheduledAt: [{ required: true, message: t('validation.required'), trigger: 'blur' }]
 }
 
 const processId = computed(() => route.params.id as string)
@@ -389,7 +391,7 @@ const loadProcess = async () => {
     }
   } catch (error) {
     console.error('Failed to load process:', error)
-    message.error('加载面试流程失败')
+    message.error(t('message.error.load'))
   } finally {
     loading.value = false
   }
@@ -409,15 +411,7 @@ const getStatusColor = (status: string) => {
 }
 
 const getStatusText = (status: string) => {
-  const texts = {
-    applied: '已投递',
-    screening: '筛选中',
-    interviewing: '面试中',
-    offer: '已录用',
-    rejected: '已拒绝',
-    withdrawn: '已撤回'
-  }
-  return texts[status as keyof typeof texts] || status
+  return t(`interviewStatus.${status}`)
 }
 
 // 轮次相关方法
@@ -452,13 +446,7 @@ const getRoundResultColor = (result: string) => {
 }
 
 const getRoundResultText = (result: string) => {
-  const texts = {
-    pending: '待面试',
-    passed: '通过',
-    failed: '未通过',
-    cancelled: '已取消'
-  }
-  return texts[result as keyof typeof texts] || result
+  return t(`roundResult.${result}`)
 }
 
 const formatDateTime = (date: Date) => {
@@ -480,7 +468,7 @@ const addRound = async () => {
     const newRound: Omit<InterviewRound, 'id' | 'createdAt' | 'updatedAt'> = {
       processId: processId.value,
       round: rounds.value.length + 1,
-      type: roundForm.value.type,
+      type: roundForm.value.type as RoundType,
       scheduledAt: roundForm.value.scheduledAt!.toDate(),
       interviewer: roundForm.value.interviewer,
       location: roundForm.value.location,
@@ -533,17 +521,17 @@ const updateRound = async () => {
     
     // 检查必需字段
     if (!editRoundForm.value.id) {
-      throw new Error('面试轮次ID不能为空');
+      throw new Error(t('validation.required'));
     }
     if (!editRoundForm.value.scheduledAt) {
-      throw new Error('面试时间不能为空');
+      throw new Error(t('validation.required'));
     }
     
     const updatedRound: Partial<InterviewRound> = {
       id: editRoundForm.value.id,
       processId: editRoundForm.value.processId,
       round: editRoundForm.value.round,
-      type: editRoundForm.value.type,
+      type: editRoundForm.value.type as RoundType,
       scheduledAt: editRoundForm.value.scheduledAt.toDate(),
       interviewer: editRoundForm.value.interviewer,
       location: editRoundForm.value.location,
@@ -559,10 +547,10 @@ const updateRound = async () => {
       .sort((a, b) => a.round - b.round)
     
     showEditRoundModal.value = false
-    message.success('更新面试轮次成功')
+    message.success(t('message.success.update'))
   } catch (error) {
     console.error('Failed to update round:', error)
-    message.error(`更新面试轮次失败: ${error.message || error}`)
+    message.error(`${t('message.error.update')}: ${(error as Error).message || error}`)
   } finally {
     updatingRound.value = false
   }

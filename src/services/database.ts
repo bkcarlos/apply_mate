@@ -331,7 +331,7 @@ class DatabaseService {
     const rounds = await this.getAllInterviewRounds();
 
     const ongoingInterviews = processes.filter(p => 
-      ['投递中', '评估中', '面试中'].includes(p.status)
+      ['applied', 'evaluating', 'interviewing'].includes(p.status)
     ).length;
 
     const pendingInterviews = rounds.filter(r => 
@@ -339,7 +339,7 @@ class DatabaseService {
     ).length;
 
     const receivedOffers = processes.filter(p => 
-      p.status === '已发Offer'
+      p.status === 'offered'
     ).length;
 
     return {

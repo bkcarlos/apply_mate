@@ -48,7 +48,7 @@
 
       <a-layout>
         <!-- 顶部导航 -->
-        <a-layout-header class="app-header">
+        <a-layout-header :class="['app-header', { collapsed }]">
           <MenuUnfoldOutlined
             v-if="collapsed"
             class="trigger"
@@ -69,7 +69,7 @@
         </a-layout-header>
 
         <!-- 主内容区 -->
-        <a-layout-content class="app-content">
+        <a-layout-content :class="['app-content', { collapsed }]">
           <div class="content-container">
             <router-view />
           </div>

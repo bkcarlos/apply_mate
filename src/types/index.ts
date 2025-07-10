@@ -44,20 +44,26 @@ export interface InterviewProcess {
   notes?: string; // 备注
 }
 
-// 面试轮次状态
-export type RoundStatus = '待安排' | '已安排' | '已完成' | '已取消';
+// 面试轮次状态  
+export type RoundResult = 'pending' | 'passed' | 'failed' | 'cancelled';
+
+// 面试轮次类型
+export type RoundType = 'phone' | 'video' | 'onsite' | 'technical' | 'hr' | 'final';
 
 // 面试轮次
 export interface InterviewRound {
   id: string; // 唯一ID
   processId: string; // 关联的面试流程ID
-  roundName: string; // 轮次名称，如 "HR面", "技术一面", "总监面"
-  scheduledTime?: Date; // 安排的面试时间
-  status: RoundStatus; // 轮次状态
+  round: number; // 轮次编号，如 1, 2, 3
+  type: RoundType; // 面试类型
+  scheduledAt: Date; // 安排的面试时间
+  result: RoundResult; // 面试结果
   interviewer?: string; // 面试官姓名/职位
+  location?: string; // 面试地点
   feedback?: string; // 面试反馈记录
-  createTime: Date;
-  updateTime: Date;
+  notes?: string; // 备注
+  createdAt: Date; // 创建时间
+  updatedAt: Date; // 更新时间
 }
 
 // 用户配置

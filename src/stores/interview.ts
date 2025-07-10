@@ -105,10 +105,16 @@ export const useInterviewStore = defineStore('interview', () => {
     }
   };
 
-  const updateRound = async (id: string, updates: Partial<InterviewRound>) => {
+  const updateRound = async (updates: Partial<InterviewRound>) => {
     try {
-      const updatedRound = await dbService.updateInterviewRound(id, updates);
-      const index = rounds.value.findIndex((r: InterviewRound) => r.id === id);
+      if (!updates.id) {
+        throw new Error('Round ID is required for update');
+      }
+      
+      console.log('Store updateRound called with:', updates);
+      
+      const updatedRound = await dbService.updateInterviewRound(updates.id, updates);
+      const index = rounds.value.findIndex((r: InterviewRound) => r.id === updates.id);
       if (index !== -1) {
         rounds.value[index] = updatedRound;
       }

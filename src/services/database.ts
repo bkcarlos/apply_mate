@@ -127,14 +127,14 @@ class DatabaseService {
   }
 
   // ========== 面试流程相关操作 ==========
-  async addInterviewProcess(process: Omit<InterviewProcess, 'id' | 'createTime' | 'updateTime'>): Promise<InterviewProcess> {
+  async addInterviewProcess(process: Omit<InterviewProcess, 'id' | 'appliedAt' | 'updatedAt'>): Promise<InterviewProcess> {
     const db = this.ensureDB();
     const now = new Date();
     const newProcess: InterviewProcess = {
       ...process,
       id: crypto.randomUUID(),
-      createTime: now,
-      updateTime: now,
+      appliedAt: now,
+      updatedAt: now,
     };
     
     await db.add('interviewProcesses', newProcess);
@@ -152,7 +152,7 @@ class DatabaseService {
       ...existing,
       ...updates,
       id,
-      updateTime: new Date(),
+      updatedAt: new Date(),
     };
 
     await db.put('interviewProcesses', updated);
@@ -186,14 +186,14 @@ class DatabaseService {
   }
 
   // ========== 面试轮次相关操作 ==========
-  async addInterviewRound(round: Omit<InterviewRound, 'id' | 'createTime' | 'updateTime'>): Promise<InterviewRound> {
+  async addInterviewRound(round: Omit<InterviewRound, 'id' | 'createdAt' | 'updatedAt'>): Promise<InterviewRound> {
     const db = this.ensureDB();
     const now = new Date();
     const newRound: InterviewRound = {
       ...round,
       id: crypto.randomUUID(),
-      createTime: now,
-      updateTime: now,
+      createdAt: now,
+      updatedAt: now,
     };
     
     await db.add('interviewRounds', newRound);
@@ -202,17 +202,24 @@ class DatabaseService {
 
   async updateInterviewRound(id: string, updates: Partial<InterviewRound>): Promise<InterviewRound> {
     const db = this.ensureDB();
+    
+    console.log('Database updateInterviewRound called with:', { id, updates });
+    
     const existing = await db.get('interviewRounds', id);
     if (!existing) {
       throw new Error(`Interview round with id ${id} not found`);
     }
 
+    console.log('Existing round:', existing);
+
     const updated: InterviewRound = {
       ...existing,
       ...updates,
       id,
-      updateTime: new Date(),
+      updatedAt: new Date(),
     };
+
+    console.log('Updated round:', updated);
 
     await db.put('interviewRounds', updated);
     return updated;
@@ -328,7 +335,7 @@ class DatabaseService {
     ).length;
 
     const pendingInterviews = rounds.filter(r => 
-      r.status === '待安排'
+      r.result === 'pending'
     ).length;
 
     const receivedOffers = processes.filter(p => 

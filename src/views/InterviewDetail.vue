@@ -355,6 +355,8 @@ const roundForm = ref({
 // 编辑轮次表单
 const editRoundForm = ref({
   id: '',
+  processId: '',
+  round: 0,
   type: '',
   scheduledAt: null as Dayjs | null,
   interviewer: '',
@@ -511,6 +513,8 @@ const addRound = async () => {
 const editRound = (round: InterviewRound) => {
   editRoundForm.value = {
     id: round.id,
+    processId: round.processId,
+    round: round.round,
     type: round.type,
     scheduledAt: dayjs(round.scheduledAt),
     interviewer: round.interviewer || '',
@@ -527,16 +531,28 @@ const updateRound = async () => {
     await editRoundFormRef.value.validate()
     updatingRound.value = true
     
+    // 检查必需字段
+    if (!editRoundForm.value.id) {
+      throw new Error('面试轮次ID不能为空');
+    }
+    if (!editRoundForm.value.scheduledAt) {
+      throw new Error('面试时间不能为空');
+    }
+    
     const updatedRound: Partial<InterviewRound> = {
       id: editRoundForm.value.id,
+      processId: editRoundForm.value.processId,
+      round: editRoundForm.value.round,
       type: editRoundForm.value.type,
-      scheduledAt: editRoundForm.value.scheduledAt!.toDate(),
+      scheduledAt: editRoundForm.value.scheduledAt.toDate(),
       interviewer: editRoundForm.value.interviewer,
       location: editRoundForm.value.location,
       result: editRoundForm.value.result,
       feedback: editRoundForm.value.feedback,
       notes: editRoundForm.value.notes
     }
+    
+    console.log('Updating round with data:', updatedRound);
     
     await interviewStore.updateRound(updatedRound)
     rounds.value = interviewStore.rounds.filter(r => r.processId === processId.value)
@@ -546,7 +562,7 @@ const updateRound = async () => {
     message.success('更新面试轮次成功')
   } catch (error) {
     console.error('Failed to update round:', error)
-    message.error('更新面试轮次失败')
+    message.error(`更新面试轮次失败: ${error.message || error}`)
   } finally {
     updatingRound.value = false
   }

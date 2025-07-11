@@ -344,12 +344,18 @@ const generateTestData = async () => {
   testDataLoading.value = true;
   try {
     // 添加测试公司和面试流程
-    const testCompanies = ['阿里巴巴', '腾讯', '字节跳动', '美团', '滴滴出行'];
+    const testCompanies = [
+      { name: '阿里巴巴', hasOffer: true, salary: { base: 28000, yearEndMonths: 15, guaranteedMonths: 13, typicalMonths: 14 } },
+      { name: '腾讯', hasOffer: true, salary: { base: 32000, yearEndMonths: 16, guaranteedMonths: 14, typicalMonths: 15 } },
+      { name: '字节跳动', hasOffer: false, salary: undefined },
+      { name: '美团', hasOffer: true, salary: { base: 26000, yearEndMonths: 13, guaranteedMonths: 12, typicalMonths: 13 } },
+      { name: '滴滴出行', hasOffer: false, salary: undefined }
+    ];
     
-    for (const companyName of testCompanies) {
+    for (const companyData of testCompanies) {
       // 创建公司
       const company = await companyStore.addCompany({
-        name: companyName,
+        name: companyData.name,
         industry: '互联网',
         scale: '1000+人'
       });
@@ -359,36 +365,60 @@ const generateTestData = async () => {
         companyId: company.id,
         position: '前端开发工程师',
         city: '北京',
-        status: 'interviewing',
-        conclusion: 'in_progress',
+        status: companyData.hasOffer ? 'offered' : 'interviewing',
+        conclusion: companyData.hasOffer ? 'passed' : 'in_progress',
         sourceChannel: 'Boss直聘',
-        expectedSalary: { min: 20000, max: 35000 }
+        expectedSalary: { min: 20000, max: 35000 },
+        offeredSalary: companyData.salary
       });
       
-      // 创建未来面试轮次
-      const now = new Date();
-      const roundTypes = ['phone', 'video', 'technical', 'hr', 'final'] as const;
-      
-      for (let i = 1; i <= 2; i++) {
-        const daysFromNow = Math.floor(Math.random() * 7) + 1;
-        const scheduledAt = new Date(now);
-        scheduledAt.setDate(now.getDate() + daysFromNow);
-        scheduledAt.setHours(9 + Math.floor(Math.random() * 9), Math.random() > 0.5 ? 0 : 30, 0, 0);
+      // 如果没有offer，创建未来面试轮次
+      if (!companyData.hasOffer) {
+        const now = new Date();
+        const roundTypes = ['phone', 'video', 'technical', 'hr', 'final'] as const;
         
-        await interviewStore.addRound({
-          processId: process.id,
-          round: i,
-          type: roundTypes[Math.floor(Math.random() * roundTypes.length)],
-          scheduledAt,
-          result: 'pending',
-          interviewer: `${companyName}面试官`,
-          location: '视频会议'
-        });
+        for (let i = 1; i <= 2; i++) {
+          const daysFromNow = Math.floor(Math.random() * 7) + 1;
+          const scheduledAt = new Date(now);
+          scheduledAt.setDate(now.getDate() + daysFromNow);
+          scheduledAt.setHours(9 + Math.floor(Math.random() * 9), Math.random() > 0.5 ? 0 : 30, 0, 0);
+          
+          await interviewStore.addRound({
+            processId: process.id,
+            round: i,
+            type: roundTypes[Math.floor(Math.random() * roundTypes.length)],
+            scheduledAt,
+            result: 'pending',
+            interviewer: `${companyData.name}面试官`,
+            location: '视频会议'
+          });
+        }
+      } else {
+        // 如果有offer，创建一些已完成的历史面试轮次
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - Math.floor(Math.random() * 30) - 1); // 1-30天前
+        
+        for (let i = 1; i <= 3; i++) {
+          const roundDate = new Date(pastDate);
+          roundDate.setDate(pastDate.getDate() + (i - 1) * 3); // 每轮间隔3天
+          roundDate.setHours(14, 0, 0, 0); // 下午2点
+          
+          await interviewStore.addRound({
+            processId: process.id,
+            round: i,
+            type: i === 1 ? 'phone' : i === 2 ? 'technical' : 'hr',
+            scheduledAt: roundDate,
+            result: 'passed',
+            interviewer: `${companyData.name}面试官${i}`,
+            location: i === 1 ? '电话面试' : '视频会议',
+            feedback: `第${i}轮面试通过`
+          });
+        }
       }
     }
     
     await loadData(); // 重新加载数据
-    console.log('测试数据生成成功');
+    console.log('测试数据生成成功 - 包含3个offer和2个进行中的面试流程');
   } catch (error) {
     console.error('生成测试数据失败:', error);
   } finally {

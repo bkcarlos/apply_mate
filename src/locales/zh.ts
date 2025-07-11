@@ -100,7 +100,7 @@ export default {
       generateTestData: '生成测试数据',
       clearTestData: '清理测试数据',
       // 图表单位
-      salaryUnit: '单位: ¥k',
+      salaryUnit: '月薪: ¥k, 年薪: ¥万',
       // 空状态鼓励语
       noOfferEncouragement: '加油！理想的 Offer 正在路上 🚀',
       quickActions: '快速操作',

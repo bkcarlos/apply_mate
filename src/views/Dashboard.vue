@@ -510,10 +510,10 @@ const initSalaryChart = () => {
   // 准备雷达图数据
   const radarSeries = salaryData.map(item => {
     const baseMonthlySalary = Math.round(item.salary.base / 1000); // 月薪转换为k，取整
-    const baseAnnual = Math.round((item.salary.base * 12) / 1000);
-    const minPackage = Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 1000);
-    const typicalPackage = Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 1000);
-    const maxPackage = Math.round((item.salary.base * (12 + item.salary.yearEndMonths)) / 1000);
+    const baseAnnual = Math.round((item.salary.base * 12) / 10000); // 年薪转换为万，取整
+    const minPackage = Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 10000); // 转换为万
+    const typicalPackage = Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 10000); // 转换为万
+    const maxPackage = Math.round((item.salary.base * (12 + item.salary.yearEndMonths)) / 10000); // 转换为万
     
     // 更新最大值
     maxMonthlyValue = Math.max(maxMonthlyValue, baseMonthlySalary);
@@ -526,8 +526,8 @@ const initSalaryChart = () => {
   });
   
   // 设置不同维度的最大值，按照指定间隔（3个刻度）
-  const monthlyMax = Math.ceil(maxMonthlyValue / 10) * 15; // 月薪：确保3个刻度显示清晰
-  const annualMax = Math.ceil(maxAnnualValue / 100) * 150; // 年薪：确保3个刻度显示清晰
+  const monthlyMax = Math.ceil(maxMonthlyValue / 10) * 15; // 月薪：确保3个刻度显示清晰，单位k
+  const annualMax = Math.ceil(maxAnnualValue / 5) * 5 + 5; // 年薪：确保3个刻度显示清晰，单位万
   
   const option = {
     title: {
@@ -553,7 +553,9 @@ const initSalaryChart = () => {
         ];
         let result = `<strong>${data.name}</strong><br/>`;
         data.value.forEach((value: number, index: number) => {
-          result += `${indicators[index]}: ¥${value}k<br/>`;
+          // 第一个是月薪（k），其他是年薪（万）
+          const unit = index === 0 ? 'k' : '万';
+          result += `${indicators[index]}: ¥${value}${unit}<br/>`;
         });
         return result;
       }

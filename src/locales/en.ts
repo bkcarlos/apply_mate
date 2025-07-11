@@ -100,7 +100,7 @@ export default {
       generateTestData: 'Generate Test Data',
       clearTestData: 'Clear Test Data',
       // Chart unit
-      salaryUnit: 'Unit: ¥k',
+      salaryUnit: 'Monthly: ¥k, Annual: ¥10k',
       // Empty state encouragement
       noOfferEncouragement: 'Keep going! Your dream offer is on the way 🚀',
       quickActions: 'Quick Actions',

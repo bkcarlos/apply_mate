@@ -110,7 +110,7 @@
               {{ $t('settings.dataStorageDescription') }}
             </a-descriptions-item>
             <a-descriptions-item :label="$t('settings.sourceCode')">
-              <a href="https://github.com/your-repo" target="_blank">GitHub</a>
+              <a href="https://github.com/bkcarlos/apply_mate" target="_blank">GitHub</a>
             </a-descriptions-item>
           </a-descriptions>
         </a-card>

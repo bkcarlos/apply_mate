@@ -2,6 +2,7 @@
   "name": "apply-mate",
   "version": "1.4.0",
   "description": "个人面试管理系统 - ApplyMate",
+  "license": "CC-BY-NC-4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

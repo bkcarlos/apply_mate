@@ -405,7 +405,6 @@ const getStatusColor = (status: string) => {
     applied: 'blue',
     screening: 'orange',
     interviewing: 'processing',
-    negotiating: 'gold',
     offer: 'green',
     rejected: 'red',
     withdrawn: 'default'

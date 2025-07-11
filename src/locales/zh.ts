@@ -90,6 +90,14 @@ export default {
       noUpcomingInterviews: '未来 7 天暂无面试安排',
       offerSalaryComparison: 'Offer 薪资对比',
       detailedAnalysis: '详细分析',
+      // 雷达图相关
+      baseAnnualSalary: '基础年薪',
+      minAnnualPackage: '年包最小值',
+      typicalAnnualPackage: '年包典型值',
+      maxAnnualPackage: '年包最大值',
+      // 测试数据按钮
+      generateTestData: '生成测试数据',
+      clearTestData: '清理测试数据',
       quickActions: '快速操作',
       newInterviewProcess: '新建面试流程',
       manageCompanies: '管理公司库',

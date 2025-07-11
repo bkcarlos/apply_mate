@@ -90,6 +90,14 @@ export default {
       noUpcomingInterviews: 'No upcoming interviews in next 7 days',
       offerSalaryComparison: 'Offer Salary Comparison',
       detailedAnalysis: 'Detailed Analysis',
+      // Radar chart related
+      baseAnnualSalary: 'Base Annual Salary',
+      minAnnualPackage: 'Min Annual Package',
+      typicalAnnualPackage: 'Typical Annual Package',
+      maxAnnualPackage: 'Max Annual Package',
+      // Test data buttons
+      generateTestData: 'Generate Test Data',
+      clearTestData: 'Clear Test Data',
       quickActions: 'Quick Actions',
       newInterviewProcess: 'New Interview Process',
       manageCompanies: 'Manage Companies',

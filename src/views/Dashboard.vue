@@ -129,10 +129,10 @@
               {{ $t('pages.dashboard.viewStatistics') }}
             </a-button>
             <a-button block type="dashed" @click="generateTestData" :loading="testDataLoading">
-              生成测试数据
+              {{ $t('pages.dashboard.generateTestData') }}
             </a-button>
             <a-button block type="dashed" danger @click="clearTestData" :loading="clearDataLoading">
-              清理测试数据
+              {{ $t('pages.dashboard.clearTestData') }}
             </a-button>
           </a-space>
         </a-card>
@@ -490,7 +490,12 @@ const initSalaryChart = () => {
       trigger: 'item',
       formatter: function(params: any) {
         const data = params.data;
-        const indicators = ['基础年薪', '年包最小值', '年包典型值', '年包最大值'];
+        const indicators = [
+          t('pages.dashboard.baseAnnualSalary'), 
+          t('pages.dashboard.minAnnualPackage'), 
+          t('pages.dashboard.typicalAnnualPackage'), 
+          t('pages.dashboard.maxAnnualPackage')
+        ];
         let result = `<strong>${data.name}</strong><br/>`;
         data.value.forEach((value: number, index: number) => {
           result += `${indicators[index]}: ¥${value}k<br/>`;
@@ -510,10 +515,10 @@ const initSalaryChart = () => {
      },
          radar: {
        indicator: [
-         { name: '基础年薪', max: radarMax },
-         { name: '年包最小值', max: radarMax },
-         { name: '年包典型值', max: radarMax },
-         { name: '年包最大值', max: radarMax }
+         { name: t('pages.dashboard.baseAnnualSalary'), max: radarMax },
+         { name: t('pages.dashboard.minAnnualPackage'), max: radarMax },
+         { name: t('pages.dashboard.typicalAnnualPackage'), max: radarMax },
+         { name: t('pages.dashboard.maxAnnualPackage'), max: radarMax }
        ],
        center: ['45%', '50%'],
        radius: '70%',

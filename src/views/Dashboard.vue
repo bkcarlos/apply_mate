@@ -199,6 +199,7 @@ const upcomingInterviewColumns = computed(() => [
     title: t('form.company'),
     dataIndex: 'companyName',
     key: 'companyName',
+    width: 120,
   },
   {
     title: t('form.round'),
@@ -208,12 +209,12 @@ const upcomingInterviewColumns = computed(() => [
   {
     title: t('form.roundType'),
     key: 'type',
-    width: 100,
+    width: 120,
   },
   {
     title: t('pages.dashboard.interviewTime'),
     key: 'scheduledAt',
-    width: 120,
+    width: 140,
   },
 ]);
 

@@ -498,37 +498,40 @@ const initSalaryChart = () => {
         return result;
       }
     },
-    legend: {
-      data: salaryData.map(item => item.companyName),
-      bottom: 10,
-      itemGap: 20
-    },
-    radar: {
-      indicator: [
-        { name: '基础年薪', max: radarMax },
-        { name: '年包最小值', max: radarMax },
-        { name: '年包典型值', max: radarMax },
-        { name: '年包最大值', max: radarMax }
-      ],
-      center: ['50%', '45%'],
-      radius: '60%',
-      axisName: {
-        color: '#666',
-        fontSize: 12
-      },
-      splitArea: {
-        areaStyle: {
-          color: ['rgba(114, 172, 209, 0.1)', 'rgba(114, 172, 209, 0.05)']
-        }
-      },
-      axisLabel: {
-        formatter: function(value: number) {
-          return `¥${value}k`;
-        },
-        color: '#999',
-        fontSize: 10
-      }
-    },
+         legend: {
+       data: salaryData.map(item => item.companyName),
+       bottom: 5,
+       itemGap: 15,
+       textStyle: {
+         fontSize: 12
+       }
+     },
+         radar: {
+       indicator: [
+         { name: '基础年薪', max: radarMax },
+         { name: '年包最小值', max: radarMax },
+         { name: '年包典型值', max: radarMax },
+         { name: '年包最大值', max: radarMax }
+       ],
+       center: ['50%', '50%'],
+       radius: '80%',
+       axisName: {
+         color: '#666',
+         fontSize: 13
+       },
+       splitArea: {
+         areaStyle: {
+           color: ['rgba(114, 172, 209, 0.1)', 'rgba(114, 172, 209, 0.05)']
+         }
+       },
+       axisLabel: {
+         formatter: function(value: number) {
+           return `¥${value}k`;
+         },
+         color: '#999',
+         fontSize: 11
+       }
+     },
     series: [
       {
         type: 'radar',

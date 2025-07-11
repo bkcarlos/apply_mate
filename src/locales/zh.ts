@@ -99,6 +99,8 @@ export default {
       // 测试数据按钮
       generateTestData: '生成测试数据',
       clearTestData: '清理测试数据',
+      // 图表单位
+      salaryUnit: '单位: ¥k',
       quickActions: '快速操作',
       newInterviewProcess: '新建面试流程',
       manageCompanies: '管理公司库',

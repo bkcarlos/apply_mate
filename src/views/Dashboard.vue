@@ -490,6 +490,16 @@ const initSalaryChart = () => {
   const annualMax = Math.ceil(maxAnnualValue / 100) * 150; // 年薪：确保3个刻度显示清晰
   
   const option = {
+    title: {
+      text: t('pages.dashboard.salaryUnit'),
+      left: 10,
+      top: 10,
+      textStyle: {
+        fontSize: 12,
+        color: '#666',
+        fontWeight: 'normal'
+      }
+    },
     tooltip: {
       trigger: 'item',
       formatter: function(params: any) {
@@ -557,9 +567,9 @@ const initSalaryChart = () => {
          show: true,
          formatter: function(value: number, index: number) {
            if (value === 0) return '';
-           // 确保显示整数值，去掉小数点
+           // 只显示数字，不显示单位和符号
            const intValue = Math.round(value);
-           return `¥${intValue}k`;
+           return `${intValue}`;
          },
          color: '#666',
          fontSize: 11,

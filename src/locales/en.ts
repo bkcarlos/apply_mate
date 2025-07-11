@@ -99,6 +99,8 @@ export default {
       // Test data buttons
       generateTestData: 'Generate Test Data',
       clearTestData: 'Clear Test Data',
+      // Chart unit
+      salaryUnit: 'Unit: ¥k',
       quickActions: 'Quick Actions',
       newInterviewProcess: 'New Interview Process',
       manageCompanies: 'Manage Companies',

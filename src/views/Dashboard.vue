@@ -109,7 +109,13 @@
             </a-button>
           </template>
           
-          <div ref="salaryChartRef" style="height: 300px;"></div>
+          <div v-if="analyticsStore.salaryComparisonData.length > 0" ref="salaryChartRef" style="height: 300px;"></div>
+          <div v-else style="height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
+            <div style="text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
+              <div>{{ $t('pages.analysis.noOfferData') }}</div>
+            </div>
+          </div>
         </a-card>
       </a-col>
     </a-row>
@@ -491,7 +497,11 @@ const initSalaryChart = () => {
   const chart = echarts.init(salaryChartRef.value);
   const salaryData = analyticsStore.salaryComparisonData;
   
-  if (salaryData.length === 0) return;
+  if (salaryData.length === 0) {
+    // 没有数据时清空图表
+    chart.clear();
+    return;
+  }
   
   // 计算各维度的最大值
   let maxAnnualValue = 0;

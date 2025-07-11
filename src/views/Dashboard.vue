@@ -461,120 +461,98 @@ const initSalaryChart = () => {
   const chart = echarts.init(salaryChartRef.value);
   const salaryData = analyticsStore.salaryComparisonData;
   
-  // 准备多维度薪资数据
-  const companyNames = salaryData.map(item => item.companyName);
-  const minPackageData = salaryData.map(item => {
-    // 年包最小值：基础薪资 * (12 + 保底年终奖月数)
-    return Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 1000);
+  if (salaryData.length === 0) return;
+  
+  // 计算所有维度的最大值，用于雷达图的尺度设置
+  let maxValue = 0;
+  
+  // 准备雷达图数据
+  const radarSeries = salaryData.map(item => {
+    const baseAnnual = Math.round((item.salary.base * 12) / 1000);
+    const minPackage = Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 1000);
+    const typicalPackage = Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 1000);
+    const maxPackage = Math.round((item.salary.base * (12 + item.salary.yearEndMonths)) / 1000);
+    
+    // 更新最大值
+    maxValue = Math.max(maxValue, baseAnnual, minPackage, typicalPackage, maxPackage);
+    
+    return {
+      name: item.companyName,
+      value: [baseAnnual, minPackage, typicalPackage, maxPackage]
+    };
   });
-  const maxPackageData = salaryData.map(item => {
-    // 年包最大值：基础薪资 * (12 + 年终奖最高月数)
-    return Math.round((item.salary.base * (12 + item.salary.yearEndMonths)) / 1000);
-  });
-  const typicalPackageData = salaryData.map(item => {
-    // 年包典型值：基础薪资 * (12 + 典型年终奖月数)
-    return Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 1000);
-  });
-  const baseAnnualData = salaryData.map(item => {
-    // 当前基础年薪：基础薪资 * 12
-    return Math.round((item.salary.base * 12) / 1000);
-  });
+  
+  // 设置雷达图的最大值，增加一些余量
+  const radarMax = Math.ceil(maxValue / 100) * 100 + 100;
   
   const option = {
     tooltip: {
-      trigger: 'axis',
+      trigger: 'item',
       formatter: function(params: any) {
-        let result = `<strong>${params[0].axisValue}</strong><br/>`;
-        params.forEach((param: any) => {
-          result += `${param.marker}${param.seriesName}: ¥${param.value}k<br/>`;
+        const data = params.data;
+        const indicators = ['基础年薪', '年包最小值', '年包典型值', '年包最大值'];
+        let result = `<strong>${data.name}</strong><br/>`;
+        data.value.forEach((value: number, index: number) => {
+          result += `${indicators[index]}: ¥${value}k<br/>`;
         });
         return result;
       }
     },
     legend: {
-      data: ['年包最小值', '年包典型值', '年包最大值', '基础年薪'],
-      bottom: 10
+      data: salaryData.map(item => item.companyName),
+      bottom: 10,
+      itemGap: 20
     },
-    xAxis: {
-      type: 'category',
-      data: companyNames,
+    radar: {
+      indicator: [
+        { name: '基础年薪', max: radarMax },
+        { name: '年包最小值', max: radarMax },
+        { name: '年包典型值', max: radarMax },
+        { name: '年包最大值', max: radarMax }
+      ],
+      center: ['50%', '45%'],
+      radius: '60%',
+      axisName: {
+        color: '#666',
+        fontSize: 12
+      },
+      splitArea: {
+        areaStyle: {
+          color: ['rgba(114, 172, 209, 0.1)', 'rgba(114, 172, 209, 0.05)']
+        }
+      },
       axisLabel: {
-        rotate: 45,
-        interval: 0
-      }
-    },
-    yAxis: {
-      type: 'value',
-      name: '薪资 (k)',
-      axisLabel: {
-        formatter: '¥{value}k'
+        formatter: function(value: number) {
+          return `¥${value}k`;
+        },
+        color: '#999',
+        fontSize: 10
       }
     },
     series: [
       {
-        name: '年包最小值',
-        type: 'line',
-        data: minPackageData,
+        type: 'radar',
+        data: radarSeries,
+        itemStyle: {
+          borderWidth: 2
+        },
         lineStyle: {
-          color: '#ff7875',
           width: 2
         },
-        itemStyle: {
-          color: '#ff7875'
+        areaStyle: {
+          opacity: 0.2
         },
-        symbol: 'circle',
-        symbolSize: 6
-      },
-      {
-        name: '年包典型值',
-        type: 'line',
-        data: typicalPackageData,
-        lineStyle: {
-          color: '#1890ff',
-          width: 3
-        },
-        itemStyle: {
-          color: '#1890ff'
-        },
-        symbol: 'circle',
-        symbolSize: 8
-      },
-      {
-        name: '年包最大值',
-        type: 'line',
-        data: maxPackageData,
-        lineStyle: {
-          color: '#52c41a',
-          width: 2
-        },
-        itemStyle: {
-          color: '#52c41a'
-        },
-        symbol: 'circle',
-        symbolSize: 6
-      },
-      {
-        name: '基础年薪',
-        type: 'line',
-        data: baseAnnualData,
-        lineStyle: {
-          color: '#faad14',
-          width: 2,
-          type: 'dashed'
-        },
-        itemStyle: {
-          color: '#faad14'
-        },
-        symbol: 'diamond',
-        symbolSize: 6
+        emphasis: {
+          lineStyle: {
+            width: 4
+          },
+          areaStyle: {
+            opacity: 0.4
+          }
+        }
       }
     ],
-    grid: {
-      left: '60px',
-      right: '20px',
-      bottom: '80px',
-      top: '20px'
-    }
+    color: ['#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1']
   };
   
   chart.setOption(option);

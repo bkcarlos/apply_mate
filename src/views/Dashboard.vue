@@ -110,10 +110,10 @@
           </template>
           
           <div v-if="analyticsStore.salaryComparisonData.length > 0" ref="salaryChartRef" style="height: 300px;"></div>
-          <div v-else style="height: 300px; display: flex; align-items: center; justify-content: center; color: #999;">
+          <div v-else style="height: 300px; display: flex; align-items: center; justify-content: center; color: #666;">
             <div style="text-align: center;">
-              <div style="font-size: 48px; margin-bottom: 16px;">📊</div>
-              <div>{{ $t('pages.analysis.noOfferData') }}</div>
+              <div style="font-size: 48px; margin-bottom: 16px;">🌟</div>
+              <div style="font-size: 16px; font-weight: 500;">{{ $t('pages.dashboard.noOfferEncouragement') }}</div>
             </div>
           </div>
         </a-card>

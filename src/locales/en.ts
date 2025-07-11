@@ -101,6 +101,8 @@ export default {
       clearTestData: 'Clear Test Data',
       // Chart unit
       salaryUnit: 'Unit: ¥k',
+      // Empty state encouragement
+      noOfferEncouragement: 'Keep going! Your dream offer is on the way 🚀',
       quickActions: 'Quick Actions',
       newInterviewProcess: 'New Interview Process',
       manageCompanies: 'Manage Companies',

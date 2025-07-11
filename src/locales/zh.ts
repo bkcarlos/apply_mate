@@ -101,6 +101,8 @@ export default {
       clearTestData: '清理测试数据',
       // 图表单位
       salaryUnit: '单位: ¥k',
+      // 空状态鼓励语
+      noOfferEncouragement: '加油！理想的 Offer 正在路上 🚀',
       quickActions: '快速操作',
       newInterviewProcess: '新建面试流程',
       manageCompanies: '管理公司库',

@@ -215,8 +215,9 @@
         <a-form-item :label="$t('form.scheduledAt')" name="scheduledAt">
           <a-date-picker
             v-model:value="roundForm.scheduledAt"
-            format="YYYY-MM-DD"
-            :placeholder="$t('form.scheduledAt')"
+            show-time
+            format="YYYY-MM-DD HH:mm"
+            :placeholder="$t('form.scheduledAtWithTime')"
             style="width: 100%"
           />
         </a-form-item>
@@ -262,8 +263,9 @@
         <a-form-item :label="$t('form.scheduledAt')" name="scheduledAt">
           <a-date-picker
             v-model:value="editRoundForm.scheduledAt"
-            format="YYYY-MM-DD"
-            :placeholder="$t('form.scheduledAt')"
+            show-time
+            format="YYYY-MM-DD HH:mm"
+            :placeholder="$t('form.scheduledAtWithTime')"
             style="width: 100%"
           />
         </a-form-item>
@@ -450,7 +452,7 @@ const getRoundResultText = (result: string) => {
 }
 
 const formatDateTime = (date: Date) => {
-  return dayjs(date).format('YYYY-MM-DD')
+  return dayjs(date).format('YYYY-MM-DD HH:mm')
 }
 
 // 操作方法

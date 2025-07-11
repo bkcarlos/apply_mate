@@ -60,22 +60,43 @@
     </a-row>
 
     <a-row :gutter="[16, 16]" style="margin-top: 16px;">
-      <!-- 近期面试 -->
+      <!-- 近期面试安排 - 未来7天 -->
       <a-col :xs="24" :lg="12">
-        <a-card :title="$t('pages.dashboard.recentInterviews')" size="small">
+        <a-card size="small">
+          <template #title>
+            <div class="upcoming-interviews-title">
+              <CalendarOutlined style="margin-right: 8px;" />
+              {{ $t('pages.dashboard.upcomingInterviewsSubtitle') }}
+            </div>
+          </template>
           <template #extra>
             <a-button type="text" size="small" @click="goToInterviews">
-                              {{ $t('pages.dashboard.viewAll') }}
+              {{ $t('pages.dashboard.viewAll') }}
             </a-button>
           </template>
           
           <a-table
-            :columns="interviewColumns"
-            :data-source="recentInterviews"
+            :columns="upcomingInterviewColumns"
+            :data-source="upcomingInterviews"
             :pagination="false"
             size="small"
-            :locale="{ emptyText: $t('pages.dashboard.noScheduledInterviews') }"
-          />
+            :locale="{ emptyText: $t('pages.dashboard.noUpcomingInterviews') }"
+          >
+            <template #bodyCell="{ column, record }">
+              <template v-if="column.key === 'scheduledAt'">
+                <div class="interview-time">
+                  <div class="interview-date">{{ formatUpcomingDate(record.scheduledAt) }}</div>
+                  <div class="interview-day-info">{{ getRelativeDayText(record.scheduledAt) }}</div>
+                </div>
+              </template>
+              <template v-else-if="column.key === 'round'">
+                <a-tag color="blue">{{ $t('pages.interviews.roundNumber', { number: record.round }) }}</a-tag>
+              </template>
+              <template v-else-if="column.key === 'type'">
+                <span class="interview-type">{{ $t(`roundType.${record.type}`) }}</span>
+              </template>
+            </template>
+          </a-table>
         </a-card>
       </a-col>
 
@@ -119,6 +140,8 @@ import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
+import 'dayjs/locale/zh-cn';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import * as echarts from 'echarts';
 import {
   TeamOutlined,
@@ -140,6 +163,10 @@ const { t, locale } = useI18n();
 const analyticsStore = useAnalyticsStore();
 const interviewStore = useInterviewStore();
 const companyStore = useCompanyStore();
+
+// 配置dayjs
+dayjs.extend(relativeTime);
+dayjs.locale(locale.value === 'zh' ? 'zh-cn' : 'en');
 
 const salaryChartRef = ref<HTMLElement>();
 
@@ -163,6 +190,30 @@ const interviewColumns = computed(() => [
     dataIndex: 'scheduledAt',
     key: 'scheduledAt',
     customRender: ({ record }: any) => formatDate(record.scheduledAt),
+  },
+]);
+
+// 未来面试表格列定义
+const upcomingInterviewColumns = computed(() => [
+  {
+    title: t('form.company'),
+    dataIndex: 'companyName',
+    key: 'companyName',
+  },
+  {
+    title: t('form.round'),
+    key: 'round',
+    width: 80,
+  },
+  {
+    title: t('form.roundType'),
+    key: 'type',
+    width: 100,
+  },
+  {
+    title: t('pages.dashboard.interviewTime'),
+    key: 'scheduledAt',
+    width: 120,
   },
 ]);
 
@@ -191,10 +242,75 @@ const recentInterviews = computed(() => {
     .slice(0, 5); // 只显示前5个
 });
 
+// 未来 7 天面试安排
+const upcomingInterviews = computed(() => {
+  // 使用dayjs来处理日期，确保准确性
+  const today = dayjs().startOf('day');
+  const sevenDaysLater = today.add(7, 'day').endOf('day');
+  
+  const allRoundsWithCompany = interviewStore.rounds
+    .filter(round => round.scheduledAt && round.result === 'pending')
+    .map(round => {
+      const process = interviewStore.getProcessById(round.processId);
+      const company = process ? companyStore.getCompanyById(process.companyId) : null;
+      return {
+        ...round,
+        companyName: company?.name || t('interview.unknownCompany'),
+      };
+    });
+  
+  return allRoundsWithCompany
+    .filter(round => {
+      const interviewDay = dayjs(round.scheduledAt).startOf('day');
+      // 面试时间要在今天(包含)到未来7天内
+      return (interviewDay.isSame(today) || interviewDay.isAfter(today)) && 
+             interviewDay.isBefore(sevenDaysLater.add(1, 'day'));
+    })
+    .sort((a, b) => dayjs(a.scheduledAt).valueOf() - dayjs(b.scheduledAt).valueOf())
+    .slice(0, 8); // 显示未来7天内的前8个面试
+});
+
 // 格式化日期
 const formatDate = (date: Date | undefined) => {
   if (!date) return '';
   return dayjs(date).format('MM-DD');
+};
+
+// 格式化未来面试日期
+const formatUpcomingDate = (date: Date | undefined) => {
+  if (!date) return '';
+  return dayjs(date).format('MM-DD HH:mm');
+};
+
+// 获取相对日期文本
+const getRelativeDayText = (date: Date | undefined) => {
+  if (!date) return '';
+  
+  // 使用startOf('day')来比较日期，忽略具体时间
+  const today = dayjs().startOf('day');
+  const interviewDay = dayjs(date).startOf('day');
+  const diffDays = interviewDay.diff(today, 'day');
+  
+  // 临时调试日志
+  console.log('Date comparison debug:', {
+    originalDate: date,
+    today: today.format('YYYY-MM-DD'),
+    interviewDay: interviewDay.format('YYYY-MM-DD'),
+    diffDays: diffDays
+  });
+  
+  if (diffDays === 0) {
+    return t('pages.dashboard.today');
+  } else if (diffDays === 1) {
+    return t('pages.dashboard.tomorrow');
+  } else if (diffDays === 2) {
+    return t('pages.dashboard.dayAfterTomorrow');
+  } else if (diffDays > 0 && diffDays <= 7) {
+    // 使用本地化的星期几显示
+    return interviewDay.format('dddd');
+  } else {
+    return interviewDay.format('MM-DD');
+  }
 };
 
 // 获取状态颜色
@@ -288,8 +404,9 @@ const loadData = async () => {
   }
 };
 
-// 监听语言变化，重新初始化图表
-watch(locale, () => {
+// 监听语言变化，重新初始化图表和dayjs本地化
+watch(locale, (newLocale) => {
+  dayjs.locale(newLocale === 'zh' ? 'zh-cn' : 'en');
   nextTick(() => {
     initSalaryChart();
   });
@@ -323,5 +440,32 @@ onMounted(() => {
 :deep(.ant-list-item-meta-description) {
   font-size: 12px;
   color: #999;
+}
+
+.upcoming-interviews-title {
+  display: flex;
+  align-items: center;
+  color: #1890ff;
+  font-weight: 600;
+}
+
+.interview-time {
+  text-align: center;
+}
+
+.interview-date {
+  font-weight: 600;
+  color: #262626;
+  margin-bottom: 2px;
+}
+
+.interview-day-info {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.interview-type {
+  color: #595959;
+  font-size: 13px;
 }
 </style>

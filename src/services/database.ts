@@ -118,12 +118,28 @@ class DatabaseService {
 
   async getCompany(id: string): Promise<Company | undefined> {
     const db = this.ensureDB();
-    return await db.get('companies', id);
+    const company = await db.get('companies', id);
+    
+    if (!company) return undefined;
+    
+    // 确保Date对象正确转换
+    return {
+      ...company,
+      createTime: new Date(company.createTime),
+      updateTime: new Date(company.updateTime),
+    };
   }
 
   async getAllCompanies(): Promise<Company[]> {
     const db = this.ensureDB();
-    return await db.getAll('companies');
+    const companies = await db.getAll('companies');
+    
+    // 确保Date对象正确转换
+    return companies.map(company => ({
+      ...company,
+      createTime: new Date(company.createTime),
+      updateTime: new Date(company.updateTime),
+    }));
   }
 
   // ========== 面试流程相关操作 ==========
@@ -172,17 +188,40 @@ class DatabaseService {
 
   async getInterviewProcess(id: string): Promise<InterviewProcess | undefined> {
     const db = this.ensureDB();
-    return await db.get('interviewProcesses', id);
+    const process = await db.get('interviewProcesses', id);
+    
+    if (!process) return undefined;
+    
+    // 确保Date对象正确转换
+    return {
+      ...process,
+      appliedAt: new Date(process.appliedAt),
+      updatedAt: new Date(process.updatedAt),
+    };
   }
 
   async getAllInterviewProcesses(): Promise<InterviewProcess[]> {
     const db = this.ensureDB();
-    return await db.getAll('interviewProcesses');
+    const processes = await db.getAll('interviewProcesses');
+    
+    // 确保Date对象正确转换
+    return processes.map(process => ({
+      ...process,
+      appliedAt: new Date(process.appliedAt),
+      updatedAt: new Date(process.updatedAt),
+    }));
   }
 
   async getInterviewProcessesByCompany(companyId: string): Promise<InterviewProcess[]> {
     const db = this.ensureDB();
-    return await db.getAllFromIndex('interviewProcesses', 'by-company', companyId);
+    const processes = await db.getAllFromIndex('interviewProcesses', 'by-company', companyId);
+    
+    // 确保Date对象正确转换
+    return processes.map(process => ({
+      ...process,
+      appliedAt: new Date(process.appliedAt),
+      updatedAt: new Date(process.updatedAt),
+    }));
   }
 
   // ========== 面试轮次相关操作 ==========
@@ -232,12 +271,30 @@ class DatabaseService {
 
   async getInterviewRound(id: string): Promise<InterviewRound | undefined> {
     const db = this.ensureDB();
-    return await db.get('interviewRounds', id);
+    const round = await db.get('interviewRounds', id);
+    
+    if (!round) return undefined;
+    
+    // 确保Date对象正确转换
+    return {
+      ...round,
+      scheduledAt: new Date(round.scheduledAt),
+      createdAt: new Date(round.createdAt),
+      updatedAt: new Date(round.updatedAt),
+    };
   }
 
   async getInterviewRoundsByProcess(processId: string): Promise<InterviewRound[]> {
     const db = this.ensureDB();
-    return await db.getAllFromIndex('interviewRounds', 'by-process', processId);
+    const rounds = await db.getAllFromIndex('interviewRounds', 'by-process', processId);
+    
+    // 确保Date对象正确转换
+    return rounds.map(round => ({
+      ...round,
+      scheduledAt: new Date(round.scheduledAt),
+      createdAt: new Date(round.createdAt),
+      updatedAt: new Date(round.updatedAt),
+    }));
   }
 
   // ========== 用户配置相关操作 ==========
@@ -322,7 +379,15 @@ class DatabaseService {
 
   async getAllInterviewRounds(): Promise<InterviewRound[]> {
     const db = this.ensureDB();
-    return await db.getAll('interviewRounds');
+    const rounds = await db.getAll('interviewRounds');
+    
+    // 确保Date对象正确转换
+    return rounds.map(round => ({
+      ...round,
+      scheduledAt: new Date(round.scheduledAt),
+      createdAt: new Date(round.createdAt),
+      updatedAt: new Date(round.updatedAt),
+    }));
   }
 
   // ========== 统计分析相关 ==========

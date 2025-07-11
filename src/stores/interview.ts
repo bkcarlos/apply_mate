@@ -57,7 +57,7 @@ export const useInterviewStore = defineStore('interview', () => {
     }
   };
 
-  const addProcess = async (processData: Omit<InterviewProcess, 'id' | 'createTime' | 'updateTime'>) => {
+  const addProcess = async (processData: Omit<InterviewProcess, 'id' | 'appliedAt' | 'updatedAt'>) => {
     try {
       const newProcess = await dbService.addInterviewProcess(processData);
       processes.value.push(newProcess);
@@ -94,7 +94,7 @@ export const useInterviewStore = defineStore('interview', () => {
     }
   };
 
-  const addRound = async (roundData: Omit<InterviewRound, 'id' | 'createTime' | 'updateTime'>) => {
+  const addRound = async (roundData: Omit<InterviewRound, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       const newRound = await dbService.addInterviewRound(roundData);
       rounds.value.push(newRound);

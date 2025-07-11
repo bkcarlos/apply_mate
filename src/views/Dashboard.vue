@@ -345,11 +345,20 @@ const generateTestData = async () => {
   try {
     // 添加测试公司和面试流程
     const testCompanies = [
+      // 传统互联网大厂：月薪中等，年终奖丰厚
       { name: '阿里巴巴', hasOffer: true, salary: { base: 28000, yearEndMonths: 15, guaranteedMonths: 13, typicalMonths: 14 } },
       { name: '腾讯', hasOffer: true, salary: { base: 32000, yearEndMonths: 16, guaranteedMonths: 14, typicalMonths: 15 } },
+      
+      // 外企：月薪很高，但年终奖少
+      { name: 'Google', hasOffer: true, salary: { base: 45000, yearEndMonths: 3, guaranteedMonths: 1, typicalMonths: 2 } },
+      { name: 'Microsoft', hasOffer: true, salary: { base: 42000, yearEndMonths: 2, guaranteedMonths: 1, typicalMonths: 1.5 } },
+      
+      // 创业公司：月薪高，几乎没有年终奖
+      { name: '某创业公司', hasOffer: true, salary: { base: 38000, yearEndMonths: 1, guaranteedMonths: 0, typicalMonths: 0.5 } },
+      
+      // 进行中的面试
       { name: '字节跳动', hasOffer: false, salary: undefined },
-      { name: '美团', hasOffer: true, salary: { base: 26000, yearEndMonths: 13, guaranteedMonths: 12, typicalMonths: 13 } },
-      { name: '滴滴出行', hasOffer: false, salary: undefined }
+      { name: '美团', hasOffer: false, salary: undefined }
     ];
     
     for (const companyData of testCompanies) {

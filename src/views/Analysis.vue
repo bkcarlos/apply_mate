@@ -172,7 +172,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, watch, nextTick } from 'vue';
 import { useI18n } from 'vue-i18n';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 import * as echarts from 'echarts';
 import {
   IconPlus,

@@ -3,7 +3,7 @@
     <div class="detail-header">
       <a-button 
         type="text" 
-        :icon="h(ArrowLeftOutlined)" 
+        :icon="h(IconLeft)" 
         @click="$router.back()"
         class="back-btn"
       >
@@ -21,22 +21,22 @@
       </div>
       <div class="header-actions">
         <a-button 
-          :icon="h(EditOutlined)" 
+          :icon="h(IconEdit)" 
           @click="showEditModal = true"
           :disabled="!process"
         >
           {{ $t('common.edit') }}
         </a-button>
         <a-dropdown>
-          <a-button :icon="h(MoreOutlined)">{{ $t('common.more') }}</a-button>
-          <template #overlay>
+          <a-button :icon="h(IconMore)">{{ $t('common.more') }}</a-button>
+          <template #content>
             <a-menu>
               <a-menu-item key="export" @click="exportData">
-                <FileOutlined />
+                <icon-file />
                 {{ $t('common.export') }}
               </a-menu-item>
-              <a-menu-item key="delete" @click="showDeleteConfirm" danger>
-                <DeleteOutlined />
+                              <a-menu-item key="delete" @click="showDeleteConfirm">
+                <icon-delete />
                 {{ $t('common.delete') }}
               </a-menu-item>
             </a-menu>
@@ -89,7 +89,7 @@
         <template #extra>
           <a-button 
             type="primary" 
-            :icon="h(PlusOutlined)"
+            :icon="h(IconPlus)"
             @click="showAddRoundModal = true"
             :disabled="process.status === 'rejected' || process.status === 'offered'"
           >
@@ -128,7 +128,7 @@
                   <a-button 
                     size="small" 
                     type="text"
-                    :icon="h(EditOutlined)"
+                    :icon="h(IconEdit)"
                     @click="editRound(round)"
                   >
                     {{ $t('common.edit') }}
@@ -141,7 +141,7 @@
                       size="small" 
                       type="text" 
                       status="danger"
-                      :icon="h(DeleteOutlined)"
+                      :icon="h(IconDelete)"
                     >
                       {{ $t('common.delete') }}
                     </a-button>
@@ -593,7 +593,7 @@ const showDeleteConfirm = () => {
     title: '确定删除这个面试流程吗？',
     content: '删除后将无法恢复，包括所有相关的面试轮次数据。',
     okText: '确定删除',
-    okType: 'danger',
+    // okType: 'danger', // Arco Design Vue Modal 不支持此属性
     cancelText: '取消',
     async onOk() {
       try {

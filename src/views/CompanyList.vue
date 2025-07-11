@@ -162,7 +162,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router'; // 暂时不需要
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
 import { Message } from '@arco-design/web-vue';
@@ -181,7 +181,7 @@ import { useInterviewStore } from '@/stores/interview';
 import type { Company } from '@/types';
 import CompanyModal from '@/components/CompanyModal.vue';
 
-const router = useRouter();
+// const router = useRouter(); // 暂时不需要
 const { t } = useI18n();
 const companyStore = useCompanyStore();
 const interviewStore = useInterviewStore();
@@ -202,37 +202,36 @@ const filters = ref({
 const industries = ['internet', 'finance', 'ecommerce', 'gaming', 'education', 'healthcare', 'automotive', 'realestate', 'manufacturing', 'consulting', 'other'];
 const scales = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge'];
 
-// 辅助函数 - 获取行业键值
-const getIndustryKey = (industry: string) => {
-  const industryMap: Record<string, string> = {
-    '互联网': 'internet',
-    '金融': 'finance',
-    '电商': 'ecommerce',
-    '游戏': 'gaming',
-    '教育': 'education',
-    '医疗': 'healthcare',
-    '汽车': 'automotive',
-    '房地产': 'realestate',
-    '制造业': 'manufacturing',
-    '咨询': 'consulting',
-    '其他': 'other'
-  };
-  return industryMap[industry] || 'other';
-};
+// 暂时注释未使用的辅助函数
+// const getIndustryKey = (industry: string) => {
+//   const industryMap: Record<string, string> = {
+//     '互联网': 'internet',
+//     '金融': 'finance',
+//     '电商': 'ecommerce',
+//     '游戏': 'gaming',
+//     '教育': 'education',
+//     '医疗': 'healthcare',
+//     '汽车': 'automotive',
+//     '房地产': 'realestate',
+//     '制造业': 'manufacturing',
+//     '咨询': 'consulting',
+//     '其他': 'other'
+//   };
+//   return industryMap[industry] || 'other';
+// };
 
-// 辅助函数 - 获取规模键值
-const getScaleKey = (scale: string) => {
-  const scaleMap: Record<string, string> = {
-    '0-20人': 'small',
-    '20-100人': 'medium',
-    '100-500人': 'large',
-    '500-1000人': 'xlarge',
-    '1000-5000人': 'xxlarge',
-    '5000-10000人': 'xxxlarge',
-    '10000人以上': 'huge'
-  };
-  return scaleMap[scale] || 'small';
-};
+// const getScaleKey = (scale: string) => {
+//   const scaleMap: Record<string, string> = {
+//     '0-20人': 'small',
+//     '20-100人': 'medium',
+//     '100-500人': 'large',
+//     '500-1000人': 'xlarge',
+//     '1000-5000人': 'xxlarge',
+//     '5000-10000人': 'xxxlarge',
+//     '10000人以上': 'huge'
+//   };
+//   return scaleMap[scale] || 'small';
+// };
 
 // 计算属性
 const filteredCompanies = computed(() => {

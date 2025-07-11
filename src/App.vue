@@ -1,5 +1,5 @@
 <template>
-  <a-config-provider :locale="arcoLocale">
+  <a-config-provider>
     <a-layout class="app-layout">
       <!-- 侧边栏 -->
       <a-layout-sider
@@ -91,11 +91,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import zhCN from '@arco-design/web-vue/es/locale/zh-CN';
-import enUS from '@arco-design/web-vue/es/locale/en-US';
+// import { useI18n } from 'vue-i18n'; // 暂时不需要
+// 暂时移除 locale 配置，使用默认语言
+// import zhCN from '@arco-design/web-vue/es/locale/zh-CN';
+// import enUS from '@arco-design/web-vue/es/locale/en-US';
 import {
   IconDashboard,
   IconUserGroup,
@@ -110,12 +111,12 @@ import LanguageSwitcher from './components/LanguageSwitcher.vue';
 
 const route = useRoute();
 const router = useRouter();
-const { locale } = useI18n();
+// const { locale } = useI18n(); // 暂时不需要
 
-// Arco Design Vue locale
-const arcoLocale = computed(() => {
-  return locale.value === 'en' ? enUS : zhCN;
-});
+// Arco Design Vue locale - 暂时禁用
+// const arcoLocale = computed(() => {
+//   return locale.value === 'en' ? enUS : zhCN;
+// });
 
 // 侧边栏状态
 const collapsed = ref(false);

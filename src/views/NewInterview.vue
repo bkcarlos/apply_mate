@@ -121,8 +121,8 @@
               :placeholder="$t('interview.minSalaryPlaceholder')"
               style="width: 45%"
               :min="0"
-              :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-              :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+              :formatter="(value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+              :parser="(value: any) => value.replace(/\$\s?|(,*)/g, '')"
             />
             <span style="width: 10%; text-align: center; line-height: 32px;">-</span>
             <a-input-number
@@ -130,8 +130,8 @@
               :placeholder="$t('interview.maxSalaryPlaceholder')"
               style="width: 45%"
               :min="0"
-              :formatter="value => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
-              :parser="value => value.replace(/\$\s?|(,*)/g, '')"
+              :formatter="(value: any) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+              :parser="(value: any) => value.replace(/\$\s?|(,*)/g, '')"
             />
           </a-input-group>
         </a-form-item>
@@ -169,11 +169,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, h } from 'vue';
-import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import { Message } from '@arco-design/web-vue';
-import { PlusOutlined } from '@ant-design/icons-vue';
-import type { FormInstance, SelectProps } from 'ant-design-vue';
+  import { useRouter } from 'vue-router';
+  // import { useI18n } from 'vue-i18n'; // 暂时不需要
+  import { Message } from '@arco-design/web-vue';
+import { IconPlus as PlusOutlined } from '@arco-design/web-vue/es/icon';
+import type { FormInstance, SelectProps } from '@arco-design/web-vue';
 
 import { useCompanyStore } from '@/stores/company';
 import { useInterviewStore } from '@/stores/interview';
@@ -181,7 +181,7 @@ import type { Company, InterviewProcess } from '@/types';
 import NewCompanyModal from '@/components/NewCompanyModal.vue';
 
 const router = useRouter();
-const { t } = useI18n();
+// const { t } = useI18n(); // 暂时不需要
 const companyStore = useCompanyStore();
 const interviewStore = useInterviewStore();
 
@@ -230,7 +230,7 @@ const rules = {
 const companies = ref<Company[]>([]);
 
 // 公司筛选
-const filterCompany: SelectProps['filterOption'] = (input, option) => {
+const filterCompany: SelectProps['filterOption'] = (input: string, option: any) => {
   const company = companies.value.find(c => c.id === option?.value);
   if (!company) return false;
   return company.name.toLowerCase().includes(input.toLowerCase()) ||
@@ -238,7 +238,7 @@ const filterCompany: SelectProps['filterOption'] = (input, option) => {
 };
 
 // 自定义下拉渲染，添加"新建公司"选项
-const dropdownRender: SelectProps['dropdownRender'] = ({ menuNode }) => {
+const dropdownRender: SelectProps['dropdownRender'] = ({ menuNode }: any) => {
   return h('div', [
     menuNode,
     h('div', { style: 'border-top: 1px solid #e8e8e8; padding: 8px; cursor: pointer;' }, [
@@ -277,13 +277,13 @@ const handleSubmit = async () => {
     };
 
     const newProcess = await interviewStore.addProcess(processData);
-    message.success('面试流程创建成功');
+    Message.success('面试流程创建成功');
     
     // 跳转到详情页
     router.push(`/interviews/${newProcess.id}`);
   } catch (error) {
     console.error('Failed to create process:', error);
-    message.error('创建失败');
+    Message.error('创建失败');
   } finally {
     submitting.value = false;
   }
@@ -299,7 +299,7 @@ const handleCompanyCreated = (company: Company) => {
   companies.value.push(company);
   formData.companyId = company.id;
   newCompanyModalVisible.value = false;
-  message.success('公司创建成功');
+      Message.success('公司创建成功');
 };
 
 // 加载数据
@@ -308,7 +308,7 @@ const loadData = async () => {
     await companyStore.loadCompanies();
     companies.value = companyStore.companies;
   } catch (error) {
-    message.error('加载公司数据失败');
+    Message.error('加载公司数据失败');
     console.error('Failed to load companies:', error);
   }
 };

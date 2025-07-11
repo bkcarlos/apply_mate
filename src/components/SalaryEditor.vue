@@ -120,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue';
+import { reactive, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { SalaryCalculator } from '@/utils/salary';
 import type { SalaryInfo } from '@/types';
@@ -201,7 +201,7 @@ const getSalaryRangeText = () => {
 };
 
 // 验证函数
-const validateTypicalMonths = (rule: any, value: number) => {
+const validateTypicalMonths = (_rule: any, value: number) => {
   if (value < salaryData.guaranteedMonths) {
     return Promise.reject(t('salaryEditor.typicalLessThanGuaranteed'));
   }
@@ -211,7 +211,7 @@ const validateTypicalMonths = (rule: any, value: number) => {
   return Promise.resolve();
 };
 
-const validateGuaranteedMonths = (rule: any, value: number) => {
+const validateGuaranteedMonths = (_rule: any, value: number) => {
   if (value > salaryData.typicalMonths) {
     return Promise.reject(t('salaryEditor.guaranteedMoreThanTypical'));
   }

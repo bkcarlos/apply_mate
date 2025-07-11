@@ -91,6 +91,7 @@ export default {
       offerSalaryComparison: 'Offer Salary Comparison',
       detailedAnalysis: 'Detailed Analysis',
       // Radar chart related
+      baseMonthlySalary: 'Base Monthly Salary',
       baseAnnualSalary: 'Base Annual Salary',
       minAnnualPackage: 'Min Annual Package',
       typicalAnnualPackage: 'Typical Annual Package',

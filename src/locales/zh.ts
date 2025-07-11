@@ -91,6 +91,7 @@ export default {
       offerSalaryComparison: 'Offer 薪资对比',
       detailedAnalysis: '详细分析',
       // 雷达图相关
+      baseMonthlySalary: '基础月薪',
       baseAnnualSalary: '基础年薪',
       minAnnualPackage: '年包最小值',
       typicalAnnualPackage: '年包典型值',

@@ -463,27 +463,31 @@ const initSalaryChart = () => {
   
   if (salaryData.length === 0) return;
   
-  // 计算所有维度的最大值，用于雷达图的尺度设置
-  let maxValue = 0;
+  // 计算各维度的最大值
+  let maxAnnualValue = 0;
+  let maxMonthlyValue = 0;
   
   // 准备雷达图数据
   const radarSeries = salaryData.map(item => {
+    const baseMonthlySalary = Math.round(item.salary.base / 1000); // 月薪转换为k
     const baseAnnual = Math.round((item.salary.base * 12) / 1000);
     const minPackage = Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 1000);
     const typicalPackage = Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 1000);
     const maxPackage = Math.round((item.salary.base * (12 + item.salary.yearEndMonths)) / 1000);
     
     // 更新最大值
-    maxValue = Math.max(maxValue, baseAnnual, minPackage, typicalPackage, maxPackage);
+    maxMonthlyValue = Math.max(maxMonthlyValue, baseMonthlySalary);
+    maxAnnualValue = Math.max(maxAnnualValue, baseAnnual, minPackage, typicalPackage, maxPackage);
     
     return {
       name: item.companyName,
-      value: [baseAnnual, minPackage, typicalPackage, maxPackage]
+      value: [baseMonthlySalary, baseAnnual, minPackage, typicalPackage, maxPackage]
     };
   });
   
-  // 设置雷达图的最大值，增加一些余量
-  const radarMax = Math.ceil(maxValue / 100) * 100 + 100;
+  // 设置不同维度的最大值
+  const monthlyMax = Math.ceil(maxMonthlyValue / 10) * 10 + 10; // 月薪最大值
+  const annualMax = Math.ceil(maxAnnualValue / 100) * 100 + 100; // 年薪最大值
   
   const option = {
     tooltip: {
@@ -491,6 +495,7 @@ const initSalaryChart = () => {
       formatter: function(params: any) {
         const data = params.data;
         const indicators = [
+          t('pages.dashboard.baseMonthlySalary'),
           t('pages.dashboard.baseAnnualSalary'), 
           t('pages.dashboard.minAnnualPackage'), 
           t('pages.dashboard.typicalAnnualPackage'), 
@@ -515,10 +520,11 @@ const initSalaryChart = () => {
      },
          radar: {
        indicator: [
-         { name: t('pages.dashboard.baseAnnualSalary'), max: radarMax },
-         { name: t('pages.dashboard.minAnnualPackage'), max: radarMax },
-         { name: t('pages.dashboard.typicalAnnualPackage'), max: radarMax },
-         { name: t('pages.dashboard.maxAnnualPackage'), max: radarMax }
+         { name: t('pages.dashboard.baseMonthlySalary'), max: monthlyMax },
+         { name: t('pages.dashboard.baseAnnualSalary'), max: annualMax },
+         { name: t('pages.dashboard.minAnnualPackage'), max: annualMax },
+         { name: t('pages.dashboard.typicalAnnualPackage'), max: annualMax },
+         { name: t('pages.dashboard.maxAnnualPackage'), max: annualMax }
        ],
        center: ['45%', '50%'],
        radius: '70%',

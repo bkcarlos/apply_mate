@@ -139,7 +139,43 @@ export default {
       title: 'Companies',
       subtitle: 'Manage company information',
       new: 'Add Company',
-      edit: 'Edit Company'
+      edit: 'Edit Company',
+      newCompany: 'New Company',
+      companyName: 'Company Name',
+      companyNamePlaceholder: 'Enter company name',
+      industry: 'Industry',
+      selectIndustry: 'Select industry',
+      companyScale: 'Company Scale',
+      selectScale: 'Select scale',
+      companyWebsite: 'Company Website',
+      websitePlaceholder: 'https://example.com',
+      companyLogo: 'Company Logo',
+      logoPlaceholder: 'Logo image URL',
+      createCompanyFailed: 'Failed to create company',
+      // Industry options
+      industries: {
+        internet: 'Internet',
+        finance: 'Finance',
+        ecommerce: 'E-commerce',
+        gaming: 'Gaming',
+        education: 'Education',
+        healthcare: 'Healthcare',
+        automotive: 'Automotive',
+        realestate: 'Real Estate',
+        manufacturing: 'Manufacturing',
+        consulting: 'Consulting',
+        other: 'Other'
+      },
+      // Scale options
+      scales: {
+        small1: '0-20 employees',
+        small2: '20-100 employees',
+        medium1: '100-500 employees',
+        medium2: '500-1000 employees',
+        large1: '1000-5000 employees',
+        large2: '5000-10000 employees',
+        xlarge: '10000+ employees'
+      }
     },
     analysis: {
       title: 'Data Analysis',
@@ -206,6 +242,12 @@ export default {
     yearEndMonths: 'Year-end Bonus Months',
     guaranteedMonths: 'Guaranteed Months',
     typicalMonths: 'Typical Months',
+    
+    // Form validation
+    validation: {
+      required: 'Please enter {field}',
+      companyNameRequired: 'Please enter company name'
+    },
     
     // Interview Round
     round: 'Round',

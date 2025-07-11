@@ -1,7 +1,7 @@
 <template>
   <a-modal
     v-model:open="visible"
-    title="新建公司"
+    :title="$t('pages.companies.newCompany')"
     width="600px"
     @ok="handleSubmit"
     @cancel="handleCancel"
@@ -12,49 +12,49 @@
       :rules="rules"
       layout="vertical"
     >
-      <a-form-item label="公司名称" name="name">
-        <a-input v-model:value="formData.name" placeholder="请输入公司名称" />
+      <a-form-item :label="$t('pages.companies.companyName')" name="name">
+        <a-input v-model:value="formData.name" :placeholder="$t('pages.companies.companyNamePlaceholder')" />
       </a-form-item>
 
       <a-row :gutter="16">
         <a-col :span="12">
-          <a-form-item label="所属行业" name="industry">
-            <a-select v-model:value="formData.industry" placeholder="选择行业">
-              <a-select-option value="互联网">互联网</a-select-option>
-              <a-select-option value="金融">金融</a-select-option>
-              <a-select-option value="电商">电商</a-select-option>
-              <a-select-option value="游戏">游戏</a-select-option>
-              <a-select-option value="教育">教育</a-select-option>
-              <a-select-option value="医疗">医疗</a-select-option>
-              <a-select-option value="汽车">汽车</a-select-option>
-              <a-select-option value="房地产">房地产</a-select-option>
-              <a-select-option value="制造业">制造业</a-select-option>
-              <a-select-option value="咨询">咨询</a-select-option>
-              <a-select-option value="其他">其他</a-select-option>
+          <a-form-item :label="$t('pages.companies.industry')" name="industry">
+            <a-select v-model:value="formData.industry" :placeholder="$t('pages.companies.selectIndustry')">
+              <a-select-option value="internet">{{ $t('pages.companies.industries.internet') }}</a-select-option>
+              <a-select-option value="finance">{{ $t('pages.companies.industries.finance') }}</a-select-option>
+              <a-select-option value="ecommerce">{{ $t('pages.companies.industries.ecommerce') }}</a-select-option>
+              <a-select-option value="gaming">{{ $t('pages.companies.industries.gaming') }}</a-select-option>
+              <a-select-option value="education">{{ $t('pages.companies.industries.education') }}</a-select-option>
+              <a-select-option value="healthcare">{{ $t('pages.companies.industries.healthcare') }}</a-select-option>
+              <a-select-option value="automotive">{{ $t('pages.companies.industries.automotive') }}</a-select-option>
+              <a-select-option value="realestate">{{ $t('pages.companies.industries.realestate') }}</a-select-option>
+              <a-select-option value="manufacturing">{{ $t('pages.companies.industries.manufacturing') }}</a-select-option>
+              <a-select-option value="consulting">{{ $t('pages.companies.industries.consulting') }}</a-select-option>
+              <a-select-option value="other">{{ $t('pages.companies.industries.other') }}</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
         <a-col :span="12">
-          <a-form-item label="公司规模" name="scale">
-            <a-select v-model:value="formData.scale" placeholder="选择规模">
-              <a-select-option value="0-20人">0-20人</a-select-option>
-              <a-select-option value="20-100人">20-100人</a-select-option>
-              <a-select-option value="100-500人">100-500人</a-select-option>
-              <a-select-option value="500-1000人">500-1000人</a-select-option>
-              <a-select-option value="1000-5000人">1000-5000人</a-select-option>
-              <a-select-option value="5000-10000人">5000-10000人</a-select-option>
-              <a-select-option value="10000人以上">10000人以上</a-select-option>
+          <a-form-item :label="$t('pages.companies.companyScale')" name="scale">
+            <a-select v-model:value="formData.scale" :placeholder="$t('pages.companies.selectScale')">
+              <a-select-option value="small1">{{ $t('pages.companies.scales.small1') }}</a-select-option>
+              <a-select-option value="small2">{{ $t('pages.companies.scales.small2') }}</a-select-option>
+              <a-select-option value="medium1">{{ $t('pages.companies.scales.medium1') }}</a-select-option>
+              <a-select-option value="medium2">{{ $t('pages.companies.scales.medium2') }}</a-select-option>
+              <a-select-option value="large1">{{ $t('pages.companies.scales.large1') }}</a-select-option>
+              <a-select-option value="large2">{{ $t('pages.companies.scales.large2') }}</a-select-option>
+              <a-select-option value="xlarge">{{ $t('pages.companies.scales.xlarge') }}</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
       </a-row>
 
-      <a-form-item label="公司官网" name="website">
-        <a-input v-model:value="formData.website" placeholder="https://example.com" />
+      <a-form-item :label="$t('pages.companies.companyWebsite')" name="website">
+        <a-input v-model:value="formData.website" :placeholder="$t('pages.companies.websitePlaceholder')" />
       </a-form-item>
 
-      <a-form-item label="公司Logo" name="logoUrl">
-        <a-input v-model:value="formData.logoUrl" placeholder="Logo图片URL" />
+      <a-form-item :label="$t('pages.companies.companyLogo')" name="logoUrl">
+        <a-input v-model:value="formData.logoUrl" :placeholder="$t('pages.companies.logoPlaceholder')" />
       </a-form-item>
     </a-form>
   </a-modal>
@@ -64,6 +64,7 @@
 import { ref, reactive, computed, watch } from 'vue';
 import { message } from 'ant-design-vue';
 import type { FormInstance } from 'ant-design-vue';
+import { useI18n } from 'vue-i18n';
 import { useCompanyStore } from '@/stores/company';
 import type { Company } from '@/types';
 
@@ -79,6 +80,7 @@ interface Emits {
 const props = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
+const { t } = useI18n();
 const companyStore = useCompanyStore();
 const formRef = ref<FormInstance>();
 
@@ -92,11 +94,11 @@ const formData = reactive({
 });
 
 // 表单验证规则
-const rules = {
+const rules = computed(() => ({
   name: [
-    { required: true, message: '请输入公司名称', trigger: 'blur' },
+    { required: true, message: t('form.validation.companyNameRequired'), trigger: 'blur' },
   ],
-};
+}));
 
 // 控制弹窗显示
 const visible = computed({
@@ -143,7 +145,7 @@ const handleSubmit = async () => {
     visible.value = false;
   } catch (error) {
     console.error('Failed to create company:', error);
-    message.error('创建公司失败');
+    message.error(t('pages.companies.createCompanyFailed'));
   }
 };
 

@@ -139,7 +139,43 @@ export default {
       title: '公司库',
       subtitle: '管理公司信息',
       new: '添加公司',
-      edit: '编辑公司'
+      edit: '编辑公司',
+      newCompany: '新建公司',
+      companyName: '公司名称',
+      companyNamePlaceholder: '请输入公司名称',
+      industry: '所属行业',
+      selectIndustry: '选择行业',
+      companyScale: '公司规模',
+      selectScale: '选择规模',
+      companyWebsite: '公司官网',
+      websitePlaceholder: 'https://example.com',
+      companyLogo: '公司Logo',
+      logoPlaceholder: 'Logo图片URL',
+      createCompanyFailed: '创建公司失败',
+      // 行业选项
+      industries: {
+        internet: '互联网',
+        finance: '金融',
+        ecommerce: '电商',
+        gaming: '游戏',
+        education: '教育',
+        healthcare: '医疗',
+        automotive: '汽车',
+        realestate: '房地产',
+        manufacturing: '制造业',
+        consulting: '咨询',
+        other: '其他'
+      },
+      // 规模选项
+      scales: {
+        small1: '0-20人',
+        small2: '20-100人',
+        medium1: '100-500人',
+        medium2: '500-1000人',
+        large1: '1000-5000人',
+        large2: '5000-10000人',
+        xlarge: '10000人以上'
+      }
     },
     analysis: {
       title: '数据分析',
@@ -206,6 +242,12 @@ export default {
     yearEndMonths: '年终奖月数',
     guaranteedMonths: '保底月数',
     typicalMonths: '典型月数',
+    
+    // 表单验证
+    validation: {
+      required: '请输入{field}',
+      companyNameRequired: '请输入公司名称'
+    },
     
     // 面试轮次
     round: '轮次',

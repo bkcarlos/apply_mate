@@ -350,6 +350,7 @@ export default {
     applied: '已投递',
     evaluating: '评估中',
     interviewing: '面试中',
+    negotiating: '沟通中',
     offered: '已发Offer',
     rejected: '已拒绝',
     closed: '已结束'

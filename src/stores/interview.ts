@@ -27,7 +27,7 @@ export const useInterviewStore = defineStore('interview', () => {
 
   const getOngoingProcesses = computed(() => {
     return processes.value.filter((p: InterviewProcess) => 
-      ['applied', 'evaluating', 'interviewing'].includes(p.status)
+      ['applied', 'evaluating', 'interviewing', 'negotiating'].includes(p.status)
     );
   });
 

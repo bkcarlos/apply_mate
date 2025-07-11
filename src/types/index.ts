@@ -11,7 +11,7 @@ export interface Company {
 }
 
 // 面试流程状态
-export type InterviewStatus = 'applied' | 'evaluating' | 'interviewing' | 'offered' | 'rejected' | 'closed';
+export type InterviewStatus = 'applied' | 'evaluating' | 'interviewing' | 'negotiating' | 'offered' | 'rejected' | 'closed';
 
 // 面试结论
 export type InterviewConclusion = 'not_started' | 'in_progress' | 'passed' | 'failed' | 'pending';

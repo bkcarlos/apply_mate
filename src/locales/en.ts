@@ -344,6 +344,7 @@ export default {
     applied: 'Applied',
     evaluating: 'Evaluating',
     interviewing: 'Interviewing',
+    negotiating: 'Negotiating',
     offered: 'Offered',
     rejected: 'Rejected',
     closed: 'Closed'

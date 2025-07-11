@@ -25,6 +25,7 @@ const getStatusColor = (status: string) => {
       evaluating: 'processing',
       screening: 'orange', 
       interviewing: 'processing',
+      negotiating: 'gold',
       offer: 'green',
       offered: 'green',
       rejected: 'red',

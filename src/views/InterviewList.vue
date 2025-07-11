@@ -53,6 +53,7 @@
                 <a-select-option value="applied">{{ $t('status.applied') }}</a-select-option>
                 <a-select-option value="evaluating">{{ $t('status.evaluating') }}</a-select-option>
                 <a-select-option value="interviewing">{{ $t('status.interviewing') }}</a-select-option>
+                <a-select-option value="negotiating">{{ $t('status.negotiating') }}</a-select-option>
                 <a-select-option value="offered">{{ $t('status.offered') }}</a-select-option>
                 <a-select-option value="rejected">{{ $t('status.rejected') }}</a-select-option>
                 <a-select-option value="closed">{{ $t('status.closed') }}</a-select-option>
@@ -329,6 +330,7 @@ const getStatusColor = (status: string) => {
     'applied': 'blue',
     'evaluating': 'processing',
     'interviewing': 'orange',
+    'negotiating': 'gold',
     'offered': 'success',
     'rejected': 'error',
     'closed': 'default',

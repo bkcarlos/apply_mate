@@ -111,7 +111,7 @@
           <!-- 虚拟 Offer -->
           <div style="margin-top: 16px;">
             <a-button @click="addVirtualOffer" type="dashed" block>
-              <PlusOutlined />
+              <IconPlus />
               {{ $t('pages.analysis.addVirtualComparison') }}
             </a-button>
             
@@ -142,7 +142,7 @@
                 </a-col>
                 <a-col :span="2">
                   <a-button size="small" type="text" danger @click="removeVirtualOffer(index)">
-                    <DeleteOutlined />
+                    <IconDelete />
                   </a-button>
                 </a-col>
               </a-row>
@@ -171,9 +171,9 @@ import { useI18n } from 'vue-i18n';
 import dayjs, { Dayjs } from 'dayjs';
 import * as echarts from 'echarts';
 import {
-  PlusOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons-vue';
+  IconPlus,
+  IconDelete,
+} from '@arco-design/web-vue/es/icon';
 
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';

@@ -171,9 +171,9 @@
 import { ref, reactive, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { message } from 'ant-design-vue';
-import { PlusOutlined } from '@ant-design/icons-vue';
-import type { FormInstance, SelectProps } from 'ant-design-vue';
+import { Message } from '@arco-design/web-vue';
+import { IconPlus } from '@arco-design/web-vue/es/icon';
+import type { FormInstance } from '@arco-design/web-vue';
 
 import { useCompanyStore } from '@/stores/company';
 import { useInterviewStore } from '@/stores/interview';
@@ -248,7 +248,7 @@ const dropdownRender: SelectProps['dropdownRender'] = ({ menuNode }) => {
           newCompanyModalVisible.value = true;
         }
       }, [
-        h(PlusOutlined, { style: 'margin-right: 8px;' }),
+        h(IconPlus, { style: 'margin-right: 8px;' }),
         '新建公司'
       ])
     ])
@@ -277,13 +277,13 @@ const handleSubmit = async () => {
     };
 
     const newProcess = await interviewStore.addProcess(processData);
-    message.success('面试流程创建成功');
+    Message.success('面试流程创建成功');
     
     // 跳转到详情页
     router.push(`/interviews/${newProcess.id}`);
   } catch (error) {
     console.error('Failed to create process:', error);
-    message.error('创建失败');
+    Message.error('创建失败');
   } finally {
     submitting.value = false;
   }
@@ -299,7 +299,7 @@ const handleCompanyCreated = (company: Company) => {
   companies.value.push(company);
   formData.companyId = company.id;
   newCompanyModalVisible.value = false;
-  message.success('公司创建成功');
+  Message.success('公司创建成功');
 };
 
 // 加载数据
@@ -308,7 +308,7 @@ const loadData = async () => {
     await companyStore.loadCompanies();
     companies.value = companyStore.companies;
   } catch (error) {
-    message.error('加载公司数据失败');
+    Message.error('加载公司数据失败');
     console.error('Failed to load companies:', error);
   }
 };

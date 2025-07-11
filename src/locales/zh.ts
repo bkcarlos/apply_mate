@@ -24,7 +24,19 @@ export default {
     prev: '上一步',
     finish: '完成',
     all: '全部',
-    actions: '操作'
+    actions: '操作',
+    logout: '退出登录'
+  },
+
+  // 底部信息
+  footer: {
+    allRightsReserved: '版权所有'
+  },
+
+  // 标签页
+  tabBar: {
+    closeOther: '关闭其他',
+    closeAll: '关闭全部'
   },
 
   // 导航
@@ -385,8 +397,8 @@ export default {
     aboutApp: '关于 ApplyMate',
     versionLabel: '版本',
     lastUpdate: '最后更新',
-    techStack: '技术栈',
-    dataStorage: '数据存储',
+    techStack: 'Vue 3 + TypeScript + Arco Design',
+    dataStorage: '本地存储',
     dataStorageDescription: '所有数据仅存储在您的浏览器本地，不会上传到任何服务器',
     sourceCode: '开源地址',
     settingsSaveSuccess: '设置保存成功',

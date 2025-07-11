@@ -62,8 +62,8 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue';
-import { message } from 'ant-design-vue';
-import type { FormInstance } from 'ant-design-vue';
+import { Message } from '@arco-design/web-vue';
+import type { FormInstance } from '@arco-design/web-vue';
 import { useI18n } from 'vue-i18n';
 import { useCompanyStore } from '@/stores/company';
 import type { Company } from '@/types';
@@ -145,7 +145,7 @@ const handleSubmit = async () => {
     visible.value = false;
   } catch (error) {
     console.error('Failed to create company:', error);
-    message.error(t('pages.companies.createCompanyFailed'));
+    Message.error(t('pages.companies.createCompanyFailed'));
   }
 };
 

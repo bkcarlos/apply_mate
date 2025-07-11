@@ -1,235 +1,52 @@
 <template>
-  <a-config-provider :locale="antdLocale">
-    <a-layout class="app-layout">
-      <!-- 侧边栏 -->
-      <a-layout-sider
-        v-model:collapsed="collapsed"
-        :trigger="null"
-        collapsible
-        class="app-sider"
-      >
-        <div class="logo">
-          <h2 v-if="!collapsed">ApplyMate</h2>
-          <h2 v-else>AM</h2>
-        </div>
-        
-        <a-menu
-          v-model:selectedKeys="selectedKeys"
-          mode="inline"
-          theme="dark"
-          @click="handleMenuClick"
-        >
-          <a-menu-item key="/dashboard">
-            <DashboardOutlined />
-            <span>{{ $t('nav.dashboard') }}</span>
-          </a-menu-item>
-          
-          <a-menu-item key="/interviews">
-            <TeamOutlined />
-            <span>{{ $t('nav.interviews') }}</span>
-          </a-menu-item>
-          
-          <a-menu-item key="/companies">
-            <BankOutlined />
-            <span>{{ $t('nav.companies') }}</span>
-          </a-menu-item>
-          
-          <a-menu-item key="/analysis">
-            <BarChartOutlined />
-            <span>{{ $t('nav.analysis') }}</span>
-          </a-menu-item>
-          
-          <a-menu-item key="/settings">
-            <SettingOutlined />
-            <span>{{ $t('nav.settings') }}</span>
-          </a-menu-item>
-        </a-menu>
-      </a-layout-sider>
-
-      <a-layout>
-        <!-- 顶部导航 -->
-        <a-layout-header :class="['app-header', { collapsed }]">
-          <MenuUnfoldOutlined
-            v-if="collapsed"
-            class="trigger"
-            @click="() => (collapsed = !collapsed)"
-          />
-          <MenuFoldOutlined
-            v-else
-            class="trigger"
-            @click="() => (collapsed = !collapsed)"
-          />
-          
-          <div class="header-actions">
-            <LanguageSwitcher />
-            <a-button type="text" @click="handleRefresh">
-              <ReloadOutlined />
-            </a-button>
-          </div>
-        </a-layout-header>
-
-        <!-- 主内容区 -->
-        <a-layout-content :class="['app-content', { collapsed }]">
-          <div class="content-container">
-            <router-view />
-          </div>
-        </a-layout-content>
-      </a-layout>
-    </a-layout>
+  <a-config-provider>
+    <Layout />
   </a-config-provider>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
-import zhCN from 'ant-design-vue/es/locale/zh_CN';
-import enUS from 'ant-design-vue/es/locale/en_US';
-import {
-  DashboardOutlined,
-  TeamOutlined,
-  BankOutlined,
-  BarChartOutlined,
-  SettingOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons-vue';
-import LanguageSwitcher from './components/LanguageSwitcher.vue';
-
-const route = useRoute();
-const router = useRouter();
-const { locale } = useI18n();
-
-// Ant Design Vue locale
-const antdLocale = computed(() => {
-  return locale.value === 'en' ? enUS : zhCN;
-});
-
-// 侧边栏状态
-const collapsed = ref(false);
-
-// 当前选中的菜单项
-const selectedKeys = ref<string[]>([route.path]);
-
-// 监听路由变化更新选中状态
-watch(
-  () => route.path,
-  (newPath) => {
-    selectedKeys.value = [newPath];
-  }
-);
-
-// 菜单点击处理
-const handleMenuClick = ({ key }: { key: string }) => {
-  router.push(key);
-};
-
-// 刷新处理
-const handleRefresh = () => {
-  window.location.reload();
-};
+import Layout from './layout/simple.vue';
 </script>
 
-<style scoped>
-.app-layout {
-  min-height: 100vh;
+<style>
+/* 全局样式重置 */
+* {
+  box-sizing: border-box;
 }
 
-.app-sider {
-  position: fixed;
-  height: 100vh;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 100;
-}
-
-.logo {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 16px;
-  border-radius: 6px;
-}
-
-.logo h2 {
-  color: white;
+html,
+body {
   margin: 0;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.app-header {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 200px;
-  z-index: 99;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
-  transition: left 0.2s;
-}
-
-.app-header.collapsed {
-  left: 80px;
-}
-
-.trigger {
-  font-size: 18px;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.trigger:hover {
-  color: #1890ff;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.app-content {
-  margin-left: 200px;
-  margin-top: 64px;
-  transition: margin-left 0.2s;
-  background: #f0f2f5;
-  min-height: calc(100vh - 64px);
-}
-
-.app-content.collapsed {
-  margin-left: 80px;
-}
-
-.content-container {
-  padding: 24px;
+  padding: 0;
   height: 100%;
 }
 
-/* 响应式布局 */
-@media (max-width: 768px) {
-  .app-sider {
-    z-index: 200;
-  }
-  
-  .app-header {
-    left: 0;
-  }
-  
-  .app-content {
-    margin-left: 0;
-  }
-  
-  .content-container {
-    padding: 16px;
-  }
+#app {
+  height: 100%;
+}
+
+/* Arco Design 样式变量覆盖 */
+:root {
+  --color-primary-6: #165DFF;
+  --color-primary-light-1: #F2F3FF;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-text-4);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-text-3);
 }
 </style>

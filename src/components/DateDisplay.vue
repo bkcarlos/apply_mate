@@ -62,7 +62,7 @@ const fullDateTime = computed(() => {
 
 <style scoped>
 .date-display {
-  color: #6b7280;
+  color: var(--color-text-3, #6b7280);
 }
 
 .date-display.small {

@@ -24,7 +24,19 @@ export default {
     prev: 'Previous',
     finish: 'Finish',
     all: 'All',
-    actions: 'Actions'
+    actions: 'Actions',
+    logout: 'Logout'
+  },
+
+  // Footer
+  footer: {
+    allRightsReserved: 'All Rights Reserved'
+  },
+
+  // Tab Bar
+  tabBar: {
+    closeOther: 'Close Others',
+    closeAll: 'Close All'
   },
 
   // Navigation
@@ -379,7 +391,7 @@ export default {
     aboutApp: 'About ApplyMate',
     versionLabel: 'Version',
     lastUpdate: 'Last Update',
-    techStack: 'Tech Stack',
+    techStack: 'Vue 3 + TypeScript + Arco Design',
     dataStorage: 'Data Storage',
     dataStorageDescription: 'All data is only stored locally in your browser and will not be uploaded to any server',
     sourceCode: 'Source Code',

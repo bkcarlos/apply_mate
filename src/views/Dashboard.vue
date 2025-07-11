@@ -10,7 +10,7 @@
             :value-style="{ color: '#1890ff' }"
           >
             <template #prefix>
-              <TeamOutlined />
+              <IconUser />
             </template>
           </a-statistic>
         </a-card>
@@ -24,7 +24,7 @@
             :value-style="{ color: '#fa8c16' }"
           >
             <template #prefix>
-              <ClockCircleOutlined />
+              <IconClockCircle />
             </template>
           </a-statistic>
         </a-card>
@@ -38,7 +38,7 @@
             :value-style="{ color: '#52c41a' }"
           >
             <template #prefix>
-              <TrophyOutlined />
+              <IconTrophy />
             </template>
           </a-statistic>
         </a-card>
@@ -52,7 +52,7 @@
             :value-style="{ color: '#722ed1' }"
           >
             <template #prefix>
-              <FileTextOutlined />
+              <IconFile />
             </template>
           </a-statistic>
         </a-card>
@@ -65,7 +65,7 @@
         <a-card size="small">
           <template #title>
             <div class="upcoming-interviews-title">
-              <CalendarOutlined style="margin-right: 8px;" />
+              <IconCalendar style="margin-right: 8px;" />
               {{ $t('pages.dashboard.upcomingInterviewsSubtitle') }}
             </div>
           </template>
@@ -156,15 +156,15 @@ import 'dayjs/locale/zh-cn';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import * as echarts from 'echarts';
 import {
-  TeamOutlined,
-  ClockCircleOutlined,
-  TrophyOutlined,
-  FileTextOutlined,
-  CalendarOutlined,
-  PlusOutlined,
-  BankOutlined,
-  BarChartOutlined,
-} from '@ant-design/icons-vue';
+  IconUser,
+  IconClockCircle,
+  IconTrophy,
+  IconFile,
+  IconCalendar,
+  IconPlus,
+  IconHome,
+  IconBarChart,
+} from '@arco-design/web-vue/es/icon';
 
 import { useAnalyticsStore } from '@/stores/analytics';
 import { useInterviewStore } from '@/stores/interview';

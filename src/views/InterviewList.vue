@@ -11,7 +11,7 @@
       </div>
       <div class="header-right">
         <a-button type="primary" @click="goToNewInterview">
-          <PlusOutlined />
+          <IconPlus />
           {{ $t('pages.interviews.new') }}
         </a-button>
       </div>
@@ -76,20 +76,20 @@
         <a-col :span="6" class="text-right">
           <a-space>
             <a-tooltip :title="$t('interview.refreshData')">
-              <a-button :icon="h(ReloadOutlined)" @click="loadData" :loading="loading" />
+              <a-button :icon="IconRefresh" @click="loadData" :loading="loading" />
             </a-tooltip>
             <a-dropdown>
-              <a-button :icon="h(DownOutlined)">
+              <a-button :icon="IconDown">
                 {{ $t('interview.batchActions') }}
               </a-button>
               <template #overlay>
-                <a-menu>
+                                  <a-menu>
                   <a-menu-item key="export" @click="exportSelectedData">
-                    <FileExcelOutlined />
+                    <IconFile />
                     {{ $t('interview.exportData') }}
                   </a-menu-item>
                   <a-menu-item key="delete" @click="batchDelete" :disabled="selectedRowKeys.length === 0">
-                    <DeleteOutlined />
+                    <IconDelete />
                     {{ $t('interview.batchDelete') }}
                   </a-menu-item>
                 </a-menu>
@@ -202,14 +202,14 @@
 import { ref, computed, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
-import { 
-  PlusOutlined, 
-  ReloadOutlined, 
-  DownOutlined, 
-  FileExcelOutlined, 
-  DeleteOutlined 
-} from '@ant-design/icons-vue';
-import { message, Modal } from 'ant-design-vue';
+import {
+  IconPlus,
+  IconRefresh,
+  IconDown,
+  IconFile,
+  IconDelete,
+} from '@arco-design/web-vue/es/icon';
+import { Message, Modal } from '@arco-design/web-vue';
 
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
@@ -376,9 +376,9 @@ const editProcess = (record: InterviewProcess) => {
 const deleteProcess = async (record: InterviewProcess) => {
   try {
     await interviewStore.deleteProcess(record.id);
-    message.success(t('interview.deleteSuccess'));
+    Message.success(t('interview.deleteSuccess'));
   } catch (error) {
-    message.error(t('interview.deleteError'));
+    Message.error(t('interview.deleteError'));
     console.error('Failed to delete process:', error);
   }
 };
@@ -411,15 +411,15 @@ const filterCompanyOption = (input: string, option: any) => {
 
 // 批量操作
 const exportSelectedData = () => {
-  const selectedData = filteredProcesses.value.filter(process => 
+  const selectedData = filteredProcesses.value.filter(process =>
     selectedRowKeys.value.includes(process.id)
   );
-  
+
   if (selectedData.length === 0) {
-    message.warning('请选择要导出的数据');
+    Message.warning('请选择要导出的数据');
     return;
   }
-  
+
   const dataToExport = selectedData.map(process => ({
     职位: process.position,
     公司: getCompany(process.companyId)?.name || 'Unknown',
@@ -429,9 +429,9 @@ const exportSelectedData = () => {
     薪资: process.offeredSalary ? getSalaryRangeText(process.offeredSalary) : '暂无',
     备注: process.notes || ''
   }));
-  
-  const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { 
-    type: 'application/json' 
+
+  const blob = new Blob([JSON.stringify(dataToExport, null, 2)], {
+    type: 'application/json'
   });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -439,21 +439,20 @@ const exportSelectedData = () => {
   a.download = `面试数据_${dayjs().format('YYYY-MM-DD')}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  
-  message.success(`已导出 ${selectedData.length} 条记录`);
+
+  Message.success(`已导出 ${selectedData.length} 条记录`);
 };
 
 const batchDelete = () => {
   if (selectedRowKeys.value.length === 0) {
-    message.warning('请选择要删除的数据');
+    Message.warning('请选择要删除的数据');
     return;
   }
-  
+
   Modal.confirm({
     title: '批量删除确认',
     content: `确定要删除选中的 ${selectedRowKeys.value.length} 条面试流程吗？此操作不可恢复。`,
     okText: '确定删除',
-    okType: 'danger',
     cancelText: '取消',
     async onOk() {
       try {
@@ -461,10 +460,10 @@ const batchDelete = () => {
           await interviewStore.deleteProcess(id);
         }
         selectedRowKeys.value = [];
-        message.success(`已删除 ${selectedRowKeys.value.length} 条记录`);
+        Message.success(`已删除 ${selectedRowKeys.value.length} 条记录`);
         await loadData();
       } catch (error) {
-        message.error('批量删除失败');
+        Message.error('批量删除失败');
         console.error('Failed to batch delete:', error);
       }
     }
@@ -480,7 +479,7 @@ const loadData = async () => {
       companyStore.loadCompanies(),
     ]);
   } catch (error) {
-    message.error('加载数据失败');
+    Message.error('加载数据失败');
     console.error('Failed to load data:', error);
   } finally {
     loading.value = false;
@@ -560,7 +559,7 @@ onMounted(() => {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   :deep(.ant-table) {
     font-size: 12px;
   }

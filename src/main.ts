@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import Antd from 'ant-design-vue';
-import 'ant-design-vue/dist/reset.css';
+import ArcoVue from '@arco-design/web-vue';
+import '@arco-design/web-vue/dist/arco.css';
 
 import App from './App.vue';
 import router from './router';
@@ -15,7 +15,7 @@ const pinia = createPinia();
 app.use(pinia);
 app.use(router);
 app.use(i18n);
-app.use(Antd);
+app.use(ArcoVue);
 
 // 初始化数据库后挂载应用
 initDatabase().then(() => {

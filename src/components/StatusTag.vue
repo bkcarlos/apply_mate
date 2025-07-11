@@ -22,25 +22,25 @@ const getStatusColor = (status: string) => {
   if (props.type === 'process') {
     const colors = {
       applied: 'blue',
-      evaluating: 'processing',
+      evaluating: 'orange',
       screening: 'orange', 
-      interviewing: 'processing',
+      interviewing: 'cyan',
       negotiating: 'gold',
       offer: 'green',
       offered: 'green',
       rejected: 'red',
-      withdrawn: 'default',
-      closed: 'default'
+      withdrawn: 'gray',
+      closed: 'gray'
     }
-    return colors[status as keyof typeof colors] || 'default'
+    return colors[status as keyof typeof colors] || 'gray'
   } else {
     const colors = {
-      pending: 'processing',
-      passed: 'success',
-      failed: 'error',
-      cancelled: 'default'
+      pending: 'orange',
+      passed: 'green',
+      failed: 'red',
+      cancelled: 'gray'
     }
-    return colors[status as keyof typeof colors] || 'processing'
+    return colors[status as keyof typeof colors] || 'orange'
   }
 }
 

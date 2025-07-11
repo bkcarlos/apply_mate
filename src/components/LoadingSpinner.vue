@@ -1,7 +1,7 @@
 <template>
   <div :class="['loading-container', { fullscreen }]">
-    <a-spin :size="size" :spinning="true">
-      <template #indicator>
+    <a-spin :size="size" :loading="true">
+      <template #icon>
         <component :is="icon" class="loading-icon" />
       </template>
       <div v-if="text" class="loading-text">{{ text }}</div>
@@ -10,19 +10,19 @@
 </template>
 
 <script setup lang="ts">
-import { LoadingOutlined } from '@ant-design/icons-vue'
+import { IconLoading } from '@arco-design/web-vue/es/icon'
 
 interface Props {
-  size?: 'small' | 'default' | 'large'
+  size?: 'mini' | 'small' | 'medium' | 'large'
   text?: string
   fullscreen?: boolean
   icon?: any
 }
 
 withDefaults(defineProps<Props>(), {
-  size: 'default',
+  size: 'medium',
   fullscreen: false,
-  icon: LoadingOutlined
+  icon: IconLoading
 })
 </script>
 
@@ -52,7 +52,7 @@ withDefaults(defineProps<Props>(), {
 
 .loading-text {
   margin-top: 16px;
-  color: #666;
+  color: var(--color-text-2, #666);
   font-size: 14px;
 }
 

@@ -54,8 +54,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { message } from 'ant-design-vue';
-import type { FormInstance } from 'ant-design-vue';
+import { Message } from '@arco-design/web-vue';
+import type { FormInstance } from '@arco-design/web-vue';
 import { useCompanyStore } from '@/stores/company';
 import type { Company } from '@/types';
 
@@ -176,17 +176,17 @@ const handleSubmit = async () => {
     if (isEdit.value && props.company) {
       // 更新公司
       await companyStore.updateCompany(props.company.id, companyData);
-      message.success(t('message.success.update'));
+      Message.success(t('message.success.update'));
     } else {
       // 创建公司
       await companyStore.addCompany(companyData);
-      message.success(t('message.success.add'));
+      Message.success(t('message.success.add'));
     }
 
     emit('saved');
   } catch (error) {
     console.error('Failed to save company:', error);
-    message.error(isEdit.value ? t('message.error.update') : t('message.error.add'));
+    Message.error(isEdit.value ? t('message.error.update') : t('message.error.add'));
   }
 };
 

@@ -202,14 +202,14 @@
 import { ref, computed, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
 import dayjs from 'dayjs';
-import { 
-  PlusOutlined, 
-  ReloadOutlined, 
-  DownOutlined, 
-  FileExcelOutlined, 
-  DeleteOutlined 
-} from '@ant-design/icons-vue';
-import { message, Modal } from 'ant-design-vue';
+  import {
+    IconPlus as PlusOutlined,
+    IconRefresh as ReloadOutlined,
+    IconDown as DownOutlined, 
+    IconFile as FileExcelOutlined, 
+    IconDelete as DeleteOutlined 
+  } from '@arco-design/web-vue/es/icon';
+import { Message, Modal } from '@arco-design/web-vue';
 
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
@@ -324,17 +324,18 @@ const getCompany = (companyId: string) => {
   return companyStore.getCompanyById(companyId);
 };
 
-const getStatusColor = (status: string) => {
-  const colorMap: Record<string, string> = {
-    'applied': 'blue',
-    'evaluating': 'processing',
-    'interviewing': 'orange',
-    'offered': 'success',
-    'rejected': 'error',
-    'closed': 'default',
-  };
-  return colorMap[status] || 'default';
-};
+// 暂时注释未使用的函数
+// const getStatusColor = (status: string) => {
+//   const colorMap: Record<string, string> = {
+//     'applied': 'blue',
+//     'evaluating': 'processing',
+//     'interviewing': 'orange',
+//     'offered': 'success',
+//     'rejected': 'error',
+//     'closed': 'default',
+//   };
+//   return colorMap[status] || 'default';
+// };
 
 const getConclusionColor = (conclusion: string) => {
   const colorMap: Record<string, string> = {
@@ -355,9 +356,10 @@ const getSalaryRangeText = (salary: any) => {
   return SalaryCalculator.getSalaryRangeText(salary);
 };
 
-const formatDate = (date: Date) => {
-  return dayjs(date).format('YYYY-MM-DD');
-};
+// 暂时注释未使用的函数
+// const formatDate = (date: Date) => {
+//   return dayjs(date).format('YYYY-MM-DD');
+// };
 
 // 事件处理
 const goToNewInterview = () => {
@@ -376,9 +378,9 @@ const editProcess = (record: InterviewProcess) => {
 const deleteProcess = async (record: InterviewProcess) => {
   try {
     await interviewStore.deleteProcess(record.id);
-    message.success(t('interview.deleteSuccess'));
+    Message.success(t('interview.deleteSuccess'));
   } catch (error) {
-    message.error(t('interview.deleteError'));
+          Message.error(t('interview.deleteError'));
     console.error('Failed to delete process:', error);
   }
 };
@@ -416,7 +418,7 @@ const exportSelectedData = () => {
   );
   
   if (selectedData.length === 0) {
-    message.warning('请选择要导出的数据');
+    Message.warning('请选择要导出的数据');
     return;
   }
   
@@ -440,12 +442,12 @@ const exportSelectedData = () => {
   a.click();
   URL.revokeObjectURL(url);
   
-  message.success(`已导出 ${selectedData.length} 条记录`);
+      Message.success(`已导出 ${selectedData.length} 条记录`);
 };
 
 const batchDelete = () => {
   if (selectedRowKeys.value.length === 0) {
-    message.warning('请选择要删除的数据');
+          Message.warning('请选择要删除的数据');
     return;
   }
   
@@ -453,7 +455,7 @@ const batchDelete = () => {
     title: '批量删除确认',
     content: `确定要删除选中的 ${selectedRowKeys.value.length} 条面试流程吗？此操作不可恢复。`,
     okText: '确定删除',
-    okType: 'danger',
+    // okType: 'danger', // Arco Design Vue Modal 不支持此属性
     cancelText: '取消',
     async onOk() {
       try {
@@ -461,10 +463,10 @@ const batchDelete = () => {
           await interviewStore.deleteProcess(id);
         }
         selectedRowKeys.value = [];
-        message.success(`已删除 ${selectedRowKeys.value.length} 条记录`);
+        Message.success(`已删除 ${selectedRowKeys.value.length} 条记录`);
         await loadData();
       } catch (error) {
-        message.error('批量删除失败');
+        Message.error('批量删除失败');
         console.error('Failed to batch delete:', error);
       }
     }
@@ -480,7 +482,7 @@ const loadData = async () => {
       companyStore.loadCompanies(),
     ]);
   } catch (error) {
-    message.error('加载数据失败');
+    Message.error('加载数据失败');
     console.error('Failed to load data:', error);
   } finally {
     loading.value = false;

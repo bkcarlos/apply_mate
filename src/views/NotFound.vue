@@ -21,10 +21,10 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { useI18n } from 'vue-i18n';
+// import { useI18n } from 'vue-i18n'; // 暂时不需要
 
 const router = useRouter();
-const { t } = useI18n();
+// const { t } = useI18n(); // 暂时不需要
 
 const goHome = () => {
   router.push('/');

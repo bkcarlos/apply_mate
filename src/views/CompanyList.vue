@@ -11,7 +11,9 @@
       </div>
       <div class="header-right">
         <a-button type="primary" @click="showNewCompanyModal">
-          <PlusOutlined />
+          <template #icon>
+            <icon-plus />
+          </template>
           {{ $t('pages.companies.new') }}
         </a-button>
       </div>
@@ -92,13 +94,13 @@
           </template>
 
           <template #actions>
-            <EditOutlined @click.stop="editCompany(company)" />
+            <icon-edit @click.stop="editCompany(company)" />
             <a-popconfirm
               :title="$t('confirm.deleteCompany')"
               @confirm="deleteCompany(company)"
               @click.stop
             >
-              <DeleteOutlined />
+              <icon-delete />
             </a-popconfirm>
           </template>
 
@@ -111,21 +113,21 @@
             <template #description>
               <div class="company-info">
                 <div v-if="company.industry" class="info-item">
-                  <BankOutlined />
+                  <icon-home />
                   <span>{{ $t(`industry.${company.industry}`) }}</span>
                 </div>
                 <div v-if="company.scale" class="info-item">
-                  <TeamOutlined />
+                  <icon-user />
                   <span>{{ $t(`companyScale.${company.scale}`) }}</span>
                 </div>
                 <div v-if="company.website" class="info-item">
-                  <LinkOutlined />
+                  <icon-link />
                   <a :href="company.website" target="_blank" @click.stop>
                     {{ $t('company.visitWebsite') }}
                   </a>
                 </div>
                 <div class="info-item">
-                  <CalendarOutlined />
+                  <icon-calendar />
                   <span>{{ formatDate(company.createTime) }}</span>
                 </div>
               </div>
@@ -160,26 +162,26 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router'; // 暂时不需要
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
-import { message } from 'ant-design-vue';
+import { Message } from '@arco-design/web-vue';
 import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  BankOutlined,
-  TeamOutlined,
-  LinkOutlined,
-  CalendarOutlined,
-} from '@ant-design/icons-vue';
+  IconPlus,
+  IconEdit,
+  IconDelete,
+  IconHome,
+  IconUser,
+  IconLink,
+  IconCalendar,
+} from '@arco-design/web-vue/es/icon';
 
 import { useCompanyStore } from '@/stores/company';
 import { useInterviewStore } from '@/stores/interview';
 import type { Company } from '@/types';
 import CompanyModal from '@/components/CompanyModal.vue';
 
-const router = useRouter();
+// const router = useRouter(); // 暂时不需要
 const { t } = useI18n();
 const companyStore = useCompanyStore();
 const interviewStore = useInterviewStore();
@@ -200,37 +202,36 @@ const filters = ref({
 const industries = ['internet', 'finance', 'ecommerce', 'gaming', 'education', 'healthcare', 'automotive', 'realestate', 'manufacturing', 'consulting', 'other'];
 const scales = ['small', 'medium', 'large', 'xlarge', 'xxlarge', 'xxxlarge', 'huge'];
 
-// 辅助函数 - 获取行业键值
-const getIndustryKey = (industry: string) => {
-  const industryMap: Record<string, string> = {
-    '互联网': 'internet',
-    '金融': 'finance',
-    '电商': 'ecommerce',
-    '游戏': 'gaming',
-    '教育': 'education',
-    '医疗': 'healthcare',
-    '汽车': 'automotive',
-    '房地产': 'realestate',
-    '制造业': 'manufacturing',
-    '咨询': 'consulting',
-    '其他': 'other'
-  };
-  return industryMap[industry] || 'other';
-};
+// 暂时注释未使用的辅助函数
+// const getIndustryKey = (industry: string) => {
+//   const industryMap: Record<string, string> = {
+//     '互联网': 'internet',
+//     '金融': 'finance',
+//     '电商': 'ecommerce',
+//     '游戏': 'gaming',
+//     '教育': 'education',
+//     '医疗': 'healthcare',
+//     '汽车': 'automotive',
+//     '房地产': 'realestate',
+//     '制造业': 'manufacturing',
+//     '咨询': 'consulting',
+//     '其他': 'other'
+//   };
+//   return industryMap[industry] || 'other';
+// };
 
-// 辅助函数 - 获取规模键值
-const getScaleKey = (scale: string) => {
-  const scaleMap: Record<string, string> = {
-    '0-20人': 'small',
-    '20-100人': 'medium',
-    '100-500人': 'large',
-    '500-1000人': 'xlarge',
-    '1000-5000人': 'xxlarge',
-    '5000-10000人': 'xxxlarge',
-    '10000人以上': 'huge'
-  };
-  return scaleMap[scale] || 'small';
-};
+// const getScaleKey = (scale: string) => {
+//   const scaleMap: Record<string, string> = {
+//     '0-20人': 'small',
+//     '20-100人': 'medium',
+//     '100-500人': 'large',
+//     '500-1000人': 'xlarge',
+//     '1000-5000人': 'xxlarge',
+//     '5000-10000人': 'xxxlarge',
+//     '10000人以上': 'huge'
+//   };
+//   return scaleMap[scale] || 'small';
+// };
 
 // 计算属性
 const filteredCompanies = computed(() => {
@@ -271,16 +272,16 @@ const editCompany = (company: Company) => {
 const deleteCompany = async (company: Company) => {
   try {
     await companyStore.deleteCompany(company.id);
-    message.success(t('company.deleteSuccess'));
+    Message.success(t('company.deleteSuccess'));
   } catch (error: any) {
-    message.error(error.message || t('company.deleteError'));
+    Message.error(error.message || t('company.deleteError'));
     console.error('Failed to delete company:', error);
   }
 };
 
 const viewCompanyDetail = (company: Company) => {
   // 可以跳转到公司详情页或显示详情弹窗
-  message.info(t('company.viewDetail', { name: company.name }));
+  Message.info(t('company.viewDetail', { name: company.name }));
 };
 
 const resetFilters = () => {
@@ -305,7 +306,7 @@ const loadData = async () => {
       interviewStore.loadProcesses(),
     ]);
   } catch (error) {
-    message.error(t('message.error.load'));
+    Message.error(t('message.error.load'));
     console.error('Failed to load data:', error);
   } finally {
     loading.value = false;

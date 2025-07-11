@@ -7,10 +7,10 @@
           <a-statistic
             :title="$t('pages.dashboard.activeInterviews')"
             :value="dashboardStats.ongoingInterviews"
-            :value-style="{ color: '#1890ff' }"
+            :value-style="{ color: '#165dff' }"
           >
             <template #prefix>
-              <TeamOutlined />
+              <icon-user />
             </template>
           </a-statistic>
         </a-card>
@@ -21,10 +21,10 @@
           <a-statistic
             :title="$t('pages.dashboard.pendingInterviews')"
             :value="dashboardStats.pendingInterviews"
-            :value-style="{ color: '#fa8c16' }"
+            :value-style="{ color: '#ff7d00' }"
           >
             <template #prefix>
-              <ClockCircleOutlined />
+              <icon-clock-circle />
             </template>
           </a-statistic>
         </a-card>
@@ -35,10 +35,10 @@
           <a-statistic
             :title="$t('pages.dashboard.receivedOffers')"
             :value="dashboardStats.receivedOffers"
-            :value-style="{ color: '#52c41a' }"
+            :value-style="{ color: '#00b42a' }"
           >
             <template #prefix>
-              <TrophyOutlined />
+              <icon-trophy />
             </template>
           </a-statistic>
         </a-card>
@@ -52,7 +52,7 @@
             :value-style="{ color: '#722ed1' }"
           >
             <template #prefix>
-              <FileTextOutlined />
+              <icon-file />
             </template>
           </a-statistic>
         </a-card>
@@ -65,7 +65,7 @@
         <a-card size="small">
           <template #title>
             <div class="upcoming-interviews-title">
-              <CalendarOutlined style="margin-right: 8px;" />
+              <icon-calendar style="margin-right: 8px;" />
               {{ $t('pages.dashboard.upcomingInterviewsSubtitle') }}
             </div>
           </template>
@@ -156,15 +156,12 @@ import 'dayjs/locale/zh-cn';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import * as echarts from 'echarts';
 import {
-  TeamOutlined,
-  ClockCircleOutlined,
-  TrophyOutlined,
-  FileTextOutlined,
-  CalendarOutlined,
-  PlusOutlined,
-  BankOutlined,
-  BarChartOutlined,
-} from '@ant-design/icons-vue';
+  IconUser,
+  IconClockCircle,
+  IconTrophy,
+  IconFile,
+  IconCalendar,
+} from '@arco-design/web-vue/es/icon';
 
 import { useAnalyticsStore } from '@/stores/analytics';
 import { useInterviewStore } from '@/stores/interview';
@@ -187,25 +184,25 @@ const clearDataLoading = ref(false);
 // 仪表盘统计数据
 const dashboardStats = computed(() => analyticsStore.dashboardStats);
 
-// 表格列定义
-const interviewColumns = computed(() => [
-  {
-    title: t('form.company'),
-    dataIndex: 'companyName',
-    key: 'companyName',
-  },
-  {
-    title: t('form.round'),
-    dataIndex: 'round',
-    key: 'round',
-  },
-  {
-    title: t('form.scheduledAt'),
-    dataIndex: 'scheduledAt',
-    key: 'scheduledAt',
-    customRender: ({ record }: any) => formatDate(record.scheduledAt),
-  },
-]);
+// 暂时注释未使用的表格列定义
+// const interviewColumns = computed(() => [
+//   {
+//     title: t('form.company'),
+//     dataIndex: 'companyName',
+//     key: 'companyName',
+//   },
+//   {
+//     title: t('form.round'),
+//     dataIndex: 'round',
+//     key: 'round',
+//   },
+//   {
+//     title: t('form.scheduledAt'),
+//     dataIndex: 'scheduledAt',
+//     key: 'scheduledAt',
+//     customRender: ({ record }: any) => formatDate(record.scheduledAt),
+//   },
+// ]);
 
 // 未来面试表格列定义
 const upcomingInterviewColumns = computed(() => [
@@ -232,30 +229,30 @@ const upcomingInterviewColumns = computed(() => [
   },
 ]);
 
-// 近期面试（7天内）
-const recentInterviews = computed(() => {
-  const now = new Date();
-  const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  
-  const allRoundsWithCompany = interviewStore.rounds
-    .filter(round => round.scheduledAt)
-    .map(round => {
-      const process = interviewStore.getProcessById(round.processId);
-      const company = process ? companyStore.getCompanyById(process.companyId) : null;
-      return {
-        ...round,
-        companyName: company?.name || 'Unknown',
-      };
-    });
-  
-  return allRoundsWithCompany
-    .filter(round => 
-      round.scheduledAt &&
-      Math.abs(now.getTime() - round.scheduledAt.getTime()) <= oneWeek
-    )
-    .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
-    .slice(0, 5); // 只显示前5个
-});
+// 暂时注释未使用的近期面试
+// const recentInterviews = computed(() => {
+//   const now = new Date();
+//   const oneWeek = 7 * 24 * 60 * 60 * 1000;
+//   
+//   const allRoundsWithCompany = interviewStore.rounds
+//     .filter(round => round.scheduledAt)
+//     .map(round => {
+//       const process = interviewStore.getProcessById(round.processId);
+//       const company = process ? companyStore.getCompanyById(process.companyId) : null;
+//       return {
+//         ...round,
+//         companyName: company?.name || 'Unknown',
+//       };
+//     });
+//   
+//   return allRoundsWithCompany
+//     .filter(round => 
+//       round.scheduledAt &&
+//       Math.abs(now.getTime() - round.scheduledAt.getTime()) <= oneWeek
+//     )
+//     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
+//     .slice(0, 5); // 只显示前5个
+// });
 
 // 未来 7 天面试安排
 const upcomingInterviews = computed(() => {
@@ -285,11 +282,11 @@ const upcomingInterviews = computed(() => {
     .slice(0, 8); // 显示未来7天内的前8个面试
 });
 
-// 格式化日期
-const formatDate = (date: Date | undefined) => {
-  if (!date) return '';
-  return dayjs(date).format('MM-DD');
-};
+// 暂时注释未使用的函数
+// const formatDate = (date: Date | undefined) => {
+//   if (!date) return '';
+//   return dayjs(date).format('MM-DD');
+// };
 
 // 格式化未来面试日期
 const formatUpcomingDate = (date: Date | undefined) => {
@@ -328,16 +325,16 @@ const getRelativeDayText = (date: Date | undefined) => {
   }
 };
 
-// 获取状态颜色
-const getStatusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    [t('pages.dashboard.pendingStatus')]: 'orange',
-    [t('pages.dashboard.scheduledStatus')]: 'blue', 
-    [t('pages.dashboard.completedStatus')]: 'green',
-    [t('pages.dashboard.cancelledStatus')]: 'red',
-  };
-  return colors[status] || 'default';
-};
+// 暂时注释未使用的函数
+// const getStatusColor = (status: string) => {
+//   const colors: Record<string, string> = {
+//     [t('pages.dashboard.pendingStatus')]: 'orange',
+//     [t('pages.dashboard.scheduledStatus')]: 'blue', 
+//     [t('pages.dashboard.completedStatus')]: 'green',
+//     [t('pages.dashboard.cancelledStatus')]: 'red',
+//   };
+//   return colors[status] || 'default';
+// };
 
 // 页面跳转
 const goToInterviews = () => router.push('/interviews');
@@ -607,7 +604,7 @@ const initSalaryChart = () => {
        },
        axisLabel: {
          show: true,
-         formatter: function(value: number, index: number) {
+         formatter: function(value: number, _index: number) {
            if (value === 0) return '';
            // 只显示数字，不显示单位和符号
            const intValue = Math.round(value);

@@ -108,7 +108,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import type { FormInstance } from 'ant-design-vue';
+import type { FormInstance } from '@arco-design/web-vue';
 import SalaryEditor from './SalaryEditor.vue';
 import type { InterviewProcess } from '@/types';
 

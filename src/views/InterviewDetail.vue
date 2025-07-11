@@ -2,8 +2,8 @@
   <div class="interview-detail">
     <div class="detail-header">
       <a-button 
-        type="link" 
-        :icon="h(ArrowLeftOutlined)" 
+        type="text" 
+        :icon="h(IconLeft)" 
         @click="$router.back()"
         class="back-btn"
       >
@@ -21,22 +21,22 @@
       </div>
       <div class="header-actions">
         <a-button 
-          :icon="h(EditOutlined)" 
+          :icon="h(IconEdit)" 
           @click="showEditModal = true"
           :disabled="!process"
         >
           {{ $t('common.edit') }}
         </a-button>
         <a-dropdown>
-          <a-button :icon="h(MoreOutlined)">{{ $t('common.more') }}</a-button>
-          <template #overlay>
+          <a-button :icon="h(IconMore)">{{ $t('common.more') }}</a-button>
+          <template #content>
             <a-menu>
               <a-menu-item key="export" @click="exportData">
-                <FileOutlined />
+                <icon-file />
                 {{ $t('common.export') }}
               </a-menu-item>
-              <a-menu-item key="delete" @click="showDeleteConfirm" danger>
-                <DeleteOutlined />
+                              <a-menu-item key="delete" @click="showDeleteConfirm">
+                <icon-delete />
                 {{ $t('common.delete') }}
               </a-menu-item>
             </a-menu>
@@ -58,7 +58,7 @@
           </a-descriptions-item>
           <a-descriptions-item :label="$t('form.company')">
             <a-button 
-              type="link" 
+              type="text" 
               @click="viewCompany" 
               v-if="company"
               class="company-link"
@@ -89,7 +89,7 @@
         <template #extra>
           <a-button 
             type="primary" 
-            :icon="h(PlusOutlined)"
+            :icon="h(IconPlus)"
             @click="showAddRoundModal = true"
             :disabled="process.status === 'rejected' || process.status === 'offered'"
           >
@@ -127,8 +127,8 @@
                 <div class="round-actions">
                   <a-button 
                     size="small" 
-                    type="link"
-                    :icon="h(EditOutlined)"
+                    type="text"
+                    :icon="h(IconEdit)"
                     @click="editRound(round)"
                   >
                     {{ $t('common.edit') }}
@@ -139,9 +139,9 @@
                   >
                     <a-button 
                       size="small" 
-                      type="link" 
-                      danger
-                      :icon="h(DeleteOutlined)"
+                      type="text" 
+                      status="danger"
+                      :icon="h(IconDelete)"
                     >
                       {{ $t('common.delete') }}
                     </a-button>
@@ -306,20 +306,20 @@
 import { ref, onMounted, computed, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { message, Modal } from 'ant-design-vue'
+import { Message, Modal } from '@arco-design/web-vue'
 import dayjs, { Dayjs } from 'dayjs'
 import { 
-  ArrowLeftOutlined,
-  EditOutlined,
-  MoreOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-  FileOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  ExclamationCircleOutlined
-} from '@ant-design/icons-vue'
+  IconLeft,
+  IconEdit,
+  IconMore,
+  IconPlus,
+  IconDelete,
+  IconFile,
+  IconClockCircle,
+  IconCheckCircle,
+  IconCloseCircle,
+  IconExclamation
+} from '@arco-design/web-vue/es/icon'
 import { useInterviewStore } from '../stores/interview'
 import { useCompanyStore } from '../stores/company'
 import type { InterviewProcess, InterviewRound, Company, RoundType, RoundResult } from '../types'
@@ -393,7 +393,7 @@ const loadProcess = async () => {
     }
   } catch (error) {
     console.error('Failed to load process:', error)
-    message.error(t('message.error.load'))
+    Message.error(t('message.error.load'))
   } finally {
     loading.value = false
   }
@@ -429,12 +429,12 @@ const getRoundColor = (result: string) => {
 
 const getRoundIcon = (result: string) => {
   const icons = {
-    pending: ClockCircleOutlined,
-    passed: CheckCircleOutlined,
-    failed: CloseCircleOutlined,
-    cancelled: ExclamationCircleOutlined
+    pending: IconClockCircle,
+    passed: IconCheckCircle,
+    failed: IconCloseCircle,
+    cancelled: IconExclamation
   }
-  return icons[result as keyof typeof icons] || ClockCircleOutlined
+  return icons[result as keyof typeof icons] || IconClockCircle
 }
 
 const getRoundResultColor = (result: string) => {
@@ -491,10 +491,10 @@ const addRound = async () => {
       location: '',
       notes: ''
     }
-    message.success('添加面试轮次成功')
+    Message.success('添加面试轮次成功')
   } catch (error) {
     console.error('Failed to add round:', error)
-    message.error('添加面试轮次失败')
+    Message.error('添加面试轮次失败')
   } finally {
     addingRound.value = false
   }
@@ -549,10 +549,10 @@ const updateRound = async () => {
       .sort((a, b) => a.round - b.round)
     
     showEditRoundModal.value = false
-    message.success(t('message.success.update'))
+    Message.success(t('message.success.update'))
   } catch (error) {
     console.error('Failed to update round:', error)
-    message.error(`${t('message.error.update')}: ${(error as Error).message || error}`)
+    Message.error(`${t('message.error.update')}: ${(error as Error).message || error}`)
   } finally {
     updatingRound.value = false
   }
@@ -563,10 +563,10 @@ const deleteRound = async (roundId: string) => {
     await interviewStore.deleteRound(roundId)
     rounds.value = interviewStore.rounds.filter(r => r.processId === processId.value)
       .sort((a, b) => a.round - b.round)
-    message.success('删除面试轮次成功')
+    Message.success('删除面试轮次成功')
   } catch (error) {
     console.error('Failed to delete round:', error)
-    message.error('删除面试轮次失败')
+    Message.error('删除面试轮次失败')
   }
 }
 
@@ -593,16 +593,16 @@ const showDeleteConfirm = () => {
     title: '确定删除这个面试流程吗？',
     content: '删除后将无法恢复，包括所有相关的面试轮次数据。',
     okText: '确定删除',
-    okType: 'danger',
+    // okType: 'danger', // Arco Design Vue Modal 不支持此属性
     cancelText: '取消',
     async onOk() {
       try {
         await interviewStore.deleteProcess(processId.value)
-        message.success('删除面试流程成功')
+        Message.success('删除面试流程成功')
         router.push('/interviews')
       } catch (error) {
         console.error('Failed to delete process:', error)
-        message.error('删除面试流程失败')
+        Message.error('删除面试流程失败')
       }
     }
   })

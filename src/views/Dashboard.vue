@@ -163,7 +163,6 @@ import {
 import { useAnalyticsStore } from '@/stores/analytics';
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
-import { generateTestData as createTestData, clearTestData as removeTestData } from '@/test-data';
 
 const router = useRouter();
 const { t, locale } = useI18n();
@@ -344,7 +343,50 @@ const goToAnalysis = () => router.push('/analysis');
 const generateTestData = async () => {
   testDataLoading.value = true;
   try {
-    await createTestData();
+    // 添加测试公司和面试流程
+    const testCompanies = ['阿里巴巴', '腾讯', '字节跳动', '美团', '滴滴出行'];
+    
+    for (const companyName of testCompanies) {
+      // 创建公司
+      const company = await companyStore.addCompany({
+        name: companyName,
+        industry: '互联网',
+        scale: '1000+人'
+      });
+      
+      // 创建面试流程
+      const process = await interviewStore.addProcess({
+        companyId: company.id,
+        position: '前端开发工程师',
+        city: '北京',
+        status: 'interviewing',
+        conclusion: 'in_progress',
+        sourceChannel: 'Boss直聘',
+        expectedSalary: { min: 20000, max: 35000 }
+      });
+      
+      // 创建未来面试轮次
+      const now = new Date();
+      const roundTypes = ['phone', 'video', 'technical', 'hr', 'final'] as const;
+      
+      for (let i = 1; i <= 2; i++) {
+        const daysFromNow = Math.floor(Math.random() * 7) + 1;
+        const scheduledAt = new Date(now);
+        scheduledAt.setDate(now.getDate() + daysFromNow);
+        scheduledAt.setHours(9 + Math.floor(Math.random() * 9), Math.random() > 0.5 ? 0 : 30, 0, 0);
+        
+        await interviewStore.addRound({
+          processId: process.id,
+          round: i,
+          type: roundTypes[Math.floor(Math.random() * roundTypes.length)],
+          scheduledAt,
+          result: 'pending',
+          interviewer: `${companyName}面试官`,
+          location: '视频会议'
+        });
+      }
+    }
+    
     await loadData(); // 重新加载数据
     console.log('测试数据生成成功');
   } catch (error) {
@@ -357,7 +399,22 @@ const generateTestData = async () => {
 const clearTestData = async () => {
   clearDataLoading.value = true;
   try {
-    await removeTestData();
+    // 清理所有数据
+    const rounds = await interviewStore.rounds;
+    for (const round of rounds) {
+      await interviewStore.deleteRound(round.id);
+    }
+    
+    const processes = await interviewStore.processes;
+    for (const process of processes) {
+      await interviewStore.deleteProcess(process.id);
+    }
+    
+    const companies = await companyStore.companies;
+    for (const company of companies) {
+      await companyStore.deleteCompany(company.id);
+    }
+    
     await loadData(); // 重新加载数据
     console.log('测试数据清理成功');
   } catch (error) {

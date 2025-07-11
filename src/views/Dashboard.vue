@@ -461,14 +461,43 @@ const initSalaryChart = () => {
   const chart = echarts.init(salaryChartRef.value);
   const salaryData = analyticsStore.salaryComparisonData;
   
+  // 准备多维度薪资数据
+  const companyNames = salaryData.map(item => item.companyName);
+  const minPackageData = salaryData.map(item => {
+    // 年包最小值：基础薪资 * (12 + 保底年终奖月数)
+    return Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 1000);
+  });
+  const maxPackageData = salaryData.map(item => {
+    // 年包最大值：基础薪资 * (12 + 年终奖最高月数)
+    return Math.round((item.salary.base * (12 + item.salary.yearEndMonths)) / 1000);
+  });
+  const typicalPackageData = salaryData.map(item => {
+    // 年包典型值：基础薪资 * (12 + 典型年终奖月数)
+    return Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 1000);
+  });
+  const baseAnnualData = salaryData.map(item => {
+    // 当前基础年薪：基础薪资 * 12
+    return Math.round((item.salary.base * 12) / 1000);
+  });
+  
   const option = {
     tooltip: {
       trigger: 'axis',
-      formatter: '{b}<br/>{a}: ¥{c}k'
+      formatter: function(params: any) {
+        let result = `<strong>${params[0].axisValue}</strong><br/>`;
+        params.forEach((param: any) => {
+          result += `${param.marker}${param.seriesName}: ¥${param.value}k<br/>`;
+        });
+        return result;
+      }
+    },
+    legend: {
+      data: ['年包最小值', '年包典型值', '年包最大值', '基础年薪'],
+      bottom: 10
     },
     xAxis: {
       type: 'category',
-      data: salaryData.map(item => item.companyName),
+      data: companyNames,
       axisLabel: {
         rotate: 45,
         interval: 0
@@ -476,30 +505,75 @@ const initSalaryChart = () => {
     },
     yAxis: {
       type: 'value',
-      name: t('pages.dashboard.annualSalary'),
+      name: '薪资 (k)',
       axisLabel: {
         formatter: '¥{value}k'
       }
     },
     series: [
       {
-        name: t('pages.dashboard.annualPackage'),
-        type: 'bar',
-        data: salaryData.map(item => Math.round((item.salary.base * 12 + item.salary.base * (item.salary.yearEndMonths || 0)) / 1000)),
+        name: '年包最小值',
+        type: 'line',
+        data: minPackageData,
+        lineStyle: {
+          color: '#ff7875',
+          width: 2
+        },
         itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#83bff6' },
-            { offset: 0.5, color: '#188df0' },
-            { offset: 1, color: '#188df0' }
-          ])
-        }
+          color: '#ff7875'
+        },
+        symbol: 'circle',
+        symbolSize: 6
+      },
+      {
+        name: '年包典型值',
+        type: 'line',
+        data: typicalPackageData,
+        lineStyle: {
+          color: '#1890ff',
+          width: 3
+        },
+        itemStyle: {
+          color: '#1890ff'
+        },
+        symbol: 'circle',
+        symbolSize: 8
+      },
+      {
+        name: '年包最大值',
+        type: 'line',
+        data: maxPackageData,
+        lineStyle: {
+          color: '#52c41a',
+          width: 2
+        },
+        itemStyle: {
+          color: '#52c41a'
+        },
+        symbol: 'circle',
+        symbolSize: 6
+      },
+      {
+        name: '基础年薪',
+        type: 'line',
+        data: baseAnnualData,
+        lineStyle: {
+          color: '#faad14',
+          width: 2,
+          type: 'dashed'
+        },
+        itemStyle: {
+          color: '#faad14'
+        },
+        symbol: 'diamond',
+        symbolSize: 6
       }
     ],
     grid: {
-      left: '50px',
+      left: '60px',
       right: '20px',
       bottom: '80px',
-      top: '40px'
+      top: '20px'
     }
   };
   

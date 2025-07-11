@@ -469,7 +469,7 @@ const initSalaryChart = () => {
   
   // 准备雷达图数据
   const radarSeries = salaryData.map(item => {
-    const baseMonthlySalary = Math.round(item.salary.base / 1000); // 月薪转换为k
+    const baseMonthlySalary = Math.round(item.salary.base / 1000); // 月薪转换为k，取整
     const baseAnnual = Math.round((item.salary.base * 12) / 1000);
     const minPackage = Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 1000);
     const typicalPackage = Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 1000);
@@ -485,9 +485,9 @@ const initSalaryChart = () => {
     };
   });
   
-  // 设置不同维度的最大值
-  const monthlyMax = Math.ceil(maxMonthlyValue / 10) * 10 + 10; // 月薪最大值
-  const annualMax = Math.ceil(maxAnnualValue / 100) * 100 + 100; // 年薪最大值
+  // 设置不同维度的最大值，按照指定间隔
+  const monthlyMax = Math.ceil(maxMonthlyValue / 5) * 5 + 5; // 月薪：按5k间隔，确保有足够刻度
+  const annualMax = Math.ceil(maxAnnualValue / 50) * 50 + 50; // 年薪：按50k间隔，减少刻度密度
   
   const option = {
     tooltip: {
@@ -555,9 +555,11 @@ const initSalaryChart = () => {
        },
        axisLabel: {
          show: true,
-         formatter: function(value: number) {
+         formatter: function(value: number, index: number) {
            if (value === 0) return '';
-           return `¥${value}k`;
+           // 确保显示整数值，去掉小数点
+           const intValue = Math.round(value);
+           return `¥${intValue}k`;
          },
          color: '#666',
          fontSize: 10,

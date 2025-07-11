@@ -485,9 +485,9 @@ const initSalaryChart = () => {
     };
   });
   
-  // 设置不同维度的最大值，按照指定间隔
-  const monthlyMax = Math.ceil(maxMonthlyValue / 5) * 5 + 5; // 月薪：按5k间隔，确保有足够刻度
-  const annualMax = Math.ceil(maxAnnualValue / 50) * 50 + 50; // 年薪：按50k间隔，减少刻度密度
+  // 设置不同维度的最大值，按照指定间隔（3个刻度）
+  const monthlyMax = Math.ceil(maxMonthlyValue / 10) * 15; // 月薪：确保3个刻度显示清晰
+  const annualMax = Math.ceil(maxAnnualValue / 100) * 150; // 年薪：确保3个刻度显示清晰
   
   const option = {
     tooltip: {
@@ -528,7 +528,7 @@ const initSalaryChart = () => {
        ],
        center: ['45%', '50%'],
        radius: '70%',
-       splitNumber: 6, // 增加刻度数量到6个（显示7条线）
+       splitNumber: 3, // 减少刻度数量到3个（显示4条线），避免重叠
        axisName: {
          color: '#666',
          fontSize: 13,
@@ -562,10 +562,12 @@ const initSalaryChart = () => {
            return `¥${intValue}k`;
          },
          color: '#666',
-         fontSize: 10,
-         padding: [2, 0],
-         backgroundColor: 'rgba(255, 255, 255, 0.8)',
-         borderRadius: 2
+         fontSize: 11,
+         padding: [3, 4],
+         backgroundColor: 'rgba(255, 255, 255, 0.9)',
+         borderRadius: 3,
+         shadowBlur: 2,
+         shadowColor: 'rgba(0,0,0,0.1)'
        }
      },
     series: [

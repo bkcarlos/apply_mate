@@ -500,7 +500,9 @@ const initSalaryChart = () => {
     },
          legend: {
        data: salaryData.map(item => item.companyName),
-       bottom: 5,
+       right: 10,
+       top: 'center',
+       orient: 'vertical',
        itemGap: 15,
        textStyle: {
          fontSize: 12
@@ -513,8 +515,8 @@ const initSalaryChart = () => {
          { name: '年包典型值', max: radarMax },
          { name: '年包最大值', max: radarMax }
        ],
-       center: ['50%', '50%'],
-       radius: '80%',
+       center: ['45%', '50%'],
+       radius: '70%',
        axisName: {
          color: '#666',
          fontSize: 13

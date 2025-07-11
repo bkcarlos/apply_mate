@@ -209,7 +209,7 @@ import {
   FileExcelOutlined, 
   DeleteOutlined 
 } from '@ant-design/icons-vue';
-import { message, Modal } from 'ant-design-vue';
+import { Message, Modal } from '@arco-design/web-vue';
 
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';

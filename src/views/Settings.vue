@@ -51,7 +51,9 @@
             <h4>{{ $t('settings.exportDataTitle') }}</h4>
             <p>{{ $t('settings.exportDataDescription') }}</p>
             <a-button type="primary" @click="exportData">
-              <DownloadOutlined />
+              <template #icon>
+                <icon-download />
+              </template>
               {{ $t('settings.exportData') }}
             </a-button>
           </div>
@@ -67,7 +69,9 @@
               accept=".json"
             >
               <a-button>
-                <UploadOutlined />
+                <template #icon>
+                  <icon-upload />
+                </template>
                 {{ $t('settings.selectFileImport') }}
               </a-button>
             </a-upload>
@@ -88,8 +92,10 @@
               :cancel-text="$t('common.cancel')"
               @confirm="clearAllData"
             >
-              <a-button danger>
-                <DeleteOutlined />
+              <a-button status="danger">
+                <template #icon>
+                  <icon-delete />
+                </template>
                 {{ $t('settings.clearAllData') }}
               </a-button>
             </a-popconfirm>
@@ -122,12 +128,12 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { message } from 'ant-design-vue';
+import { Message } from '@arco-design/web-vue';
 import {
-  DownloadOutlined,
-  UploadOutlined,
-  DeleteOutlined,
-} from '@ant-design/icons-vue';
+  IconDownload,
+  IconUpload,
+  IconDelete,
+} from '@arco-design/web-vue/es/icon';
 
 import { useUserStore } from '@/stores/user';
 import { useInterviewStore } from '@/stores/interview';
@@ -154,10 +160,10 @@ const userConfig = reactive({
 const saveUserConfig = async () => {
   try {
     await userStore.updateProfile(userConfig);
-    message.success(t('settings.settingsSaveSuccess'));
+    Message.success(t('settings.settingsSaveSuccess'));
   } catch (error) {
     console.error('Save config error:', error);
-    message.error(t('settings.settingsSaveError'));
+    Message.error(t('settings.settingsSaveError'));
   }
 };
 
@@ -186,10 +192,10 @@ const exportData = async () => {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
     
-    message.success(t('settings.exportSuccess'));
+    Message.success(t('settings.exportSuccess'));
   } catch (error) {
     console.error('Export error:', error);
-    message.error(t('settings.exportError'));
+    Message.error(t('settings.exportError'));
   } finally {
     loading.value = false;
   }
@@ -199,13 +205,13 @@ const exportData = async () => {
 const beforeUpload = (file: File) => {
   // 检查文件类型
   if (!file.name.endsWith('.json')) {
-    message.error(t('settings.importFormatError'));
+    Message.error(t('settings.importFormatError'));
     return false;
   }
   
   // 检查文件大小（10MB）
   if (file.size > 10 * 1024 * 1024) {
-    message.error(t('settings.importSizeError'));
+    Message.error(t('settings.importSizeError'));
     return false;
   }
   
@@ -226,7 +232,7 @@ const importData = async (file: File) => {
     }
     
     await dbService.importData(data, importStrategy.value);
-    message.success(t('settings.importSuccess', { 
+    Message.success(t('settings.importSuccess', { 
       strategy: importStrategy.value === 'skip' ? t('settings.skipDuplicate') : t('settings.overwriteDuplicate')
     }));
     
@@ -238,7 +244,7 @@ const importData = async (file: File) => {
     ]);
   } catch (error) {
     console.error('Import error:', error);
-    message.error(t('settings.importError'));
+    Message.error(t('settings.importError'));
   } finally {
     loading.value = false;
   }
@@ -263,13 +269,13 @@ const clearAllData = async () => {
     interviewStore.$reset();
     companyStore.$reset();
     
-    message.success(t('settings.clearSuccess'));
+    Message.success(t('settings.clearSuccess'));
     
     // 重新加载页面
     window.location.reload();
   } catch (error) {
     console.error('Clear data error:', error);
-    message.error(t('settings.clearError'));
+    Message.error(t('settings.clearError'));
   } finally {
     loading.value = false;
   }

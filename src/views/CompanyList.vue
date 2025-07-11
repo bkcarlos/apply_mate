@@ -11,7 +11,9 @@
       </div>
       <div class="header-right">
         <a-button type="primary" @click="showNewCompanyModal">
-          <PlusOutlined />
+          <template #icon>
+            <icon-plus />
+          </template>
           {{ $t('pages.companies.new') }}
         </a-button>
       </div>
@@ -92,13 +94,13 @@
           </template>
 
           <template #actions>
-            <EditOutlined @click.stop="editCompany(company)" />
+            <icon-edit @click.stop="editCompany(company)" />
             <a-popconfirm
               :title="$t('confirm.deleteCompany')"
               @confirm="deleteCompany(company)"
               @click.stop
             >
-              <DeleteOutlined />
+              <icon-delete />
             </a-popconfirm>
           </template>
 
@@ -111,21 +113,21 @@
             <template #description>
               <div class="company-info">
                 <div v-if="company.industry" class="info-item">
-                  <BankOutlined />
+                  <icon-home />
                   <span>{{ $t(`industry.${company.industry}`) }}</span>
                 </div>
                 <div v-if="company.scale" class="info-item">
-                  <TeamOutlined />
+                  <icon-user />
                   <span>{{ $t(`companyScale.${company.scale}`) }}</span>
                 </div>
                 <div v-if="company.website" class="info-item">
-                  <LinkOutlined />
+                  <icon-link />
                   <a :href="company.website" target="_blank" @click.stop>
                     {{ $t('company.visitWebsite') }}
                   </a>
                 </div>
                 <div class="info-item">
-                  <CalendarOutlined />
+                  <icon-calendar />
                   <span>{{ formatDate(company.createTime) }}</span>
                 </div>
               </div>
@@ -163,16 +165,16 @@ import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
-import { message } from 'ant-design-vue';
+import { Message } from '@arco-design/web-vue';
 import {
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  BankOutlined,
-  TeamOutlined,
-  LinkOutlined,
-  CalendarOutlined,
-} from '@ant-design/icons-vue';
+  IconPlus,
+  IconEdit,
+  IconDelete,
+  IconHome,
+  IconUser,
+  IconLink,
+  IconCalendar,
+} from '@arco-design/web-vue/es/icon';
 
 import { useCompanyStore } from '@/stores/company';
 import { useInterviewStore } from '@/stores/interview';
@@ -271,16 +273,16 @@ const editCompany = (company: Company) => {
 const deleteCompany = async (company: Company) => {
   try {
     await companyStore.deleteCompany(company.id);
-    message.success(t('company.deleteSuccess'));
+    Message.success(t('company.deleteSuccess'));
   } catch (error: any) {
-    message.error(error.message || t('company.deleteError'));
+    Message.error(error.message || t('company.deleteError'));
     console.error('Failed to delete company:', error);
   }
 };
 
 const viewCompanyDetail = (company: Company) => {
   // 可以跳转到公司详情页或显示详情弹窗
-  message.info(t('company.viewDetail', { name: company.name }));
+  Message.info(t('company.viewDetail', { name: company.name }));
 };
 
 const resetFilters = () => {
@@ -305,7 +307,7 @@ const loadData = async () => {
       interviewStore.loadProcesses(),
     ]);
   } catch (error) {
-    message.error(t('message.error.load'));
+    Message.error(t('message.error.load'));
     console.error('Failed to load data:', error);
   } finally {
     loading.value = false;

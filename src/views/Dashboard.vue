@@ -7,10 +7,10 @@
           <a-statistic
             :title="$t('pages.dashboard.activeInterviews')"
             :value="dashboardStats.ongoingInterviews"
-            :value-style="{ color: '#1890ff' }"
+            :value-style="{ color: '#165dff' }"
           >
             <template #prefix>
-              <TeamOutlined />
+              <icon-user />
             </template>
           </a-statistic>
         </a-card>
@@ -21,10 +21,10 @@
           <a-statistic
             :title="$t('pages.dashboard.pendingInterviews')"
             :value="dashboardStats.pendingInterviews"
-            :value-style="{ color: '#fa8c16' }"
+            :value-style="{ color: '#ff7d00' }"
           >
             <template #prefix>
-              <ClockCircleOutlined />
+              <icon-clock-circle />
             </template>
           </a-statistic>
         </a-card>
@@ -35,10 +35,10 @@
           <a-statistic
             :title="$t('pages.dashboard.receivedOffers')"
             :value="dashboardStats.receivedOffers"
-            :value-style="{ color: '#52c41a' }"
+            :value-style="{ color: '#00b42a' }"
           >
             <template #prefix>
-              <TrophyOutlined />
+              <icon-trophy />
             </template>
           </a-statistic>
         </a-card>
@@ -52,7 +52,7 @@
             :value-style="{ color: '#722ed1' }"
           >
             <template #prefix>
-              <FileTextOutlined />
+              <icon-file />
             </template>
           </a-statistic>
         </a-card>
@@ -65,7 +65,7 @@
         <a-card size="small">
           <template #title>
             <div class="upcoming-interviews-title">
-              <CalendarOutlined style="margin-right: 8px;" />
+              <icon-calendar style="margin-right: 8px;" />
               {{ $t('pages.dashboard.upcomingInterviewsSubtitle') }}
             </div>
           </template>
@@ -156,15 +156,12 @@ import 'dayjs/locale/zh-cn';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import * as echarts from 'echarts';
 import {
-  TeamOutlined,
-  ClockCircleOutlined,
-  TrophyOutlined,
-  FileTextOutlined,
-  CalendarOutlined,
-  PlusOutlined,
-  BankOutlined,
-  BarChartOutlined,
-} from '@ant-design/icons-vue';
+  IconUser,
+  IconClockCircle,
+  IconTrophy,
+  IconFile,
+  IconCalendar,
+} from '@arco-design/web-vue/es/icon';
 
 import { useAnalyticsStore } from '@/stores/analytics';
 import { useInterviewStore } from '@/stores/interview';

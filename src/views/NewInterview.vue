@@ -171,7 +171,7 @@
 import { ref, reactive, onMounted, h } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { message } from 'ant-design-vue';
+import { Message } from '@arco-design/web-vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 import type { FormInstance, SelectProps } from 'ant-design-vue';
 

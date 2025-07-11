@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { LoadingOutlined } from '@ant-design/icons-vue'
+import { IconLoading } from '@arco-design/web-vue/es/icon'
 
 interface Props {
   size?: 'small' | 'default' | 'large'
@@ -22,7 +22,7 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   size: 'default',
   fullscreen: false,
-  icon: LoadingOutlined
+  icon: IconLoading
 })
 </script>
 

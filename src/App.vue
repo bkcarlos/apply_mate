@@ -1,10 +1,9 @@
 <template>
-  <a-config-provider :locale="antdLocale">
+  <a-config-provider :locale="arcoLocale">
     <a-layout class="app-layout">
       <!-- 侧边栏 -->
       <a-layout-sider
         v-model:collapsed="collapsed"
-        :trigger="null"
         collapsible
         class="app-sider"
       >
@@ -14,33 +13,43 @@
         </div>
         
         <a-menu
-          v-model:selectedKeys="selectedKeys"
-          mode="inline"
+          v-model:selected-keys="selectedKeys"
+          mode="vertical"
           theme="dark"
-          @click="handleMenuClick"
+          @menu-item-click="handleMenuClick"
         >
           <a-menu-item key="/dashboard">
-            <DashboardOutlined />
+            <template #icon>
+              <icon-dashboard />
+            </template>
             <span>{{ $t('nav.dashboard') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/interviews">
-            <TeamOutlined />
+            <template #icon>
+              <icon-user-group />
+            </template>
             <span>{{ $t('nav.interviews') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/companies">
-            <BankOutlined />
+            <template #icon>
+              <icon-home />
+            </template>
             <span>{{ $t('nav.companies') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/analysis">
-            <BarChartOutlined />
+            <template #icon>
+              <icon-bar-chart />
+            </template>
             <span>{{ $t('nav.analysis') }}</span>
           </a-menu-item>
           
           <a-menu-item key="/settings">
-            <SettingOutlined />
+            <template #icon>
+              <icon-settings />
+            </template>
             <span>{{ $t('nav.settings') }}</span>
           </a-menu-item>
         </a-menu>
@@ -49,12 +58,12 @@
       <a-layout>
         <!-- 顶部导航 -->
         <a-layout-header :class="['app-header', { collapsed }]">
-          <MenuUnfoldOutlined
+          <icon-menu-unfold
             v-if="collapsed"
             class="trigger"
             @click="() => (collapsed = !collapsed)"
           />
-          <MenuFoldOutlined
+          <icon-menu-fold
             v-else
             class="trigger"
             @click="() => (collapsed = !collapsed)"
@@ -63,7 +72,9 @@
           <div class="header-actions">
             <LanguageSwitcher />
             <a-button type="text" @click="handleRefresh">
-              <ReloadOutlined />
+              <template #icon>
+                <icon-refresh />
+              </template>
             </a-button>
           </div>
         </a-layout-header>
@@ -83,26 +94,26 @@
 import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import zhCN from 'ant-design-vue/es/locale/zh_CN';
-import enUS from 'ant-design-vue/es/locale/en_US';
+import zhCN from '@arco-design/web-vue/es/locale/zh-CN';
+import enUS from '@arco-design/web-vue/es/locale/en-US';
 import {
-  DashboardOutlined,
-  TeamOutlined,
-  BankOutlined,
-  BarChartOutlined,
-  SettingOutlined,
-  MenuUnfoldOutlined,
-  MenuFoldOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons-vue';
+  IconDashboard,
+  IconUserGroup,
+  IconHome,
+  IconBarChart,
+  IconSettings,
+  IconMenuUnfold,
+  IconMenuFold,
+  IconRefresh,
+} from '@arco-design/web-vue/es/icon';
 import LanguageSwitcher from './components/LanguageSwitcher.vue';
 
 const route = useRoute();
 const router = useRouter();
 const { locale } = useI18n();
 
-// Ant Design Vue locale
-const antdLocale = computed(() => {
+// Arco Design Vue locale
+const arcoLocale = computed(() => {
   return locale.value === 'en' ? enUS : zhCN;
 });
 
@@ -121,7 +132,7 @@ watch(
 );
 
 // 菜单点击处理
-const handleMenuClick = ({ key }: { key: string }) => {
+const handleMenuClick = (key: string) => {
   router.push(key);
 };
 
@@ -188,7 +199,7 @@ const handleRefresh = () => {
 }
 
 .trigger:hover {
-  color: #1890ff;
+  color: #165dff;
 }
 
 .header-actions {
@@ -201,7 +212,7 @@ const handleRefresh = () => {
   margin-left: 200px;
   margin-top: 64px;
   transition: margin-left 0.2s;
-  background: #f0f2f5;
+  background: #f2f3f5;
   min-height: calc(100vh - 64px);
 }
 

@@ -1,15 +1,13 @@
 <template>
-  <a-dropdown placement="bottomRight" trigger="hover">
+  <a-dropdown placement="br" trigger="hover">
     <a class="language-switcher" @click.prevent>
-      <global-outlined />
+      <icon-language />
       <span class="current-lang">{{ currentLanguage }}</span>
-      <down-outlined />
+      <icon-down />
     </a>
-    <template #overlay>
-      <a-menu @click="handleMenuClick">
-        <a-menu-item key="zh">{{ $t('language.chinese') }}</a-menu-item>
-        <a-menu-item key="en">{{ $t('language.english') }}</a-menu-item>
-      </a-menu>
+    <template #content>
+      <a-doption @click="handleMenuClick('zh')">{{ $t('language.chinese') }}</a-doption>
+      <a-doption @click="handleMenuClick('en')">{{ $t('language.english') }}</a-doption>
     </template>
   </a-dropdown>
 </template>
@@ -17,7 +15,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { GlobalOutlined, DownOutlined } from '@ant-design/icons-vue';
+import { IconLanguage, IconDown } from '@arco-design/web-vue/es/icon';
 
 const { locale, t } = useI18n();
 
@@ -25,7 +23,7 @@ const currentLanguage = computed(() => {
   return locale.value === 'zh' ? t('language.chinese') : t('language.english');
 });
 
-const handleMenuClick = ({ key }: { key: string }) => {
+const handleMenuClick = (key: string) => {
   locale.value = key;
   localStorage.setItem('language', key);
 };

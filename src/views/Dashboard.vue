@@ -128,6 +128,12 @@
             <a-button block @click="goToAnalysis">
               {{ $t('pages.dashboard.viewStatistics') }}
             </a-button>
+            <a-button block type="dashed" @click="generateTestData" :loading="testDataLoading">
+              生成测试数据
+            </a-button>
+            <a-button block type="dashed" danger @click="clearTestData" :loading="clearDataLoading">
+              清理测试数据
+            </a-button>
           </a-space>
         </a-card>
       </a-col>
@@ -157,6 +163,7 @@ import {
 import { useAnalyticsStore } from '@/stores/analytics';
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
+import { generateTestData as createTestData, clearTestData as removeTestData } from '@/test-data';
 
 const router = useRouter();
 const { t, locale } = useI18n();
@@ -169,6 +176,8 @@ dayjs.extend(relativeTime);
 dayjs.locale(locale.value === 'zh' ? 'zh-cn' : 'en');
 
 const salaryChartRef = ref<HTMLElement>();
+const testDataLoading = ref(false);
+const clearDataLoading = ref(false);
 
 // 仪表盘统计数据
 const dashboardStats = computed(() => analyticsStore.dashboardStats);
@@ -330,6 +339,33 @@ const goToInterviews = () => router.push('/interviews');
 const goToNewInterview = () => router.push('/interviews/new');
 const goToCompanies = () => router.push('/companies');
 const goToAnalysis = () => router.push('/analysis');
+
+// 测试数据操作
+const generateTestData = async () => {
+  testDataLoading.value = true;
+  try {
+    await createTestData();
+    await loadData(); // 重新加载数据
+    console.log('测试数据生成成功');
+  } catch (error) {
+    console.error('生成测试数据失败:', error);
+  } finally {
+    testDataLoading.value = false;
+  }
+};
+
+const clearTestData = async () => {
+  clearDataLoading.value = true;
+  try {
+    await removeTestData();
+    await loadData(); // 重新加载数据
+    console.log('测试数据清理成功');
+  } catch (error) {
+    console.error('清理测试数据失败:', error);
+  } finally {
+    clearDataLoading.value = false;
+  }
+};
 
 // 初始化薪资对比图表
 const initSalaryChart = () => {

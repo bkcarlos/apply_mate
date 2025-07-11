@@ -24,7 +24,15 @@ export default {
     prev: 'Previous',
     finish: 'Finish',
     all: 'All',
-    actions: 'Actions'
+    actions: 'Actions',
+    globalSearch: 'Global Search',
+    notifications: 'Notifications',
+    markAllRead: 'Mark All Read',
+    markAllReadSuccess: 'All marked as read',
+    profile: 'Profile',
+    settings: 'Settings',
+    logout: 'Logout',
+    logoutSuccess: 'Logout successful'
   },
 
   // Navigation
@@ -32,6 +40,7 @@ export default {
     dashboard: 'Dashboard',
     interviews: 'Interviews',
     companies: 'Companies',
+    calendar: 'Calendar',
     analysis: 'Analysis',
     settings: 'Settings'
   },

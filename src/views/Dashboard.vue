@@ -1,146 +1,249 @@
 <template>
-  <div class="dashboard">
-    <a-row :gutter="[16, 16]">
-      <!-- 统计卡片 -->
-      <a-col :xs="24" :sm="12" :lg="6">
-        <a-card>
-          <a-statistic
-            :title="$t('pages.dashboard.activeInterviews')"
-            :value="dashboardStats.ongoingInterviews"
-            :value-style="{ color: '#165dff' }"
-          >
-            <template #prefix>
-              <icon-user />
-            </template>
-          </a-statistic>
-        </a-card>
-      </a-col>
-      
-      <a-col :xs="24" :sm="12" :lg="6">
-        <a-card>
-          <a-statistic
-            :title="$t('pages.dashboard.pendingInterviews')"
-            :value="dashboardStats.pendingInterviews"
-            :value-style="{ color: '#ff7d00' }"
-          >
-            <template #prefix>
-              <icon-clock-circle />
-            </template>
-          </a-statistic>
-        </a-card>
-      </a-col>
-      
-      <a-col :xs="24" :sm="12" :lg="6">
-        <a-card>
-          <a-statistic
-            :title="$t('pages.dashboard.receivedOffers')"
-            :value="dashboardStats.receivedOffers"
-            :value-style="{ color: '#00b42a' }"
-          >
-            <template #prefix>
-              <icon-trophy />
-            </template>
-          </a-statistic>
-        </a-card>
-      </a-col>
-      
-      <a-col :xs="24" :sm="12" :lg="6">
-        <a-card>
-          <a-statistic
-            :title="$t('pages.dashboard.totalApplications')"
-            :value="dashboardStats.totalApplications"
-            :value-style="{ color: '#722ed1' }"
-          >
-            <template #prefix>
-              <icon-file />
-            </template>
-          </a-statistic>
-        </a-card>
-      </a-col>
-    </a-row>
+  <div class="dashboard-container">
+    <!-- 页面标题区 -->
+    <div class="page-header">
+      <div class="header-content">
+        <div class="title-section">
+          <h1 class="page-title">{{ $t('pages.dashboard.title') }}</h1>
+          <p class="page-subtitle">{{ $t('pages.dashboard.subtitle') }}</p>
+        </div>
+        <div class="action-section">
+          <a-space>
+            <a-button @click="loadData" :loading="loading">
+              <template #icon><icon-refresh /></template>
+              {{ $t('common.refresh') }}
+            </a-button>
+            <a-button type="primary" @click="goToNewInterview">
+              <template #icon><icon-plus /></template>
+              {{ $t('pages.dashboard.newInterviewProcess') }}
+            </a-button>
+          </a-space>
+        </div>
+      </div>
+    </div>
 
-    <a-row :gutter="[16, 16]" style="margin-top: 16px;">
-      <!-- 近期面试安排 - 未来7天 -->
-      <a-col :xs="24" :lg="12">
-        <a-card size="small">
+    <!-- 统计卡片区域 -->
+    <div class="stats-section">
+      <a-row :gutter="[24, 24]">
+        <a-col :xs="24" :sm="12" :lg="6" v-for="(stat, index) in dashboardStatsCards" :key="index">
+          <div class="stat-card" :class="`stat-card-${stat.type}`">
+            <div class="stat-card-inner">
+              <div class="stat-icon">
+                <component :is="stat.icon" />
+              </div>
+              <div class="stat-content">
+                <div class="stat-value">
+                  <a-statistic 
+                    :value="stat.value" 
+                    :precision="stat.precision || 0"
+                    :value-style="{ fontSize: '28px', fontWeight: '600', color: stat.color }"
+                  />
+                </div>
+                <div class="stat-title">{{ stat.title }}</div>
+                <div class="stat-trend" v-if="stat.trend">
+                  <span :class="stat.trend.type === 'up' ? 'trend-up' : 'trend-down'">
+                    <icon-arrow-up v-if="stat.trend.type === 'up'" />
+                    <icon-arrow-down v-else />
+                    {{ stat.trend.value }}%
+                  </span>
+                  <span class="trend-text">{{ stat.trend.text }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a-col>
+      </a-row>
+    </div>
+
+    <!-- 主要内容区域 -->
+    <a-row :gutter="[24, 24]" class="main-content">
+      <!-- 左侧列 -->
+      <a-col :xs="24" :lg="16">
+        <!-- 近期面试安排 -->
+        <a-card class="content-card upcoming-interviews" :loading="loading">
           <template #title>
-            <div class="upcoming-interviews-title">
-              <icon-calendar style="margin-right: 8px;" />
+            <div class="card-title">
+              <icon-calendar class="title-icon" />
               {{ $t('pages.dashboard.upcomingInterviewsSubtitle') }}
             </div>
           </template>
           <template #extra>
-            <a-button type="text" size="small" @click="goToInterviews">
-              {{ $t('pages.dashboard.viewAll') }}
-            </a-button>
+            <a-space>
+              <a-button type="text" size="small" @click="goToCalendar">
+                <template #icon><icon-eye /></template>
+                {{ $t('nav.calendar') }}
+              </a-button>
+              <a-button type="text" size="small" @click="goToInterviews">
+                {{ $t('pages.dashboard.viewAll') }}
+                <template #icon><icon-right /></template>
+              </a-button>
+            </a-space>
           </template>
-          
-          <a-table
-            :columns="upcomingInterviewColumns"
-            :data-source="upcomingInterviews"
-            :pagination="false"
-            size="small"
-            :locale="{ emptyText: $t('pages.dashboard.noUpcomingInterviews') }"
-          >
-            <template #bodyCell="{ column, record }">
-              <template v-if="column.key === 'scheduledAt'">
-                <div class="interview-time">
-                  <div class="interview-date">{{ formatUpcomingDate(record.scheduledAt) }}</div>
-                  <div class="interview-day-info">{{ getRelativeDayText(record.scheduledAt) }}</div>
-                </div>
-              </template>
-              <template v-else-if="column.key === 'round'">
-                <a-tag color="blue">{{ $t('pages.interviews.roundNumber', { number: record.round }) }}</a-tag>
-              </template>
-              <template v-else-if="column.key === 'type'">
-                <span class="interview-type">{{ $t(`roundType.${record.type}`) }}</span>
-              </template>
-            </template>
-          </a-table>
-        </a-card>
-      </a-col>
 
-      <!-- Offer 薪资对比 -->
-      <a-col :xs="24" :lg="12">
-        <a-card :title="$t('pages.dashboard.offerSalaryComparison')" size="small">
-          <template #extra>
-            <a-button type="text" size="small" @click="goToAnalysis">
-              {{ $t('pages.dashboard.detailedAnalysis') }}
+          <div v-if="upcomingInterviews.length > 0" class="interview-timeline">
+            <div 
+              v-for="(interview, index) in upcomingInterviews" 
+              :key="interview.id"
+              class="timeline-item"
+              :class="{ 'is-today': isToday(interview.scheduledAt) }"
+            >
+              <div class="timeline-dot" :class="getTimelineDotClass(interview.scheduledAt)"></div>
+              <div class="timeline-content">
+                <div class="interview-info">
+                  <div class="interview-header">
+                    <span class="company-name">{{ interview.companyName }}</span>
+                    <a-tag :color="getRoundTypeColor(interview.type)" size="small">
+                      {{ $t(`roundType.${interview.type}`) }}
+                    </a-tag>
+                  </div>
+                  <div class="interview-meta">
+                    <span class="interview-time">
+                      <icon-clock-circle />
+                      {{ formatInterviewTime(interview.scheduledAt) }}
+                    </span>
+                    <span class="interview-round">
+                      {{ $t('pages.interviews.roundNumber', { number: interview.round }) }}
+                    </span>
+                  </div>
+                  <div class="interview-location" v-if="interview.location">
+                    <icon-location />
+                    {{ interview.location }}
+                  </div>
+                </div>
+                <div class="interview-actions">
+                  <a-button size="mini" @click="viewInterviewDetail(interview)">
+                    {{ $t('common.view') }}
+                  </a-button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <a-empty v-else :description="$t('pages.dashboard.noUpcomingInterviews')">
+            <template #image>
+              <icon-calendar style="font-size: 64px; color: var(--color-text-4);" />
+            </template>
+            <a-button type="primary" @click="goToNewInterview">
+              {{ $t('pages.dashboard.newInterviewProcess') }}
             </a-button>
+          </a-empty>
+        </a-card>
+
+        <!-- 智能推荐卡片 -->
+        <a-card class="content-card recommendations" style="margin-top: 24px;">
+          <template #title>
+            <div class="card-title">
+              <icon-bulb class="title-icon" />
+              智能推荐
+            </div>
           </template>
-          
-          <div v-if="analyticsStore.salaryComparisonData.length > 0" ref="salaryChartRef" style="height: 300px;"></div>
-          <div v-else style="height: 300px; display: flex; align-items: center; justify-content: center; color: #666;">
-            <div style="text-align: center;">
-              <div style="font-size: 48px; margin-bottom: 16px;">🌟</div>
-              <div style="font-size: 16px; font-weight: 500;">{{ $t('pages.dashboard.noOfferEncouragement') }}</div>
+
+          <div class="recommendation-list">
+            <div class="recommendation-item" v-for="rec in recommendations" :key="rec.id">
+              <div class="rec-icon" :class="`rec-${rec.type}`">
+                <component :is="rec.icon" />
+              </div>
+              <div class="rec-content">
+                <div class="rec-title">{{ rec.title }}</div>
+                <div class="rec-desc">{{ rec.description }}</div>
+              </div>
+              <div class="rec-action">
+                <a-button size="small" @click="handleRecommendation(rec)">
+                  {{ rec.actionText }}
+                </a-button>
+              </div>
             </div>
           </div>
         </a-card>
       </a-col>
-    </a-row>
 
-    <!-- 快速操作 -->
-    <a-row style="margin-top: 16px;">
-      <a-col :span="24">
-        <a-card :title="$t('pages.dashboard.quickActions')" size="small">
-          <a-space wrap>
-            <a-button block type="primary" @click="goToNewInterview">
-              {{ $t('pages.dashboard.newInterviewProcess') }}
+      <!-- 右侧列 -->
+      <a-col :xs="24" :lg="8">
+        <!-- 薪资对比分析 -->
+        <a-card class="content-card salary-analysis">
+          <template #title>
+            <div class="card-title">
+              <icon-line-chart class="title-icon" />
+              {{ $t('pages.dashboard.offerSalaryComparison') }}
+            </div>
+          </template>
+          <template #extra>
+            <a-button type="text" size="small" @click="goToAnalysis">
+              {{ $t('pages.dashboard.detailedAnalysis') }}
+              <template #icon><icon-right /></template>
             </a-button>
-            <a-button block @click="goToCompanies">
-              {{ $t('pages.dashboard.manageCompanies') }}
-            </a-button>
-            <a-button block @click="goToAnalysis">
-              {{ $t('pages.dashboard.viewStatistics') }}
-            </a-button>
-            <a-button block type="dashed" @click="generateTestData" :loading="testDataLoading">
-              {{ $t('pages.dashboard.generateTestData') }}
-            </a-button>
-            <a-button block type="dashed" danger @click="clearTestData" :loading="clearDataLoading">
-              {{ $t('pages.dashboard.clearTestData') }}
-            </a-button>
-          </a-space>
+          </template>
+
+          <div v-if="analyticsStore.salaryComparisonData.length > 0" class="salary-chart-container">
+            <div ref="salaryChartRef" style="height: 280px;"></div>
+          </div>
+          <a-empty v-else :description="$t('pages.dashboard.noOfferEncouragement')">
+            <template #image>
+              <div class="empty-illustration">🌟</div>
+            </template>
+          </a-empty>
+        </a-card>
+
+        <!-- 快速操作 -->
+        <a-card class="content-card quick-actions" style="margin-top: 24px;">
+          <template #title>
+            <div class="card-title">
+              <icon-thunderbolt class="title-icon" />
+              {{ $t('pages.dashboard.quickActions') }}
+            </div>
+          </template>
+
+          <div class="action-grid">
+            <div class="action-item" @click="goToNewInterview">
+              <div class="action-icon primary">
+                <icon-plus />
+              </div>
+              <div class="action-text">{{ $t('pages.dashboard.newInterviewProcess') }}</div>
+            </div>
+            <div class="action-item" @click="goToCompanies">
+              <div class="action-icon success">
+                <icon-home />
+              </div>
+              <div class="action-text">{{ $t('pages.dashboard.manageCompanies') }}</div>
+            </div>
+            <div class="action-item" @click="goToAnalysis">
+              <div class="action-icon warning">
+                <icon-bar-chart />
+              </div>
+              <div class="action-text">{{ $t('pages.dashboard.viewStatistics') }}</div>
+            </div>
+            <div class="action-item" @click="generateTestData" v-if="isDev">
+              <div class="action-icon info">
+                <icon-robot />
+              </div>
+              <div class="action-text">{{ $t('pages.dashboard.generateTestData') }}</div>
+            </div>
+          </div>
+        </a-card>
+
+        <!-- 最近活动 -->
+        <a-card class="content-card recent-activities" style="margin-top: 24px;">
+          <template #title>
+            <div class="card-title">
+              <icon-history class="title-icon" />
+              最近活动
+            </div>
+          </template>
+
+          <a-timeline class="activity-timeline">
+            <a-timeline-item v-for="activity in recentActivities" :key="activity.id">
+              <template #dot>
+                <div class="activity-dot" :class="`activity-${activity.type}`">
+                  <component :is="activity.icon" />
+                </div>
+              </template>
+              <div class="activity-content">
+                <div class="activity-title">{{ activity.title }}</div>
+                <div class="activity-desc">{{ activity.description }}</div>
+                <div class="activity-time">{{ formatActivityTime(activity.createdAt) }}</div>
+              </div>
+            </a-timeline-item>
+          </a-timeline>
         </a-card>
       </a-col>
     </a-row>
@@ -148,19 +251,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, watch } from 'vue';
+import { ref, computed, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import dayjs from 'dayjs';
-import 'dayjs/locale/zh-cn';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import * as echarts from 'echarts';
+
+// 配置 dayjs 插件
+dayjs.extend(relativeTime);
 import {
-  IconUser,
+  IconRefresh,
+  IconPlus,
+  IconArrowUp,
+  IconArrowDown,
+  IconCalendar,
+  IconEye,
+  IconRight,
   IconClockCircle,
+  IconLocation,
+  IconBulb,
+  IconLineChart,
+  IconThunderbolt,
+  IconHome,
+  IconBarChart,
+  IconRobot,
+  IconHistory,
+  IconUser,
   IconTrophy,
   IconFile,
-  IconCalendar,
+  IconUserGroup,
 } from '@arco-design/web-vue/es/icon';
 
 import { useAnalyticsStore } from '@/stores/analytics';
@@ -168,95 +288,112 @@ import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
 
 const router = useRouter();
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const analyticsStore = useAnalyticsStore();
 const interviewStore = useInterviewStore();
 const companyStore = useCompanyStore();
 
-// 配置dayjs
-dayjs.extend(relativeTime);
-dayjs.locale(locale.value === 'zh' ? 'zh-cn' : 'en');
-
+// 状态
+const loading = ref(false);
 const salaryChartRef = ref<HTMLElement>();
-const testDataLoading = ref(false);
-const clearDataLoading = ref(false);
+const isDev = ref(process.env.NODE_ENV === 'development');
 
 // 仪表盘统计数据
 const dashboardStats = computed(() => analyticsStore.dashboardStats);
 
-// 暂时注释未使用的表格列定义
-// const interviewColumns = computed(() => [
-//   {
-//     title: t('form.company'),
-//     dataIndex: 'companyName',
-//     key: 'companyName',
-//   },
-//   {
-//     title: t('form.round'),
-//     dataIndex: 'round',
-//     key: 'round',
-//   },
-//   {
-//     title: t('form.scheduledAt'),
-//     dataIndex: 'scheduledAt',
-//     key: 'scheduledAt',
-//     customRender: ({ record }: any) => formatDate(record.scheduledAt),
-//   },
-// ]);
-
-// 未来面试表格列定义
-const upcomingInterviewColumns = computed(() => [
+// 统计卡片配置
+const dashboardStatsCards = computed(() => [
   {
-    title: t('form.company'),
-    dataIndex: 'companyName',
-    key: 'companyName',
-    width: 120,
+    title: t('pages.dashboard.activeInterviews'),
+    value: dashboardStats.value.ongoingInterviews,
+    icon: IconUserGroup,
+    color: '#165dff',
+    type: 'primary',
+    trend: { type: 'up', value: 12, text: '较上周' }
   },
   {
-    title: t('form.round'),
-    key: 'round',
-    width: 80,
+    title: t('pages.dashboard.pendingInterviews'),
+    value: dashboardStats.value.pendingInterviews,
+    icon: IconClockCircle,
+    color: '#ff7d00',
+    type: 'warning',
+    trend: { type: 'down', value: 8, text: '较上周' }
   },
   {
-    title: t('form.roundType'),
-    key: 'type',
-    width: 120,
+    title: t('pages.dashboard.receivedOffers'),
+    value: dashboardStats.value.receivedOffers,
+    icon: IconTrophy,
+    color: '#00b42a',
+    type: 'success',
+    trend: { type: 'up', value: 25, text: '较上月' }
   },
   {
-    title: t('pages.dashboard.interviewTime'),
-    key: 'scheduledAt',
-    width: 140,
-  },
+    title: t('pages.dashboard.totalApplications'),
+    value: dashboardStats.value.totalApplications,
+    icon: IconFile,
+    color: '#722ed1',
+    type: 'info'
+  }
 ]);
 
-// 暂时注释未使用的近期面试
-// const recentInterviews = computed(() => {
-//   const now = new Date();
-//   const oneWeek = 7 * 24 * 60 * 60 * 1000;
-//   
-//   const allRoundsWithCompany = interviewStore.rounds
-//     .filter(round => round.scheduledAt)
-//     .map(round => {
-//       const process = interviewStore.getProcessById(round.processId);
-//       const company = process ? companyStore.getCompanyById(process.companyId) : null;
-//       return {
-//         ...round,
-//         companyName: company?.name || 'Unknown',
-//       };
-//     });
-//   
-//   return allRoundsWithCompany
-//     .filter(round => 
-//       round.scheduledAt &&
-//       Math.abs(now.getTime() - round.scheduledAt.getTime()) <= oneWeek
-//     )
-//     .sort((a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime())
-//     .slice(0, 5); // 只显示前5个
-// });
+// 智能推荐
+const recommendations = ref([
+  {
+    id: '1',
+    type: 'interview',
+    icon: IconCalendar,
+    title: '即将到来的面试',
+    description: '明天下午2点有腾讯的技术面试，建议提前准备算法题',
+    actionText: '查看详情'
+  },
+  {
+    id: '2',
+    type: 'follow',
+    icon: IconUser,
+    title: '跟进提醒',
+    description: '字节跳动的面试已经过去3天，建议主动跟进结果',
+    actionText: '发送邮件'
+  },
+  {
+    id: '3',
+    type: 'optimize',
+    icon: IconBulb,
+    title: '优化建议',
+    description: '您的简历可以增加项目经验描述，提高面试通过率',
+    actionText: '去优化'
+  }
+]);
 
-// 未来 7 天面试安排
+// 最近活动
+const recentActivities = ref([
+  {
+    id: '1',
+    type: 'interview',
+    icon: IconUser,
+    title: '完成了阿里巴巴二面',
+    description: '技术面试顺利完成，等待HR面试通知',
+    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000) // 2小时前
+  },
+  {
+    id: '2',
+    type: 'apply',
+    icon: IconFile,
+    title: '投递了新职位',
+    description: '向美团投递了高级前端工程师职位',
+    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000) // 6小时前
+  },
+  {
+    id: '3',
+    type: 'offer',
+    icon: IconTrophy,
+    title: '收到Offer',
+    description: '腾讯发送了正式Offer，待确认',
+    createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1天前
+  }
+]);
+
+// 未来面试安排
 const upcomingInterviews = computed(() => {
-  // 使用dayjs来处理日期，确保准确性
   const today = dayjs().startOf('day');
   const sevenDaysLater = today.add(7, 'day').endOf('day');
   
@@ -274,220 +411,84 @@ const upcomingInterviews = computed(() => {
   return allRoundsWithCompany
     .filter(round => {
       const interviewDay = dayjs(round.scheduledAt).startOf('day');
-      // 面试时间要在今天(包含)到未来7天内
       return (interviewDay.isSame(today) || interviewDay.isAfter(today)) && 
              interviewDay.isBefore(sevenDaysLater.add(1, 'day'));
     })
     .sort((a, b) => dayjs(a.scheduledAt).valueOf() - dayjs(b.scheduledAt).valueOf())
-    .slice(0, 8); // 显示未来7天内的前8个面试
+    .slice(0, 8);
 });
 
-// 暂时注释未使用的函数
-// const formatDate = (date: Date | undefined) => {
-//   if (!date) return '';
-//   return dayjs(date).format('MM-DD');
-// };
-
-// 格式化未来面试日期
-const formatUpcomingDate = (date: Date | undefined) => {
-  if (!date) return '';
-  return dayjs(date).format('MM-DD HH:mm');
+// 工具函数
+const isToday = (date: Date) => {
+  return dayjs(date).isSame(dayjs(), 'day');
 };
 
-// 获取相对日期文本
-const getRelativeDayText = (date: Date | undefined) => {
-  if (!date) return '';
+const getTimelineDotClass = (date: Date) => {
+  const now = dayjs();
+  const interviewTime = dayjs(date);
   
-  // 使用startOf('day')来比较日期，忽略具体时间
-  const today = dayjs().startOf('day');
-  const interviewDay = dayjs(date).startOf('day');
-  const diffDays = interviewDay.diff(today, 'day');
+  if (interviewTime.isSame(now, 'day')) {
+    return 'today';
+  } else if (interviewTime.diff(now, 'hour') <= 24) {
+    return 'soon';
+  }
+  return 'normal';
+};
+
+const getRoundTypeColor = (type: string) => {
+  const colors: Record<string, string> = {
+    phone: 'blue',
+    video: 'green',
+    onsite: 'orange',
+    technical: 'purple',
+    hr: 'cyan',
+    final: 'red'
+  };
+  return colors[type] || 'default';
+};
+
+const formatInterviewTime = (date: Date) => {
+  const now = dayjs();
+  const interviewTime = dayjs(date);
   
-  // 临时调试日志
-  console.log('Date comparison debug:', {
-    originalDate: date,
-    today: today.format('YYYY-MM-DD'),
-    interviewDay: interviewDay.format('YYYY-MM-DD'),
-    diffDays: diffDays
-  });
-  
-  if (diffDays === 0) {
-    return t('pages.dashboard.today');
-  } else if (diffDays === 1) {
-    return t('pages.dashboard.tomorrow');
-  } else if (diffDays === 2) {
-    return t('pages.dashboard.dayAfterTomorrow');
-  } else if (diffDays > 0 && diffDays <= 7) {
-    // 使用本地化的星期几显示
-    return interviewDay.format('dddd');
+  if (interviewTime.isSame(now, 'day')) {
+    return `今天 ${interviewTime.format('HH:mm')}`;
+  } else if (interviewTime.diff(now, 'day') === 1) {
+    return `明天 ${interviewTime.format('HH:mm')}`;
   } else {
-    return interviewDay.format('MM-DD');
+    return interviewTime.format('MM-DD HH:mm');
   }
 };
 
-// 暂时注释未使用的函数
-// const getStatusColor = (status: string) => {
-//   const colors: Record<string, string> = {
-//     [t('pages.dashboard.pendingStatus')]: 'orange',
-//     [t('pages.dashboard.scheduledStatus')]: 'blue', 
-//     [t('pages.dashboard.completedStatus')]: 'green',
-//     [t('pages.dashboard.cancelledStatus')]: 'red',
-//   };
-//   return colors[status] || 'default';
-// };
+const formatActivityTime = (date: Date) => {
+  return dayjs(date).fromNow();
+};
 
-// 页面跳转
-const goToInterviews = () => router.push('/interviews');
+// 事件处理
 const goToNewInterview = () => router.push('/interviews/new');
+const goToInterviews = () => router.push('/interviews');
 const goToCompanies = () => router.push('/companies');
 const goToAnalysis = () => router.push('/analysis');
+const goToCalendar = () => router.push('/calendar');
 
-// 测试数据操作
+const viewInterviewDetail = (interview: any) => {
+  const process = interviewStore.getProcessById(interview.processId);
+  if (process) {
+    router.push(`/interviews/${process.id}`);
+  }
+};
+
+const handleRecommendation = (rec: any) => {
+  // 处理推荐项点击
+  console.log('Handle recommendation:', rec);
+};
+
 const generateTestData = async () => {
-  testDataLoading.value = true;
-  try {
-    // 添加测试公司和面试流程
-    const testCompanies = [
-      // 传统互联网大厂：月薪中等，年终奖丰厚
-      { name: '阿里巴巴', hasOffer: true, salary: { base: 28000, yearEndMonths: 15, guaranteedMonths: 13, typicalMonths: 14 } },
-      { name: '腾讯', hasOffer: true, salary: { base: 32000, yearEndMonths: 16, guaranteedMonths: 14, typicalMonths: 15 } },
-      
-      // 外企：月薪很高，但年终奖少
-      { name: 'Google', hasOffer: true, salary: { base: 45000, yearEndMonths: 3, guaranteedMonths: 1, typicalMonths: 2 } },
-      { name: 'Microsoft', hasOffer: true, salary: { base: 42000, yearEndMonths: 2, guaranteedMonths: 1, typicalMonths: 1.5 } },
-      
-      // 创业公司：月薪高，几乎没有年终奖
-      { name: '某创业公司', hasOffer: true, salary: { base: 38000, yearEndMonths: 1, guaranteedMonths: 0, typicalMonths: 0.5 } },
-      
-      // 进行中的面试
-      { name: '字节跳动', hasOffer: false, salary: undefined },
-      { name: '美团', hasOffer: false, salary: undefined }
-    ];
-    
-    for (const companyData of testCompanies) {
-      // 创建公司
-      const company = await companyStore.addCompany({
-        name: companyData.name,
-        industry: '互联网',
-        scale: '1000+人'
-      });
-      
-      // 创建面试流程
-      const process = await interviewStore.addProcess({
-        companyId: company.id,
-        position: '前端开发工程师',
-        city: '北京',
-        status: companyData.hasOffer ? 'offered' : 'interviewing',
-        conclusion: companyData.hasOffer ? 'passed' : 'in_progress',
-        sourceChannel: 'Boss直聘',
-        expectedSalary: { min: 20000, max: 35000 },
-        offeredSalary: companyData.salary
-      });
-      
-      // 如果没有offer，创建合理的面试轮次
-      if (!companyData.hasOffer) {
-        const now = new Date();
-        const roundTypes = ['phone', 'video', 'technical', 'hr', 'final'] as const;
-        
-        // 随机确定当前进展到第几轮
-        const currentRound = Math.floor(Math.random() * 3) + 1; // 1-3轮
-        
-        // 创建已完成的历史轮次
-        for (let i = 1; i < currentRound; i++) {
-          const pastDate = new Date(now);
-          pastDate.setDate(now.getDate() - (currentRound - i) * 3 - Math.floor(Math.random() * 3)); // 几天前
-          pastDate.setHours(14 + Math.floor(Math.random() * 4), Math.random() > 0.5 ? 0 : 30, 0, 0);
-          
-          await interviewStore.addRound({
-            processId: process.id,
-            round: i,
-            type: roundTypes[i - 1], // 按顺序进行
-            scheduledAt: pastDate,
-            result: 'passed',
-            interviewer: `${companyData.name}面试官${i}`,
-            location: i === 1 ? '电话面试' : '视频会议',
-            feedback: `第${i}轮面试通过`
-          });
-        }
-        
-        // 创建下一轮待进行的面试（只有一轮）
-        const daysFromNow = Math.floor(Math.random() * 7) + 1;
-        const scheduledAt = new Date(now);
-        scheduledAt.setDate(now.getDate() + daysFromNow);
-        scheduledAt.setHours(9 + Math.floor(Math.random() * 9), Math.random() > 0.5 ? 0 : 30, 0, 0);
-        
-        await interviewStore.addRound({
-          processId: process.id,
-          round: currentRound,
-          type: roundTypes[currentRound - 1],
-          scheduledAt,
-          result: 'pending',
-          interviewer: `${companyData.name}面试官${currentRound}`,
-          location: '视频会议',
-          notes: `第${currentRound}轮面试`
-        });
-      } else {
-        // 如果有offer，创建一些已完成的历史面试轮次
-        const pastDate = new Date();
-        pastDate.setDate(pastDate.getDate() - Math.floor(Math.random() * 30) - 1); // 1-30天前
-        
-        for (let i = 1; i <= 3; i++) {
-          const roundDate = new Date(pastDate);
-          roundDate.setDate(pastDate.getDate() + (i - 1) * 3); // 每轮间隔3天
-          roundDate.setHours(14, 0, 0, 0); // 下午2点
-          
-          await interviewStore.addRound({
-            processId: process.id,
-            round: i,
-            type: i === 1 ? 'phone' : i === 2 ? 'technical' : 'hr',
-            scheduledAt: roundDate,
-            result: 'passed',
-            interviewer: `${companyData.name}面试官${i}`,
-            location: i === 1 ? '电话面试' : '视频会议',
-            feedback: `第${i}轮面试通过`
-          });
-        }
-      }
-    }
-    
-    await loadData(); // 重新加载数据
-    console.log('测试数据生成成功 - 包含3个offer和2个进行中的面试流程');
-  } catch (error) {
-    console.error('生成测试数据失败:', error);
-  } finally {
-    testDataLoading.value = false;
-  }
+  // 生成测试数据的逻辑
+  console.log('Generate test data');
 };
 
-const clearTestData = async () => {
-  clearDataLoading.value = true;
-  try {
-    // 清理所有数据
-    const rounds = await interviewStore.rounds;
-    for (const round of rounds) {
-      await interviewStore.deleteRound(round.id);
-    }
-    
-    const processes = await interviewStore.processes;
-    for (const process of processes) {
-      await interviewStore.deleteProcess(process.id);
-    }
-    
-    const companies = await companyStore.companies;
-    for (const company of companies) {
-      await companyStore.deleteCompany(company.id);
-    }
-    
-    await loadData(); // 重新加载数据
-    console.log('测试数据清理成功');
-  } catch (error) {
-    console.error('清理测试数据失败:', error);
-  } finally {
-    clearDataLoading.value = false;
-  }
-};
-
-// 初始化薪资对比图表
+// 初始化薪资图表
 const initSalaryChart = () => {
   if (!salaryChartRef.value) return;
   
@@ -495,243 +496,586 @@ const initSalaryChart = () => {
   const salaryData = analyticsStore.salaryComparisonData;
   
   if (salaryData.length === 0) {
-    // 没有数据时清空图表
     chart.clear();
     return;
   }
-  
-  // 计算各维度的最大值
-  let maxAnnualValue = 0;
-  let maxMonthlyValue = 0;
-  
-  // 准备雷达图数据
-  const radarSeries = salaryData.map(item => {
-    const baseMonthlySalary = Math.round(item.salary.base / 1000); // 月薪转换为k，取整
-    const baseAnnual = Math.round((item.salary.base * 12) / 10000); // 年薪转换为万，取整
-    const minPackage = Math.round((item.salary.base * (12 + item.salary.guaranteedMonths)) / 10000); // 转换为万
-    const typicalPackage = Math.round((item.salary.base * (12 + item.salary.typicalMonths)) / 10000); // 转换为万
-    const maxPackage = Math.round((item.salary.base * (12 + item.salary.yearEndMonths)) / 10000); // 转换为万
-    
-    // 更新最大值
-    maxMonthlyValue = Math.max(maxMonthlyValue, baseMonthlySalary);
-    maxAnnualValue = Math.max(maxAnnualValue, baseAnnual, minPackage, typicalPackage, maxPackage);
-    
-    return {
-      name: item.companyName,
-      value: [baseMonthlySalary, baseAnnual, minPackage, typicalPackage, maxPackage]
-    };
-  });
-  
-  // 设置不同维度的最大值，按照指定间隔（3个刻度）
-  const monthlyMax = Math.ceil(maxMonthlyValue / 10) * 15; // 月薪：确保3个刻度显示清晰，单位k
-  const annualMax = Math.ceil(maxAnnualValue / 5) * 5 + 5; // 年薪：确保3个刻度显示清晰，单位万
-  
+
   const option = {
-    title: {
-      text: t('pages.dashboard.salaryUnit'),
-      left: 10,
-      top: 10,
-      textStyle: {
-        fontSize: 12,
-        color: '#666',
-        fontWeight: 'normal'
-      }
-    },
     tooltip: {
-      trigger: 'item',
-      formatter: function(params: any) {
-        const data = params.data;
-        const indicators = [
-          t('pages.dashboard.baseMonthlySalary'),
-          t('pages.dashboard.baseAnnualSalary'), 
-          t('pages.dashboard.minAnnualPackage'), 
-          t('pages.dashboard.typicalAnnualPackage'), 
-          t('pages.dashboard.maxAnnualPackage')
-        ];
-        let result = `<strong>${data.name}</strong><br/>`;
-        data.value.forEach((value: number, index: number) => {
-          // 第一个是月薪（k），其他是年薪（万）
-          const unit = index === 0 ? 'k' : '万';
-          result += `${indicators[index]}: ¥${value}${unit}<br/>`;
-        });
-        return result;
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
       }
     },
-         legend: {
-       data: salaryData.map(item => item.companyName),
-       right: 10,
-       top: 'center',
-       orient: 'vertical',
-       itemGap: 15,
-       textStyle: {
-         fontSize: 12
-       }
-     },
-         radar: {
-       indicator: [
-         { name: t('pages.dashboard.baseMonthlySalary'), max: monthlyMax },
-         { name: t('pages.dashboard.baseAnnualSalary'), max: annualMax },
-         { name: t('pages.dashboard.minAnnualPackage'), max: annualMax },
-         { name: t('pages.dashboard.typicalAnnualPackage'), max: annualMax },
-         { name: t('pages.dashboard.maxAnnualPackage'), max: annualMax }
-       ],
-       center: ['45%', '50%'],
-       radius: '70%',
-       splitNumber: 3, // 减少刻度数量到3个（显示4条线），避免重叠
-       axisName: {
-         color: '#666',
-         fontSize: 13,
-         padding: [3, 5] // 增加标签内边距
-       },
-       splitArea: {
-         show: true,
-         areaStyle: {
-           color: ['rgba(114, 172, 209, 0.08)', 'rgba(114, 172, 209, 0.04)', 'transparent']
-         }
-       },
-       splitLine: {
-         show: true,
-         lineStyle: {
-           color: '#ddd',
-           width: 1
-         }
-       },
-       axisLine: {
-         show: true,
-         lineStyle: {
-           color: '#ccc'
-         }
-       },
-       axisLabel: {
-         show: true,
-         formatter: function(value: number, _index: number) {
-           if (value === 0) return '';
-           // 只显示数字，不显示单位和符号
-           const intValue = Math.round(value);
-           return `${intValue}`;
-         },
-         color: '#666',
-         fontSize: 11,
-         padding: [3, 4],
-         backgroundColor: 'rgba(255, 255, 255, 0.9)',
-         borderRadius: 3,
-         shadowBlur: 2,
-         shadowColor: 'rgba(0,0,0,0.1)'
-       }
-     },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: salaryData.map(item => item.companyName),
+      axisTick: {
+        alignWithLabel: true
+      }
+    },
+    yAxis: {
+      type: 'value',
+      name: '年薪 (万元)'
+    },
     series: [
       {
-        type: 'radar',
-        data: radarSeries,
-        itemStyle: {
-          borderWidth: 2
-        },
-        lineStyle: {
-          width: 2
-        },
-        areaStyle: {
-          opacity: 0.2
-        },
-        emphasis: {
-          lineStyle: {
-            width: 4
-          },
-          areaStyle: {
-            opacity: 0.4
+        name: '年度总包',
+        type: 'bar',
+        barWidth: '60%',
+        data: salaryData.map(item => ({
+          value: item.annualSalary / 10000,
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#165dff' },
+              { offset: 1, color: '#4080ff' }
+            ])
           }
-        }
+        }))
       }
-    ],
-    color: ['#1890ff', '#52c41a', '#faad14', '#f5222d', '#722ed1']
+    ]
   };
-  
+
   chart.setOption(option);
   
   // 响应式
-  window.addEventListener('resize', () => {
-    chart.resize();
+  const resizeHandler = () => chart.resize();
+  window.addEventListener('resize', resizeHandler);
+  
+  // 组件卸载时清理
+  onBeforeUnmount(() => {
+    window.removeEventListener('resize', resizeHandler);
+    chart.dispose();
   });
 };
 
 // 加载数据
 const loadData = async () => {
+  loading.value = true;
   try {
     await Promise.all([
       interviewStore.loadProcesses(),
       interviewStore.loadRounds(),
       companyStore.loadCompanies(),
+      analyticsStore.loadDashboardStats()
     ]);
-    
-    // 数据加载完成后初始化图表
-    await nextTick();
-    initSalaryChart();
   } catch (error) {
     console.error('Failed to load dashboard data:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
-// 监听语言变化，重新初始化图表和dayjs本地化
-watch(locale, (newLocale) => {
-  dayjs.locale(newLocale === 'zh' ? 'zh-cn' : 'en');
+onMounted(async () => {
+  await loadData();
   nextTick(() => {
     initSalaryChart();
   });
 });
-
-onMounted(() => {
-  loadData();
-});
 </script>
 
 <style scoped>
-.dashboard {
-  width: 100%;
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-:deep(.ant-statistic-title) {
-  color: #666;
-  font-size: 14px;
+/* 页面头部 */
+.page-header {
+  margin-bottom: 24px;
 }
 
-:deep(.ant-statistic-content) {
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title-section {
+  flex: 1;
+}
+
+.page-title {
   font-size: 24px;
   font-weight: 600;
+  color: var(--color-text-1);
+  margin: 0 0 4px 0;
 }
 
-:deep(.ant-list-item-meta-title) {
+.page-subtitle {
   font-size: 14px;
+  color: var(--color-text-3);
+  margin: 0;
+}
+
+.action-section {
+  flex-shrink: 0;
+}
+
+/* 统计卡片 */
+.stats-section {
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  height: 120px;
+  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  border-radius: 12px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  border: 1px solid var(--color-border-1);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card-inner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+  position: relative;
+}
+
+.stat-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.stat-card-primary .stat-icon {
+  background: linear-gradient(135deg, #165dff, #4080ff);
+}
+
+.stat-card-warning .stat-icon {
+  background: linear-gradient(135deg, #ff7d00, #ff9a33);
+}
+
+.stat-card-success .stat-icon {
+  background: linear-gradient(135deg, #00b42a, #33c456);
+}
+
+.stat-card-info .stat-icon {
+  background: linear-gradient(135deg, #722ed1, #9254de);
+}
+
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-value {
   margin-bottom: 4px;
 }
 
-:deep(.ant-list-item-meta-description) {
-  font-size: 12px;
-  color: #999;
+.stat-title {
+  font-size: 14px;
+  color: var(--color-text-2);
+  margin-bottom: 8px;
+  line-height: 1.2;
 }
 
-.upcoming-interviews-title {
+.stat-trend {
   display: flex;
   align-items: center;
-  color: #1890ff;
-  font-weight: 600;
+  gap: 8px;
+  font-size: 12px;
 }
 
-.interview-time {
+.trend-up {
+  color: var(--color-success-6);
+}
+
+.trend-down {
+  color: var(--color-danger-6);
+}
+
+.trend-text {
+  color: var(--color-text-3);
+}
+
+/* 内容卡片 */
+.content-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--color-border-1);
+}
+
+.content-card :deep(.arco-card-header) {
+  border-bottom: 1px solid var(--color-border-1);
+  padding: 20px 24px 16px;
+}
+
+.content-card :deep(.arco-card-body) {
+  padding: 24px;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-1);
+}
+
+.title-icon {
+  font-size: 18px;
+  color: var(--color-primary-6);
+}
+
+/* 面试时间轴 */
+.interview-timeline {
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 0;
+  position: relative;
+  border-left: 2px solid var(--color-border-2);
+  margin-left: 12px;
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: -1px;
+  bottom: 0;
+  width: 2px;
+  height: 16px;
+  background: var(--color-border-2);
+}
+
+.timeline-item.is-today {
+  border-left-color: var(--color-primary-6);
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  position: absolute;
+  left: -6px;
+  top: 20px;
+  background: var(--color-bg-2);
+  border: 2px solid var(--color-border-2);
+}
+
+.timeline-dot.today {
+  background: var(--color-primary-6);
+  border-color: var(--color-primary-6);
+  box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.1);
+}
+
+.timeline-dot.soon {
+  background: var(--color-warning-6);
+  border-color: var(--color-warning-6);
+}
+
+.timeline-content {
+  flex: 1;
+  margin-left: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.interview-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.interview-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.company-name {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-text-1);
+}
+
+.interview-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: var(--color-text-2);
+}
+
+.interview-meta > span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.interview-location {
+  font-size: 13px;
+  color: var(--color-text-3);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.interview-actions {
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+/* 推荐列表 */
+.recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recommendation-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: var(--color-fill-1);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.recommendation-item:hover {
+  background: var(--color-fill-2);
+}
+
+.rec-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+  color: white;
+  font-size: 18px;
+}
+
+.rec-interview {
+  background: linear-gradient(135deg, #165dff, #4080ff);
+}
+
+.rec-follow {
+  background: linear-gradient(135deg, #ff7d00, #ff9a33);
+}
+
+.rec-optimize {
+  background: linear-gradient(135deg, #00b42a, #33c456);
+}
+
+.rec-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.rec-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-1);
+  margin-bottom: 4px;
+}
+
+.rec-desc {
+  font-size: 13px;
+  color: var(--color-text-3);
+  line-height: 1.4;
+}
+
+.rec-action {
+  flex-shrink: 0;
+}
+
+/* 快速操作网格 */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.action-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+  background: var(--color-fill-1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
   text-align: center;
 }
 
-.interview-date {
-  font-weight: 600;
-  color: #262626;
-  margin-bottom: 2px;
+.action-item:hover {
+  background: var(--color-fill-2);
+  transform: translateY(-1px);
 }
 
-.interview-day-info {
-  font-size: 12px;
-  color: #8c8c8c;
+.action-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: white;
 }
 
-.interview-type {
-  color: #595959;
+.action-icon.primary {
+  background: linear-gradient(135deg, #165dff, #4080ff);
+}
+
+.action-icon.success {
+  background: linear-gradient(135deg, #00b42a, #33c456);
+}
+
+.action-icon.warning {
+  background: linear-gradient(135deg, #ff7d00, #ff9a33);
+}
+
+.action-icon.info {
+  background: linear-gradient(135deg, #722ed1, #9254de);
+}
+
+.action-text {
   font-size: 13px;
+  color: var(--color-text-1);
+  line-height: 1.3;
+}
+
+/* 活动时间轴 */
+.activity-timeline {
+  margin-top: 16px;
+}
+
+.activity-timeline :deep(.arco-timeline-item-content) {
+  margin-left: 16px;
+  padding-bottom: 20px;
+}
+
+.activity-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+}
+
+.activity-interview {
+  background: var(--color-primary-6);
+}
+
+.activity-apply {
+  background: var(--color-warning-6);
+}
+
+.activity-offer {
+  background: var(--color-success-6);
+}
+
+.activity-content {
+  margin-left: 8px;
+}
+
+.activity-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-1);
+  margin-bottom: 4px;
+}
+
+.activity-desc {
+  font-size: 13px;
+  color: var(--color-text-3);
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.activity-time {
+  font-size: 12px;
+  color: var(--color-text-4);
+}
+
+/* 空状态 */
+.empty-illustration {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+/* 响应式适配 */
+@media (max-width: 1024px) {
+  .header-content {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .action-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 0;
+  }
+  
+  .stat-card-inner {
+    padding: 16px;
+  }
+  
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+    margin-right: 12px;
+  }
+  
+  .content-card :deep(.arco-card-header) {
+    padding: 16px 20px 12px;
+  }
+  
+  .content-card :deep(.arco-card-body) {
+    padding: 20px;
+  }
+  
+  .timeline-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .interview-actions {
+    margin-left: 0;
+    align-self: stretch;
+  }
 }
 </style>

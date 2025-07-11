@@ -24,7 +24,15 @@ export default {
     prev: '上一步',
     finish: '完成',
     all: '全部',
-    actions: '操作'
+    actions: '操作',
+    globalSearch: '全局搜索',
+    notifications: '通知',
+    markAllRead: '全部已读',
+    markAllReadSuccess: '已全部标记为已读',
+    profile: '个人资料',
+    settings: '设置',
+    logout: '退出登录',
+    logoutSuccess: '退出成功'
   },
 
   // 导航
@@ -32,6 +40,7 @@ export default {
     dashboard: '仪表盘',
     interviews: '面试管理',
     companies: '公司库',
+    calendar: '面试日历',
     analysis: '数据分析',
     settings: '设置'
   },

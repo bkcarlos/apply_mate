@@ -40,6 +40,12 @@ const router = createRouter({
       meta: { titleKey: 'pages.companies.title' }
     },
     {
+      path: '/calendar',
+      name: 'Calendar',
+      component: () => import('@/views/Calendar.vue'),
+      meta: { titleKey: 'nav.calendar' }
+    },
+    {
       path: '/analysis',
       name: 'Analysis',
       component: () => import('@/views/Analysis.vue'),

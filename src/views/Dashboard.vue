@@ -381,27 +381,48 @@ const generateTestData = async () => {
         offeredSalary: companyData.salary
       });
       
-      // 如果没有offer，创建未来面试轮次
+      // 如果没有offer，创建合理的面试轮次
       if (!companyData.hasOffer) {
         const now = new Date();
         const roundTypes = ['phone', 'video', 'technical', 'hr', 'final'] as const;
         
-        for (let i = 1; i <= 2; i++) {
-          const daysFromNow = Math.floor(Math.random() * 7) + 1;
-          const scheduledAt = new Date(now);
-          scheduledAt.setDate(now.getDate() + daysFromNow);
-          scheduledAt.setHours(9 + Math.floor(Math.random() * 9), Math.random() > 0.5 ? 0 : 30, 0, 0);
+        // 随机确定当前进展到第几轮
+        const currentRound = Math.floor(Math.random() * 3) + 1; // 1-3轮
+        
+        // 创建已完成的历史轮次
+        for (let i = 1; i < currentRound; i++) {
+          const pastDate = new Date(now);
+          pastDate.setDate(now.getDate() - (currentRound - i) * 3 - Math.floor(Math.random() * 3)); // 几天前
+          pastDate.setHours(14 + Math.floor(Math.random() * 4), Math.random() > 0.5 ? 0 : 30, 0, 0);
           
           await interviewStore.addRound({
             processId: process.id,
             round: i,
-            type: roundTypes[Math.floor(Math.random() * roundTypes.length)],
-            scheduledAt,
-            result: 'pending',
-            interviewer: `${companyData.name}面试官`,
-            location: '视频会议'
+            type: roundTypes[i - 1], // 按顺序进行
+            scheduledAt: pastDate,
+            result: 'passed',
+            interviewer: `${companyData.name}面试官${i}`,
+            location: i === 1 ? '电话面试' : '视频会议',
+            feedback: `第${i}轮面试通过`
           });
         }
+        
+        // 创建下一轮待进行的面试（只有一轮）
+        const daysFromNow = Math.floor(Math.random() * 7) + 1;
+        const scheduledAt = new Date(now);
+        scheduledAt.setDate(now.getDate() + daysFromNow);
+        scheduledAt.setHours(9 + Math.floor(Math.random() * 9), Math.random() > 0.5 ? 0 : 30, 0, 0);
+        
+        await interviewStore.addRound({
+          processId: process.id,
+          round: currentRound,
+          type: roundTypes[currentRound - 1],
+          scheduledAt,
+          result: 'pending',
+          interviewer: `${companyData.name}面试官${currentRound}`,
+          location: '视频会议',
+          notes: `第${currentRound}轮面试`
+        });
       } else {
         // 如果有offer，创建一些已完成的历史面试轮次
         const pastDate = new Date();

@@ -528,21 +528,42 @@ const initSalaryChart = () => {
        ],
        center: ['45%', '50%'],
        radius: '70%',
+       splitNumber: 6, // 增加刻度数量到6个（显示7条线）
        axisName: {
          color: '#666',
-         fontSize: 13
+         fontSize: 13,
+         padding: [3, 5] // 增加标签内边距
        },
        splitArea: {
+         show: true,
          areaStyle: {
-           color: ['rgba(114, 172, 209, 0.1)', 'rgba(114, 172, 209, 0.05)']
+           color: ['rgba(114, 172, 209, 0.08)', 'rgba(114, 172, 209, 0.04)', 'transparent']
+         }
+       },
+       splitLine: {
+         show: true,
+         lineStyle: {
+           color: '#ddd',
+           width: 1
+         }
+       },
+       axisLine: {
+         show: true,
+         lineStyle: {
+           color: '#ccc'
          }
        },
        axisLabel: {
+         show: true,
          formatter: function(value: number) {
+           if (value === 0) return '';
            return `¥${value}k`;
          },
-         color: '#999',
-         fontSize: 11
+         color: '#666',
+         fontSize: 10,
+         padding: [2, 0],
+         backgroundColor: 'rgba(255, 255, 255, 0.8)',
+         borderRadius: 2
        }
      },
     series: [

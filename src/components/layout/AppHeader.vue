@@ -15,8 +15,9 @@
       <el-menu
         :default-active="activeMenu"
         mode="horizontal"
-        router
+        :router="true"
         class="header-menu"
+        :ellipsis="false"
       >
         <el-menu-item
           v-for="menu in menuItems"

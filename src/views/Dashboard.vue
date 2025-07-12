@@ -2,13 +2,13 @@
   <div class="dashboard-view">
     <!-- 页面标题 -->
     <div class="dashboard-header">
-      <h2 class="page-title">工作台</h2>
+      <h2 class="page-title">{{ $t('dashboard.title') }}</h2>
       <div class="header-actions">
         <el-button type="primary" :icon="Plus" @click="createInterview">
-          新建面试
+          {{ $t('dashboard.newInterview') }}
         </el-button>
         <el-button :icon="Calendar" @click="goToCalendar">
-          查看日历
+          {{ $t('dashboard.viewCalendar') }}
         </el-button>
       </div>
     </div>
@@ -36,8 +36,8 @@
         <el-card class="content-card">
           <template #header>
             <div class="card-header">
-              <span>近期面试安排</span>
-              <el-button type="text" @click="goToCalendar">查看全部</el-button>
+              <span>{{ $t('dashboard.upcomingSchedule') }}</span>
+              <el-button type="text" @click="goToCalendar">{{ $t('dashboard.viewAll') }}</el-button>
             </div>
           </template>
           
@@ -52,8 +52,8 @@
         <el-card class="content-card">
           <template #header>
             <div class="card-header">
-              <span>Offer 薪资对比</span>
-              <el-button type="text" @click="goToAnalysis">详细分析</el-button>
+              <span>{{ $t('dashboard.offerSalaryComparison') }}</span>
+              <el-button type="text" @click="goToAnalysis">{{ $t('dashboard.detailedAnalysis') }}</el-button>
             </div>
           </template>
           
@@ -68,7 +68,7 @@
     <el-card class="quick-actions-card">
       <template #header>
         <div class="card-header">
-          <span>快速开始</span>
+          <span>{{ $t('dashboard.quickStart') }}</span>
         </div>
       </template>
       
@@ -79,7 +79,7 @@
           :icon="Plus"
           @click="createInterview"
         >
-          新建面试流程
+          {{ $t('dashboard.newInterviewProcess') }}
         </el-button>
         
         <el-button
@@ -87,7 +87,7 @@
           :icon="OfficeBuilding"
           @click="manageCompanies"
         >
-          管理公司
+          {{ $t('dashboard.manageCompanies') }}
         </el-button>
         
         <el-button
@@ -95,7 +95,7 @@
           :icon="Calendar"
           @click="goToCalendar"
         >
-          查看日历
+          {{ $t('dashboard.viewCalendar') }}
         </el-button>
       </div>
     </el-card>
@@ -105,6 +105,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   Plus,
   OfficeBuilding,
@@ -117,6 +118,7 @@ import UpcomingInterviews from '@/components/dashboard/UpcomingInterviews.vue'
 import OfferChart from '@/components/dashboard/OfferChart.vue'
 
 const router = useRouter()
+const { t } = useI18n()
 const interviewStore = useInterviewStore()
 const roundStore = useRoundStore()
 
@@ -127,28 +129,28 @@ const stats = computed(() => {
   return [
     {
       key: 'ongoing',
-      title: '进行中的面试',
+      title: t('dashboard.ongoingInterviews'),
       value: dashboardStats.ongoingInterviews,
       color: '#F28A31',
       trend: null
     },
     {
       key: 'pending',
-      title: '待安排的面试',
+      title: t('dashboard.pendingSchedule'),
       value: roundStore.getRoundsByStatus('pending').length,
       color: '#6975A7',
       trend: null
     },
     {
       key: 'offers',
-      title: '已收到 Offer',
+      title: t('dashboard.receivedOffers'),
       value: dashboardStats.receivedOffers,
       color: '#67C23A',
       trend: null
     },
     {
       key: 'total',
-      title: '总投递数量',
+      title: t('dashboard.totalApplications'),
       value: dashboardStats.totalApplications,
       color: '#E6A23C',
       trend: null

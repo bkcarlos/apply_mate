@@ -60,6 +60,7 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     InterviewDetail: typeof import('./src/components/InterviewDetail.vue')['default']
     InterviewForm: typeof import('./src/components/InterviewForm.vue')['default']
+    LanguageSwitcher: typeof import('./src/components/LanguageSwitcher.vue')['default']
     OfferChart: typeof import('./src/components/dashboard/OfferChart.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

@@ -6,6 +6,7 @@ import 'element-plus/dist/index.css';
 
 import App from './App.vue';
 import router from './router';
+import i18n from './i18n';
 import './styles/index.scss';
 
 // 创建应用实例
@@ -20,6 +21,9 @@ app.use(router);
 
 // 注册 Element Plus
 app.use(ElementPlus);
+
+// 注册 i18n
+app.use(i18n);
 
 // 注册 Element Plus 图标
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

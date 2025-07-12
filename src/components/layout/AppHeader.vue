@@ -6,7 +6,7 @@
         <div class="logo">
           <img src="/src/assets/images/logo.svg" alt="ApplyMate Logo" class="logo-image" />
         </div>
-        <h1 class="brand-name">Apply Mate</h1>
+        <h1 class="brand-name">{{ $t('header.brandName') }}</h1>
       </div>
     </div>
     
@@ -29,7 +29,7 @@
             <component :is="menu.icon" />
           </el-icon>
           <template #title>
-            <span>{{ menu.title }}</span>
+            <span>{{ $t(`nav.${menu.key}`) }}</span>
           </template>
         </el-menu-item>
       </el-menu>
@@ -38,17 +38,17 @@
     <div class="header-right">
       <!-- 快捷操作 -->
       <div class="quick-actions">
-        <el-tooltip content="新建面试流程" placement="bottom">
+        <el-tooltip :content="$t('header.newInterview')" placement="bottom">
           <el-button
             type="primary"
             :icon="Plus"
             @click="createInterview"
           >
-            新建面试
+            {{ $t('header.newInterview') }}
           </el-button>
         </el-tooltip>
         
-        <el-tooltip content="今日面试" placement="bottom">
+        <el-tooltip :content="$t('header.todayInterviews')" placement="bottom">
           <el-badge :value="todayInterviewsCount" :hidden="todayInterviewsCount === 0">
             <el-button
               :icon="Calendar"
@@ -58,7 +58,7 @@
           </el-badge>
         </el-tooltip>
         
-        <el-tooltip content="通知" placement="bottom">
+        <el-tooltip :content="$t('header.notifications')" placement="bottom">
           <el-badge :value="notificationCount" :hidden="notificationCount === 0">
             <el-button
               :icon="Bell"
@@ -68,6 +68,9 @@
           </el-badge>
         </el-tooltip>
       </div>
+      
+      <!-- 语言切换器 -->
+      <LanguageSwitcher />
       
       <!-- 用户菜单 -->
       <el-dropdown class="user-menu" @command="handleCommand">
@@ -81,15 +84,15 @@
           <el-dropdown-menu>
             <el-dropdown-item command="profile">
               <el-icon><User /></el-icon>
-              个人资料
+              {{ $t('nav.profile') }}
             </el-dropdown-item>
             <el-dropdown-item command="settings">
               <el-icon><Setting /></el-icon>
-              系统设置
+              {{ $t('nav.settings') }}
             </el-dropdown-item>
             <el-dropdown-item divided command="about">
               <el-icon><InfoFilled /></el-icon>
-              关于
+              {{ $t('nav.about') }}
             </el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -117,6 +120,7 @@ import {
 import { useInterviewStore } from '@/stores/interview'
 import { useRoundStore } from '@/stores/round'
 import { formatFileSize } from '@/utils'
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -128,31 +132,31 @@ const menuItems = ref([
   {
     name: 'Dashboard',
     path: '/dashboard',
-    title: '工作台',
+    key: 'dashboard',
     icon: 'House'
   },
   {
     name: 'Calendar',
     path: '/calendar',
-    title: '面试日历',
+    key: 'calendar',
     icon: 'Calendar'
   },
   {
     name: 'InterviewList',
     path: '/interviews',
-    title: '面试管理',
+    key: 'interviews',
     icon: 'Document'
   },
   {
     name: 'CompanyList',
     path: '/companies',
-    title: '公司管理',
+    key: 'companies',
     icon: 'OfficeBuilding'
   },
   {
     name: 'Analysis',
     path: '/analysis',
-    title: '数据分析',
+    key: 'analysis',
     icon: 'DataAnalysis'
   }
 ])

@@ -76,7 +76,21 @@ export default {
     upcomingSchedule: '近期面试安排',
     viewAll: '查看全部',
     offerSalaryComparison: 'Offer 薪资对比',
-    detailedAnalysis: '详细分析'
+    detailedAnalysis: '详细分析',
+    
+    // 测试数据功能
+    generateTestData: '生成测试数据',
+    clearTestData: '清除测试数据',
+    generateTestDataTitle: '生成测试数据',
+    generateTestDataConfirm: '确定要生成测试数据吗？这将创建一些示例公司和面试记录，方便您体验系统功能。',
+    clearTestDataTitle: '清除测试数据',
+    clearTestDataConfirm: '确定要清除所有数据吗？此操作将删除所有公司、面试记录等数据，且无法恢复。',
+    testDataGenerated: '测试数据生成成功！页面即将刷新。',
+    testDataCleared: '测试数据清除成功！页面即将刷新。',
+    testDataGenerationFailed: '测试数据生成失败',
+    testDataClearingFailed: '测试数据清除失败',
+    confirm: '确定',
+    cancel: '取消'
   },
 
   // 面试管理
@@ -199,24 +213,7 @@ export default {
     }
   },
 
-  // 面试日历
-  calendar: {
-    title: '面试日历',
-    today: '今天',
-    month: '月',
-    week: '周',
-    day: '日',
-    agenda: '议程',
-    noEvents: '暂无安排',
-    createEvent: '创建事件',
-    editEvent: '编辑事件',
-    eventDetails: '事件详情',
-    allDay: '全天',
-    startTime: '开始时间',
-    endTime: '结束时间',
-    reminder: '提醒',
-    repeat: '重复'
-  },
+
 
   // 数据分析
   analysis: {

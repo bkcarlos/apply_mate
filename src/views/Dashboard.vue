@@ -97,23 +97,53 @@
         >
           {{ $t('dashboard.viewCalendar') }}
         </el-button>
+        
+        <!-- 测试数据按钮 -->
+        <el-divider direction="vertical" />
+        
+        <el-button
+          size="large"
+          :icon="DataBoard"
+          @click="generateTestData"
+          :loading="generatingData"
+          type="success"
+          plain
+        >
+          {{ $t('dashboard.generateTestData') }}
+        </el-button>
+        
+        <el-button
+          size="large"
+          :icon="Delete"
+          @click="clearTestData"
+          :loading="clearingData"
+          type="danger"
+          plain
+        >
+          {{ $t('dashboard.clearTestData') }}
+        </el-button>
       </div>
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   Plus,
   OfficeBuilding,
-  Calendar
+  Calendar,
+  DataBoard,
+  Delete
 } from '@element-plus/icons-vue'
 import { useInterviewStore } from '@/stores/interview'
 import { useRoundStore } from '@/stores/round'
-import DashboardCard from '@/components/dashboard/DashboardCard.vue'
+import { useCompanyStore } from '@/stores/company'
+import { generateCompleteTestData, clearAllTestData } from '@/utils/testData'
+// import DashboardCard from '@/components/dashboard/DashboardCard.vue'
 import UpcomingInterviews from '@/components/dashboard/UpcomingInterviews.vue'
 import OfferChart from '@/components/dashboard/OfferChart.vue'
 
@@ -121,6 +151,7 @@ const router = useRouter()
 const { t } = useI18n()
 const interviewStore = useInterviewStore()
 const roundStore = useRoundStore()
+const companyStore = useCompanyStore()
 
 // 计算统计数据
 const stats = computed(() => {
@@ -196,6 +227,87 @@ const goToCalendar = () => {
 
 const goToAnalysis = () => {
   router.push('/analysis')
+}
+
+// 测试数据生成和清除
+const generatingData = ref(false)
+const clearingData = ref(false)
+
+const generateTestData = async () => {
+  try {
+    await ElMessageBox.confirm(
+      t('dashboard.generateTestDataConfirm'),
+      t('dashboard.generateTestDataTitle'),
+      {
+        confirmButtonText: t('dashboard.confirm'),
+        cancelButtonText: t('dashboard.cancel'),
+        type: 'info',
+      }
+    )
+    
+    generatingData.value = true
+    
+    // 生成测试数据
+    const testData = generateCompleteTestData()
+    
+    // 导入到各个store
+    await companyStore.importCompanies(testData.companies)
+    await interviewStore.importInterviews(testData.interviews)
+    
+    // 保存面试轮次数据到localStorage
+    localStorage.setItem('apply-mate-interview-rounds', JSON.stringify(testData.rounds))
+    
+    ElMessage.success(t('dashboard.testDataGenerated'))
+    
+    // 刷新页面数据
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(t('dashboard.testDataGenerationFailed'))
+      console.error(error)
+    }
+  } finally {
+    generatingData.value = false
+  }
+}
+
+const clearTestData = async () => {
+  try {
+    await ElMessageBox.confirm(
+      t('dashboard.clearTestDataConfirm'),
+      t('dashboard.clearTestDataTitle'),
+      {
+        confirmButtonText: t('dashboard.confirm'),
+        cancelButtonText: t('dashboard.cancel'),
+        type: 'warning',
+      }
+    )
+    
+    clearingData.value = true
+    
+    // 清除所有测试数据
+    clearAllTestData()
+    
+    // 重置store状态
+    companyStore.companies = []
+    interviewStore.interviews = []
+    
+    ElMessage.success(t('dashboard.testDataCleared'))
+    
+    // 刷新页面数据
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error(t('dashboard.testDataClearingFailed'))
+      console.error(error)
+    }
+  } finally {
+    clearingData.value = false
+  }
 }
 
 onMounted(() => {

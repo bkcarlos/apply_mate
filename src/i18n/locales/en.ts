@@ -76,7 +76,21 @@ export default {
     upcomingSchedule: 'Upcoming Schedule',
     viewAll: 'View All',
     offerSalaryComparison: 'Offer Salary Comparison',
-    detailedAnalysis: 'Detailed Analysis'
+    detailedAnalysis: 'Detailed Analysis',
+    
+    // Test Data Features
+    generateTestData: 'Generate Test Data',
+    clearTestData: 'Clear Test Data',
+    generateTestDataTitle: 'Generate Test Data',
+    generateTestDataConfirm: 'Are you sure you want to generate test data? This will create some sample companies and interview records to help you experience the system features.',
+    clearTestDataTitle: 'Clear Test Data',
+    clearTestDataConfirm: 'Are you sure you want to clear all data? This operation will delete all companies, interview records and other data, and cannot be undone.',
+    testDataGenerated: 'Test data generated successfully! The page will refresh shortly.',
+    testDataCleared: 'Test data cleared successfully! The page will refresh shortly.',
+    testDataGenerationFailed: 'Failed to generate test data',
+    testDataClearingFailed: 'Failed to clear test data',
+    confirm: 'Confirm',
+    cancel: 'Cancel'
   },
 
   // Interview Management
@@ -199,24 +213,7 @@ export default {
     }
   },
 
-  // Calendar
-  calendar: {
-    title: 'Interview Calendar',
-    today: 'Today',
-    month: 'Month',
-    week: 'Week',
-    day: 'Day',
-    agenda: 'Agenda',
-    noEvents: 'No Events',
-    createEvent: 'Create Event',
-    editEvent: 'Edit Event',
-    eventDetails: 'Event Details',
-    allDay: 'All Day',
-    startTime: 'Start Time',
-    endTime: 'End Time',
-    reminder: 'Reminder',
-    repeat: 'Repeat'
-  },
+
 
   // Analysis
   analysis: {

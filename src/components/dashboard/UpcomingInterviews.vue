@@ -6,7 +6,7 @@
     
     <div v-else-if="upcomingRounds.length === 0" class="empty-state">
       <el-empty
-        description="近期没有安排面试"
+        :description="$t('upcomingInterviews.emptyState.description')"
         :image-size="120"
       >
         <template #image>
@@ -15,7 +15,7 @@
           </el-icon>
         </template>
         <el-button type="primary" @click="createInterview">
-          安排新面试
+          {{ $t('upcomingInterviews.emptyState.createButton') }}
         </el-button>
       </el-empty>
     </div>
@@ -55,7 +55,7 @@
                   :type="getStatusType(round.status)"
                   size="small"
                 >
-                  {{ round.status }}
+                  {{ getStatusText(round.status) }}
                 </el-tag>
                 
                 <div v-if="round.interviewer" class="interviewer">
@@ -66,7 +66,7 @@
             </div>
             
             <div class="interview-actions">
-              <el-tooltip content="查看详情" placement="top">
+              <el-tooltip :content="$t('upcomingInterviews.tooltips.viewDetail')" placement="top">
                 <el-button
                   :icon="View"
                   circle
@@ -75,7 +75,7 @@
                 />
               </el-tooltip>
               
-              <el-tooltip content="编辑轮次" placement="top">
+              <el-tooltip :content="$t('upcomingInterviews.tooltips.editRound')" placement="top">
                 <el-button
                   :icon="Edit"
                   circle
@@ -92,7 +92,7 @@
     <!-- 查看更多链接 -->
     <div v-if="!loading && upcomingRounds.length > 0" class="view-more">
       <el-button type="text" @click="goToCalendar">
-        查看完整日历
+        {{ $t('upcomingInterviews.viewMore') }}
         <el-icon class="ml-xs"><ArrowRight /></el-icon>
       </el-button>
     </div>
@@ -102,6 +102,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import {
   Calendar,
@@ -127,6 +128,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const router = useRouter()
+const { t } = useI18n()
 const roundStore = useRoundStore()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
@@ -176,30 +178,40 @@ const formatTime = (dateTime: Date | string): string => {
 
 const getCompanyName = (processId: string): string => {
   const interview = interviewStore.getInterviewById(processId)
-  if (!interview) return '未知公司'
+  if (!interview) return t('upcomingInterviews.unknownCompany')
   
   const company = companyStore.getCompanyById(interview.companyId)
-  return company?.name || '未知公司'
+  return company?.name || t('upcomingInterviews.unknownCompany')
 }
 
 const getPosition = (processId: string): string => {
   const interview = interviewStore.getInterviewById(processId)
-  return interview?.position || '未知职位'
+  return interview?.position || t('upcomingInterviews.unknownPosition')
 }
 
 const getStatusType = (status: string): 'primary' | 'success' | 'info' | 'warning' | 'danger' => {
   switch (status) {
-    case '已安排':
     case 'scheduled':
       return 'primary'
-    case '已完成':
     case 'completed':
       return 'success'
-    case '已取消':
     case 'cancelled':
       return 'danger'
     default:
       return 'warning'
+  }
+}
+
+const getStatusText = (status: string): string => {
+  switch (status) {
+    case 'scheduled':
+      return t('upcomingInterviews.statusMap.scheduled')
+    case 'completed':
+      return t('upcomingInterviews.statusMap.completed')
+    case 'cancelled':
+      return t('upcomingInterviews.statusMap.cancelled')
+    default:
+      return status
   }
 }
 
@@ -216,7 +228,7 @@ const createInterview = () => {
 }
 
 const editRound = (_round: InterviewRound) => {
-  ElMessage.info('编辑轮次功能开发中...')
+  ElMessage.info(t('upcomingInterviews.messages.editRoundInProgress'))
   // TODO: 实现编辑轮次功能
 }
 
@@ -230,8 +242,8 @@ onMounted(async () => {
       companyStore.loadCompanies()
     ])
   } catch (error) {
-    console.error('加载面试数据失败:', error)
-    ElMessage.error('加载面试数据失败')
+    console.error(t('upcomingInterviews.comments.ensureDataLoaded') + ':', error)
+    ElMessage.error(t('upcomingInterviews.messages.loadDataFailed'))
   } finally {
     loading.value = false
   }

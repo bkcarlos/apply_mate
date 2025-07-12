@@ -9,10 +9,10 @@
     >
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="公司" prop="companyId">
+          <el-form-item :label="$t('interviewForm.labels.company')" prop="companyId">
             <el-select
               v-model="formData.companyId"
-              placeholder="选择公司"
+              :placeholder="$t('interviewForm.placeholders.company')"
               filterable
               allow-create
               default-first-option
@@ -30,10 +30,10 @@
         </el-col>
         
         <el-col :span="12">
-          <el-form-item label="职位" prop="position">
+          <el-form-item :label="$t('interviewForm.labels.position')" prop="position">
             <el-input
               v-model="formData.position"
-              placeholder="请输入职位名称"
+              :placeholder="$t('interviewForm.placeholders.position')"
             />
           </el-form-item>
         </el-col>
@@ -41,11 +41,11 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="面试时间" prop="scheduledTime">
+          <el-form-item :label="$t('interviewForm.labels.scheduledTime')" prop="scheduledTime">
             <el-date-picker
               v-model="formData.scheduledTime"
               type="datetime"
-              placeholder="选择面试时间"
+              :placeholder="$t('interviewForm.placeholders.scheduledTime')"
               style="width: 100%"
               format="YYYY-MM-DD HH:mm"
               value-format="YYYY-MM-DD HH:mm:ss"
@@ -54,7 +54,7 @@
         </el-col>
         
         <el-col :span="6">
-          <el-form-item label="面试轮次" prop="round">
+          <el-form-item :label="$t('interviewForm.labels.round')" prop="round">
             <el-input-number
               v-model="formData.round"
               :min="1"
@@ -65,11 +65,11 @@
         </el-col>
         
         <el-col :span="6">
-          <el-form-item label="面试方式" prop="type">
-            <el-select v-model="formData.type" placeholder="选择方式" style="width: 100%">
-              <el-option label="现场面试" value="现场面试" />
-              <el-option label="视频面试" value="视频面试" />
-              <el-option label="电话面试" value="电话面试" />
+          <el-form-item :label="$t('interviewForm.labels.type')" prop="type">
+            <el-select v-model="formData.type" :placeholder="$t('interviewForm.placeholders.type')" style="width: 100%">
+              <el-option :label="$t('interviewForm.interviewTypes.onsite')" value="onsite" />
+              <el-option :label="$t('interviewForm.interviewTypes.video')" value="video" />
+              <el-option :label="$t('interviewForm.interviewTypes.phone')" value="phone" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -77,19 +77,19 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="面试官">
+          <el-form-item :label="$t('interviewForm.labels.interviewer')">
             <el-input
               v-model="formData.interviewer"
-              placeholder="请输入面试官姓名"
+              :placeholder="$t('interviewForm.placeholders.interviewer')"
             />
           </el-form-item>
         </el-col>
         
         <el-col :span="12">
-          <el-form-item label="期望薪资">
+          <el-form-item :label="$t('interviewForm.labels.expectedSalary')">
             <el-input
               v-model="formData.expectedSalary"
-              placeholder="如：15K-20K"
+              :placeholder="$t('interviewForm.placeholders.expectedSalary')"
             />
           </el-form-item>
         </el-col>
@@ -97,49 +97,49 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="状态" prop="status">
-            <el-select v-model="formData.status" placeholder="选择状态" style="width: 100%">
-              <el-option label="待确认" value="pending" />
-              <el-option label="已安排" value="scheduled" />
-              <el-option label="已完成" value="completed" />
-              <el-option label="已取消" value="cancelled" />
+          <el-form-item :label="$t('interviewForm.labels.status')" prop="status">
+            <el-select v-model="formData.status" :placeholder="$t('interviewForm.placeholders.status')" style="width: 100%">
+              <el-option :label="$t('interviewForm.statusOptions.pending')" value="pending" />
+              <el-option :label="$t('interviewForm.statusOptions.scheduled')" value="scheduled" />
+              <el-option :label="$t('interviewForm.statusOptions.completed')" value="completed" />
+              <el-option :label="$t('interviewForm.statusOptions.cancelled')" value="cancelled" />
             </el-select>
           </el-form-item>
         </el-col>
         
         <el-col :span="12" v-if="formData.status === 'completed'">
-          <el-form-item label="面试结果">
-            <el-select v-model="formData.result" placeholder="选择结果" style="width: 100%">
-              <el-option label="通过" value="passed" />
-              <el-option label="未通过" value="failed" />
-              <el-option label="待定" value="pending" />
+          <el-form-item :label="$t('interviewForm.labels.result')">
+            <el-select v-model="formData.result" :placeholder="$t('interviewForm.placeholders.result')" style="width: 100%">
+              <el-option :label="$t('interviewForm.resultOptions.passed')" value="passed" />
+              <el-option :label="$t('interviewForm.resultOptions.failed')" value="failed" />
+              <el-option :label="$t('interviewForm.resultOptions.pending')" value="pending" />
             </el-select>
           </el-form-item>
         </el-col>
       </el-row>
 
-      <el-form-item label="备注">
+      <el-form-item :label="$t('interviewForm.labels.notes')">
         <el-input
           v-model="formData.notes"
           type="textarea"
           :rows="3"
-          placeholder="请输入面试备注或准备事项"
+          :placeholder="$t('interviewForm.placeholders.notes')"
         />
       </el-form-item>
 
-      <el-form-item label="反馈" v-if="formData.status === 'completed'">
+      <el-form-item :label="$t('interviewForm.labels.feedback')" v-if="formData.status === 'completed'">
         <el-input
           v-model="formData.feedback"
           type="textarea"
           :rows="3"
-          placeholder="请输入面试反馈"
+          :placeholder="$t('interviewForm.placeholders.feedback')"
         />
       </el-form-item>
 
       <div class="form-actions">
-        <el-button @click="handleCancel">取消</el-button>
+        <el-button @click="handleCancel">{{ $t('interviewForm.buttons.cancel') }}</el-button>
         <el-button type="primary" @click="handleSubmit" :loading="submitting">
-          {{ editMode ? '更新' : '创建' }}
+          {{ editMode ? $t('interviewForm.buttons.update') : $t('interviewForm.buttons.create') }}
         </el-button>
       </div>
     </el-form>
@@ -148,6 +148,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import dayjs from 'dayjs'
@@ -166,6 +167,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { t } = useI18n()
 
 const companyStore = useCompanyStore()
 const formRef = ref<FormInstance>()
@@ -177,7 +179,7 @@ const formData = ref({
   position: '',
   scheduledTime: '',
   round: 1,
-  type: '视频面试',
+  type: 'video',
   interviewer: '',
   expectedSalary: '',
   status: 'scheduled',
@@ -193,22 +195,22 @@ const companies = computed(() => companyStore.companies)
 // 表单验证规则
 const formRules: FormRules = {
   companyId: [
-    { required: true, message: '请选择公司', trigger: 'change' }
+    { required: true, message: t('interviewForm.validation.companyRequired'), trigger: 'change' }
   ],
   position: [
-    { required: true, message: '请输入职位名称', trigger: 'blur' }
+    { required: true, message: t('interviewForm.validation.positionRequired'), trigger: 'blur' }
   ],
   scheduledTime: [
-    { required: true, message: '请选择面试时间', trigger: 'change' }
+    { required: true, message: t('interviewForm.validation.scheduledTimeRequired'), trigger: 'change' }
   ],
   round: [
-    { required: true, message: '请输入面试轮次', trigger: 'blur' }
+    { required: true, message: t('interviewForm.validation.roundRequired'), trigger: 'blur' }
   ],
   type: [
-    { required: true, message: '请选择面试方式', trigger: 'change' }
+    { required: true, message: t('interviewForm.validation.typeRequired'), trigger: 'change' }
   ],
   status: [
-    { required: true, message: '请选择状态', trigger: 'change' }
+    { required: true, message: t('interviewForm.validation.statusRequired'), trigger: 'change' }
   ]
 }
 
@@ -222,7 +224,7 @@ const initializeForm = () => {
       scheduledTime: props.interview.scheduledTime ? 
         dayjs(props.interview.scheduledTime).format('YYYY-MM-DD HH:mm:ss') : '',
       round: props.interview.round || 1,
-      type: props.interview.type || '视频面试',
+      type: props.interview.type || 'video',
       interviewer: props.interview.interviewer || '',
       expectedSalary: props.interview.expectedSalary?.toString() || '',
       status: props.interview.status || 'scheduled',
@@ -238,7 +240,7 @@ const initializeForm = () => {
       position: '',
       scheduledTime: dayjs(initialTime).format('YYYY-MM-DD HH:mm:ss'),
       round: 1,
-      type: '视频面试',
+      type: 'video',
       interviewer: '',
       expectedSalary: '',
       status: 'scheduled',
@@ -253,7 +255,7 @@ const handleCompanyChange = (companyId: string) => {
   // 如果是新创建的公司名称（字符串而非ID）
   if (companyId && !companies.value.find(c => c.id === companyId)) {
     // TODO: 创建新公司
-    console.log('需要创建新公司:', companyId)
+    console.log(t('interviewForm.comments.createNewCompany') + ':', companyId)
   }
 }
 
@@ -277,7 +279,7 @@ const handleSubmit = async () => {
     
     emit('submit', submitData)
   } catch (error) {
-    ElMessage.error('请检查表单填写')
+    ElMessage.error(t('interviewForm.validation.formValidationFailed'))
   } finally {
     submitting.value = false
   }

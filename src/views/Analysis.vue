@@ -1,21 +1,21 @@
 <template>
   <div class="analysis-view">
     <div class="analysis-header">
-      <h2 class="page-title">数据分析</h2>
+      <h2 class="page-title">{{ $t('analysis.title') }}</h2>
       <div class="header-actions">
         <el-date-picker
           v-model="dateRange"
           type="daterange"
-          range-separator="至"
-          start-placeholder="开始日期"
-          end-placeholder="结束日期"
+          :range-separator="$t('analysis.dateRange.separator')"
+          :start-placeholder="$t('analysis.dateRange.startPlaceholder')"
+          :end-placeholder="$t('analysis.dateRange.endPlaceholder')"
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
           @change="handleDateRangeChange"
         />
         <el-button @click="exportData">
           <ph-download :size="16" />
-          导出数据
+          {{ $t('analysis.exportData') }}
         </el-button>
       </div>
     </div>
@@ -27,7 +27,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalApplications }}</div>
-              <div class="stat-label">总投递数</div>
+              <div class="stat-label">{{ $t('analysis.stats.totalApplications') }}</div>
               <div class="stat-trend" :class="applicationTrend.type">
                 <ph-trend-up v-if="applicationTrend.type === 'up'" :size="16" />
                 <ph-trend-down v-if="applicationTrend.type === 'down'" :size="16" />
@@ -41,7 +41,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalInterviews }}</div>
-              <div class="stat-label">面试总数</div>
+              <div class="stat-label">{{ $t('analysis.stats.totalInterviews') }}</div>
               <div class="stat-trend" :class="interviewTrend.type">
                 <ph-trend-up v-if="interviewTrend.type === 'up'" :size="16" />
                 <ph-trend-down v-if="interviewTrend.type === 'down'" :size="16" />
@@ -55,7 +55,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalOffers }}</div>
-              <div class="stat-label">收到Offer</div>
+              <div class="stat-label">{{ $t('analysis.stats.totalOffers') }}</div>
               <div class="stat-trend" :class="offerTrend.type">
                 <ph-trend-up v-if="offerTrend.type === 'up'" :size="16" />
                 <ph-trend-down v-if="offerTrend.type === 'down'" :size="16" />
@@ -69,7 +69,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ overallSuccessRate }}%</div>
-              <div class="stat-label">总成功率</div>
+              <div class="stat-label">{{ $t('analysis.stats.successRate') }}</div>
               <div class="stat-trend" :class="successRateTrend.type">
                 <ph-trend-up v-if="successRateTrend.type === 'up'" :size="16" />
                 <ph-trend-down v-if="successRateTrend.type === 'down'" :size="16" />
@@ -87,7 +87,7 @@
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>投递趋势分析</span>
+            <span>{{ $t('analysis.charts.applicationTrend') }}</span>
           </template>
           <div ref="applicationTrendChart" class="chart-container"></div>
         </el-card>
@@ -96,7 +96,7 @@
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>面试状态分布</span>
+            <span>{{ $t('analysis.charts.interviewStatus') }}</span>
           </template>
           <div ref="interviewStatusChart" class="chart-container"></div>
         </el-card>
@@ -107,7 +107,7 @@
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>公司类型分析</span>
+            <span>{{ $t('analysis.charts.companyType') }}</span>
           </template>
           <div ref="companyTypeChart" class="chart-container"></div>
         </el-card>
@@ -116,7 +116,7 @@
       <el-col :span="12">
         <el-card class="chart-card">
           <template #header>
-            <span>行业分布</span>
+            <span>{{ $t('analysis.charts.industryDistribution') }}</span>
           </template>
           <div ref="industryChart" class="chart-container"></div>
         </el-card>
@@ -127,7 +127,7 @@
       <el-col :span="24">
         <el-card class="chart-card">
           <template #header>
-            <span>面试轮次分析</span>
+            <span>{{ $t('analysis.charts.interviewRound') }}</span>
           </template>
           <div ref="interviewRoundChart" class="chart-container"></div>
         </el-card>
@@ -139,14 +139,14 @@
       <el-col :span="12">
         <el-card class="table-card">
           <template #header>
-            <span>公司投递统计</span>
+            <span>{{ $t('analysis.tables.companyStats') }}</span>
           </template>
           <el-table :data="companyStats" stripe style="width: 100%">
-            <el-table-column prop="name" label="公司名称" width="150" />
-            <el-table-column prop="applications" label="投递数" width="80" align="center" />
-            <el-table-column prop="interviews" label="面试数" width="80" align="center" />
-            <el-table-column prop="offers" label="Offer数" width="80" align="center" />
-            <el-table-column prop="successRate" label="成功率" width="80" align="center">
+            <el-table-column prop="name" :label="$t('analysis.tables.companyName')" width="150" />
+            <el-table-column prop="applications" :label="$t('analysis.tables.applications')" width="80" align="center" />
+            <el-table-column prop="interviews" :label="$t('analysis.tables.interviews')" width="80" align="center" />
+            <el-table-column prop="offers" :label="$t('analysis.tables.offers')" width="80" align="center" />
+            <el-table-column prop="successRate" :label="$t('analysis.tables.successRate')" width="80" align="center">
               <template #default="{ row }">
                 <span>{{ row.successRate }}%</span>
               </template>
@@ -158,14 +158,14 @@
       <el-col :span="12">
         <el-card class="table-card">
           <template #header>
-            <span>行业投递统计</span>
+            <span>{{ $t('analysis.tables.industryStats') }}</span>
           </template>
           <el-table :data="industryStats" stripe style="width: 100%">
-            <el-table-column prop="industry" label="行业" width="120" />
-            <el-table-column prop="companies" label="公司数" width="80" align="center" />
-            <el-table-column prop="applications" label="投递数" width="80" align="center" />
-            <el-table-column prop="interviews" label="面试数" width="80" align="center" />
-            <el-table-column prop="successRate" label="成功率" width="80" align="center">
+            <el-table-column prop="industry" :label="$t('analysis.tables.industry')" width="120" />
+            <el-table-column prop="companies" :label="$t('analysis.tables.companies')" width="80" align="center" />
+            <el-table-column prop="applications" :label="$t('analysis.tables.applications')" width="80" align="center" />
+            <el-table-column prop="interviews" :label="$t('analysis.tables.interviews')" width="80" align="center" />
+            <el-table-column prop="successRate" :label="$t('analysis.tables.successRate')" width="80" align="center">
               <template #default="{ row }">
                 <span>{{ row.successRate }}%</span>
               </template>
@@ -179,6 +179,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import {
   PhDownload,
@@ -194,6 +195,7 @@ import dayjs from 'dayjs'
 import { useInterviewStore } from '@/stores/interview'
 import { useCompanyStore } from '@/stores/company'
 
+const { t } = useI18n()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
 
@@ -209,7 +211,7 @@ const interviewRoundChart = ref<HTMLElement>()
 const totalApplications = computed(() => interviewStore.processes.length)
 const totalInterviews = computed(() => interviewStore.rounds.length)
 const totalOffers = computed(() => 
-  interviewStore.processes.filter((p: any) => p.status === '已发Offer').length
+  interviewStore.processes.filter((p: any) => p.status === 'offer').length
 )
 const overallSuccessRate = computed(() => {
   if (totalApplications.value === 0) return 0
@@ -227,7 +229,7 @@ const companyStats = computed(() => {
     const applications = interviewStore.processes.filter(p => p.companyId === company.id).length
     const interviews = interviewStore.rounds.filter(r => r.companyId === company.id).length
     const offers = interviewStore.processes.filter((p: any) => 
-      p.companyId === company.id && p.status === '已发Offer'
+      p.companyId === company.id && p.status === 'offer'
     ).length
     const successRate = applications > 0 ? Math.round((offers / applications) * 100) : 0
     
@@ -247,7 +249,7 @@ const industryStats = computed(() => {
   const industryMap = new Map()
   
   companyStore.companies.forEach(company => {
-    const industry = company.industry || '未分类'
+    const industry = company.industry || t('analysis.uncategorized')
     if (!industryMap.has(industry)) {
       industryMap.set(industry, {
         industry,
@@ -263,7 +265,7 @@ const industryStats = computed(() => {
     stat.applications += interviewStore.processes.filter(p => p.companyId === company.id).length
     stat.interviews += interviewStore.rounds.filter(r => r.companyId === company.id).length
     stat.offers += interviewStore.processes.filter((p: any) => 
-      p.companyId === company.id && p.status === '已发Offer'
+      p.companyId === company.id && p.status === 'offer'
     ).length
   })
   
@@ -284,7 +286,7 @@ const handleDateRangeChange = (dates: [string, string] | null) => {
 
 const exportData = () => {
   // TODO: 实现数据导出功能
-  ElMessage.success('数据导出功能开发中...')
+  ElMessage.success(t('analysis.exportInProgress'))
 }
 
 const initApplicationTrendChart = () => {
@@ -376,7 +378,7 @@ const initCompanyTypeChart = () => {
   
   const typeCount = new Map()
   companyStore.companies.forEach(company => {
-    const type = company.type || '未分类'
+    const type = company.type || t('analysis.uncategorized')
     typeCount.set(type, (typeCount.get(type) || 0) + 1)
   })
   
@@ -413,7 +415,7 @@ const initIndustryChart = () => {
   
   const industryCount = new Map()
   companyStore.companies.forEach(company => {
-    const industry = company.industry || '未分类'
+    const industry = company.industry || t('analysis.uncategorized')
     industryCount.set(industry, (industryCount.get(industry) || 0) + 1)
   })
   
@@ -457,7 +459,7 @@ const initInterviewRoundChart = () => {
   
   const roundCount = new Map()
   interviewStore.processes.forEach((process, index) => {
-    const roundKey = process.position || `面试${index + 1}`
+    const roundKey = process.position || `${t('analysis.charts.interviewRound')}${index + 1}`
     roundCount.set(roundKey, (roundCount.get(roundKey) || 0) + 1)
   })
   
@@ -487,13 +489,7 @@ const initInterviewRoundChart = () => {
 }
 
 const getStatusName = (status: string) => {
-  const statusMap: Record<string, string> = {
-    'scheduled': '已安排',
-    'completed': '已完成',
-    'cancelled': '已取消',
-    'pending': '待确认'
-  }
-  return statusMap[status] || status
+  return t(`analysis.statusMap.${status}`, status)
 }
 
 const initCharts = async () => {

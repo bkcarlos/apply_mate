@@ -4,13 +4,13 @@
       <div class="header-left">
         <el-button @click="$router.back()" link>
           <el-icon><ArrowLeft /></el-icon>
-          返回
+          {{ $t('interview.detail.back') }}
         </el-button>
-        <h3>面试详情</h3>
+        <h3>{{ $t('interview.detail.title') }}</h3>
       </div>
       <div class="header-actions">
-        <el-button type="primary" @click="editInterview">编辑</el-button>
-        <el-button type="danger" @click="deleteInterview">删除</el-button>
+        <el-button type="primary" @click="editInterview">{{ $t('interview.detail.edit') }}</el-button>
+        <el-button type="danger" @click="deleteInterview">{{ $t('interview.detail.delete') }}</el-button>
       </div>
     </div>
 
@@ -19,7 +19,7 @@
       <el-card class="info-card">
         <template #header>
           <div class="card-header">
-            <span>基本信息</span>
+            <span>{{ $t('interview.detail.basicInfo') }}</span>
             <el-tag 
               :type="getStatusType(interview.status)" 
               size="large"
@@ -30,23 +30,23 @@
         </template>
         
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="公司">
+          <el-descriptions-item :label="$t('interview.detail.company')">
             {{ getCompanyName(interview.companyId) }}
           </el-descriptions-item>
-          <el-descriptions-item label="职位">
+          <el-descriptions-item :label="$t('interview.position')">
             {{ interview.position }}
           </el-descriptions-item>
-          <el-descriptions-item label="城市">
+          <el-descriptions-item :label="$t('interview.detail.city')">
             {{ interview.city }}
           </el-descriptions-item>
-          <el-descriptions-item label="投递渠道">
+          <el-descriptions-item :label="$t('interview.detail.sourceChannel')">
             {{ interview.sourceChannel }}
           </el-descriptions-item>
-          <el-descriptions-item label="期望薪资" :span="2">
+          <el-descriptions-item :label="$t('interview.detail.expectedSalary')" :span="2">
             {{ interview.expectedSalary.min }}k - {{ interview.expectedSalary.max }}k
           </el-descriptions-item>
-          <el-descriptions-item v-if="interview.offeredSalary" label="提供薪资" :span="2">
-            {{ interview.offeredSalary.base }}k ({{ interview.offeredSalary.total }}k总包)
+          <el-descriptions-item v-if="interview.offeredSalary" :label="$t('interview.detail.offeredSalary')" :span="2">
+            {{ interview.offeredSalary.base }}k ({{ interview.offeredSalary.total }}k{{ $t('interview.detail.totalPackage') }})
           </el-descriptions-item>
         </el-descriptions>
       </el-card>
@@ -54,13 +54,13 @@
       <el-card class="rounds-card">
         <template #header>
           <div class="card-header">
-            <span>面试轮次</span>
+            <span>{{ $t('interview.detail.rounds') }}</span>
             <el-button 
               type="primary" 
               size="small" 
               @click="addRound"
             >
-              添加轮次
+              {{ $t('interview.detail.addRound') }}
             </el-button>
           </div>
         </template>
@@ -78,15 +78,15 @@
               </el-tag>
             </div>
             <div class="round-details">
-              <p><strong>面试官：</strong>{{ round.interviewer || '未安排' }}</p>
-              <p><strong>时间：</strong>{{ formatDateTime(round.scheduledTime) }}</p>
-              <p v-if="round.feedback"><strong>反馈：</strong>{{ round.feedback }}</p>
+              <p><strong>{{ $t('interview.detail.interviewer') }}：</strong>{{ round.interviewer || $t('interview.detail.notScheduled') }}</p>
+              <p><strong>{{ $t('interview.detail.time') }}：</strong>{{ formatDateTime(round.scheduledTime) }}</p>
+              <p v-if="round.feedback"><strong>{{ $t('interview.detail.feedback') }}：</strong>{{ round.feedback }}</p>
             </div>
           </div>
         </div>
         
         <div v-else class="no-rounds">
-          <p>暂无面试轮次</p>
+          <p>{{ $t('interview.detail.noRounds') }}</p>
         </div>
       </el-card>
     </div>
@@ -100,6 +100,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { ElMessage, ElMessageBox, ElLoading } from 'element-plus';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useInterviewStore } from '@/stores/interview';
@@ -109,6 +110,7 @@ import type { InterviewProcess, InterviewRound } from '@/types';
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 const interviewStore = useInterviewStore();
 const roundStore = useRoundStore();
 const companyStore = useCompanyStore();
@@ -118,12 +120,12 @@ const rounds = ref<InterviewRound[]>([]);
 
 const getStatusType = (status: string): 'primary' | 'success' | 'info' | 'warning' | 'danger' => {
   const types: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = {
-    '投递中': 'info',
-    '评估中': 'warning',
-    '面试中': 'primary',
-    '已发Offer': 'success',
-    '已拒绝': 'danger',
-    '已结束': 'info'
+    'applied': 'info',
+    'screening': 'warning',
+    'interview': 'primary',
+    'offer': 'success',
+    'rejected': 'danger',
+    'withdrawn': 'info'
   };
   return types[status] || 'info';
 };
@@ -140,11 +142,11 @@ const getRoundStatusType = (status: string): 'primary' | 'success' | 'info' | 'w
 
 const getCompanyName = (companyId: string) => {
   const company = companyStore.getCompanyById(companyId);
-  return company?.name || '未知公司';
+  return company?.name || t('interview.detail.unknownCompany');
 };
 
 const formatDateTime = (date: Date | string) => {
-  return new Date(date).toLocaleString('zh-CN');
+  return new Date(date).toLocaleString();
 };
 
 const editInterview = () => {
@@ -160,11 +162,11 @@ const deleteInterview = async () => {
   
   try {
     await ElMessageBox.confirm(
-      '此操作将永久删除该面试记录, 是否继续?',
-      '提示',
+      t('interview.detail.deleteConfirm'),
+      t('interview.detail.deleteTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning',
       }
     );
@@ -172,7 +174,7 @@ const deleteInterview = async () => {
     if (interview.value) {
       // TODO: 实现删除方法
       // await interviewStore.deleteInterview(interview.value.id);
-      ElMessage.success('删除成功');
+      ElMessage.success(t('interview.detail.deleteSuccess'));
       router.push('/interviews');
     }
   } catch {

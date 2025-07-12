@@ -1,24 +1,24 @@
 <template>
   <div class="interview-list">
     <div class="list-header">
-      <h2 class="page-title">面试管理</h2>
+      <h2 class="page-title">{{ $t('interviewList.title') }}</h2>
       <div class="header-actions">
         <el-input
           v-model="searchKeyword"
-          placeholder="搜索公司名称或职位"
+          :placeholder="$t('interviewList.search.placeholder')"
           :prefix-icon="Search"
           style="width: 300px"
           clearable
         />
-        <el-select v-model="filterStatus" placeholder="状态筛选" clearable style="width: 150px">
-          <el-option label="已安排" value="scheduled" />
-          <el-option label="已完成" value="completed" />
-          <el-option label="已取消" value="cancelled" />
-          <el-option label="待确认" value="pending" />
+        <el-select v-model="filterStatus" :placeholder="$t('interviewList.search.statusFilter')" clearable style="width: 150px">
+          <el-option :label="$t('interviewList.statusOptions.scheduled')" value="scheduled" />
+          <el-option :label="$t('interviewList.statusOptions.completed')" value="completed" />
+          <el-option :label="$t('interviewList.statusOptions.cancelled')" value="cancelled" />
+          <el-option :label="$t('interviewList.statusOptions.pending')" value="pending" />
         </el-select>
         <el-button type="primary" @click="showAddDialog = true">
           <ph-plus :size="16" />
-          新增面试
+          {{ $t('interviewList.buttons.addInterview') }}
         </el-button>
       </div>
     </div>
@@ -29,7 +29,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalInterviews }}</div>
-              <div class="stat-label">总面试数</div>
+              <div class="stat-label">{{ $t('interviewList.stats.totalInterviews') }}</div>
             </div>
             <ph-calendar class="stat-icon" />
           </el-card>
@@ -38,7 +38,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ scheduledInterviews }}</div>
-              <div class="stat-label">待面试</div>
+              <div class="stat-label">{{ $t('interviewList.stats.scheduledInterviews') }}</div>
             </div>
             <ph-clock class="stat-icon" />
           </el-card>
@@ -47,7 +47,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ completedInterviews }}</div>
-              <div class="stat-label">已完成</div>
+              <div class="stat-label">{{ $t('interviewList.stats.completedInterviews') }}</div>
             </div>
             <ph-check-circle class="stat-icon" />
           </el-card>
@@ -56,7 +56,7 @@
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ successRate }}%</div>
-              <div class="stat-label">通过率</div>
+              <div class="stat-label">{{ $t('interviewList.stats.successRate') }}</div>
             </div>
             <ph-trend-up class="stat-icon" />
           </el-card>
@@ -71,49 +71,49 @@
         stripe
         style="width: 100%"
       >
-        <el-table-column label="公司" width="180">
+        <el-table-column :label="$t('interviewList.table.company')" width="180">
           <template #default="{ row }">
             <div class="company-info">
-              <div class="company-name">{{ row.company?.name || '未知公司' }}</div>
+              <div class="company-name">{{ row.company?.name || $t('interviewList.unknownCompany') }}</div>
               <div class="company-type">{{ row.company?.type || '' }}</div>
             </div>
           </template>
         </el-table-column>
         
-        <el-table-column label="职位" width="200">
+        <el-table-column :label="$t('interviewList.table.position')" width="200">
           <template #default="{ row }">
             <div class="position-info">
               <div class="position-title">{{ row.position }}</div>
               <div class="position-salary" v-if="row.expectedSalary">
-                期望: {{ formatSalary(row.expectedSalary) }}
+                {{ $t('interviewList.expected') }}: {{ formatSalary(row.expectedSalary) }}
               </div>
             </div>
           </template>
         </el-table-column>
         
-        <el-table-column label="面试时间" width="180">
+        <el-table-column :label="$t('interviewList.table.interviewTime')" width="180">
           <template #default="{ row }">
             <div v-if="row.scheduledTime" class="interview-time">
               <div>{{ formatDate(row.scheduledTime) }}</div>
               <div class="time-detail">{{ formatTime(row.scheduledTime) }}</div>
             </div>
-            <span v-else class="text-placeholder">未安排</span>
+            <span v-else class="text-placeholder">{{ $t('interviewList.notScheduled') }}</span>
           </template>
         </el-table-column>
         
-        <el-table-column label="轮次" width="80" align="center">
+        <el-table-column :label="$t('interviewList.table.round')" width="80" align="center">
           <template #default="{ row }">
-            <el-tag size="small">第{{ row.round }}轮</el-tag>
+            <el-tag size="small">{{ $t('interviewList.roundNumber', { number: row.round }) }}</el-tag>
           </template>
         </el-table-column>
         
-        <el-table-column label="面试方式" width="100">
+        <el-table-column :label="$t('interviewList.table.interviewType')" width="100">
           <template #default="{ row }">
-            <span class="interview-type">{{ row.type }}</span>
+            <span class="interview-type">{{ translateInterviewType(row.type) }}</span>
           </template>
         </el-table-column>
         
-        <el-table-column label="状态" width="100">
+        <el-table-column :label="$t('interviewList.table.status')" width="100">
           <template #default="{ row }">
             <el-tag :type="getStatusTagType(row.status)">
               {{ formatStatus(row.status) }}
@@ -121,33 +121,33 @@
           </template>
         </el-table-column>
         
-        <el-table-column label="面试官" width="120">
+        <el-table-column :label="$t('interviewList.table.interviewer')" width="120">
           <template #default="{ row }">
-            <span>{{ row.interviewer || '未知' }}</span>
+            <span>{{ row.interviewer || $t('interviewList.unknown') }}</span>
           </template>
         </el-table-column>
         
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column :label="$t('interviewList.table.actions')" width="200" fixed="right">
           <template #default="{ row }">
             <el-button
               type="primary"
               size="small"
               @click="viewInterview(row)"
             >
-              查看
+              {{ $t('interviewList.buttons.view') }}
             </el-button>
             <el-button
               size="small"
               @click="editInterview(row)"
             >
-              编辑
+              {{ $t('interviewList.buttons.edit') }}
             </el-button>
             <el-button
               type="danger"
               size="small"
               @click="deleteInterview(row)"
             >
-              删除
+              {{ $t('interviewList.buttons.delete') }}
             </el-button>
           </template>
         </el-table-column>
@@ -167,7 +167,7 @@
     <!-- 面试详情弹框 -->
     <el-dialog
       v-model="showDetailDialog"
-      title="面试详情"
+      :title="$t('interviewList.dialogs.interviewDetail')"
       width="800px"
     >
       <interview-detail
@@ -181,7 +181,7 @@
     <!-- 新增/编辑面试弹框 -->
     <el-dialog
       v-model="showFormDialog"
-      :title="editMode ? '编辑面试' : '新增面试'"
+      :title="editMode ? $t('interviewList.dialogs.editInterview') : $t('interviewList.dialogs.addInterview')"
       width="600px"
     >
       <interview-form
@@ -196,6 +196,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import {
@@ -212,6 +213,7 @@ import type { InterviewRound } from '@/types'
 import InterviewDetail from '@/components/InterviewDetail.vue'
 import InterviewForm from '@/components/InterviewForm.vue'
 
+const { t } = useI18n()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
 
@@ -230,16 +232,16 @@ const editMode = ref(false)
 // 计算属性
 const totalInterviews = computed(() => interviewStore.processes.length)
 const scheduledInterviews = computed(() => 
-  interviewStore.processes.filter((p: any) => p.status === '面试中').length
+  interviewStore.processes.filter((p: any) => p.status === 'interviewing').length
 )
 const completedInterviews = computed(() => 
-  interviewStore.processes.filter((p: any) => p.status === '已结束').length
+  interviewStore.processes.filter((p: any) => p.status === 'finished').length
 )
 const successRate = computed(() => {
   const completed = completedInterviews.value
   if (completed === 0) return 0
   const passed = interviewStore.processes.filter((p: any) => 
-    p.status === '已发Offer'
+    p.status === 'offered'
   ).length
   return Math.round((passed / completed) * 100)
 })
@@ -289,13 +291,35 @@ const formatSalary = (salary: string) => {
 }
 
 const formatStatus = (status: string) => {
-  const statusMap: Record<string, string> = {
-    'scheduled': '已安排',
-    'completed': '已完成',
-    'cancelled': '已取消',
-    'pending': '待确认'
+  switch (status) {
+    case 'scheduled':
+      return t('interviewList.statusOptions.scheduled')
+    case 'completed':
+      return t('interviewList.statusOptions.completed')
+    case 'cancelled':
+      return t('interviewList.statusOptions.cancelled')
+    case 'pending':
+      return t('interviewList.statusOptions.pending')
+    default:
+      return status
   }
-  return statusMap[status] || status
+}
+
+const translateInterviewType = (type?: string) => {
+  if (!type) return t('interviewList.unknown')
+  
+  switch (type) {
+    case 'onsite':
+      return t('interviewList.interviewTypes.onsite')
+    case 'video':
+      return t('interviewList.interviewTypes.video')
+    case 'phone':
+      return t('interviewList.interviewTypes.phone')
+    case 'online':
+      return t('interviewList.interviewTypes.online')
+    default:
+      return type
+  }
 }
 
 const getStatusTagType = (status: string): 'primary' | 'success' | 'info' | 'warning' | 'danger' => {
@@ -328,20 +352,20 @@ const handleEditFromDetail = () => {
 const deleteInterview = async (interview: InterviewRound) => {
   try {
     await ElMessageBox.confirm(
-      '确定要删除这个面试记录吗？',
-      '删除确认',
+      t('interviewList.confirmDelete.message'),
+      t('interviewList.confirmDelete.title'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('interviewList.confirmDelete.confirmText'),
+        cancelButtonText: t('interviewList.confirmDelete.cancelText'),
         type: 'warning',
       }
     )
     
     await interviewStore.deleteRound(interview.id)
-    ElMessage.success('删除成功')
+    ElMessage.success(t('interviewList.messages.deleteSuccess'))
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('删除失败')
+      ElMessage.error(t('interviewList.messages.deleteError'))
     }
   }
 }
@@ -350,10 +374,10 @@ const handleSubmit = async (data: any) => {
   try {
     if (editMode.value && selectedInterview.value) {
       await interviewStore.updateRound(selectedInterview.value.id, data)
-      ElMessage.success('更新成功')
+      ElMessage.success(t('interviewList.messages.updateSuccess'))
     } else {
       await interviewStore.addRound(data)
-      ElMessage.success('添加成功')
+      ElMessage.success(t('interviewList.messages.addSuccess'))
     }
     
     showFormDialog.value = false
@@ -361,7 +385,7 @@ const handleSubmit = async (data: any) => {
     editMode.value = false
     selectedInterview.value = null
   } catch (error) {
-    ElMessage.error('操作失败')
+    ElMessage.error(t('interviewList.messages.operationError'))
   }
 }
 

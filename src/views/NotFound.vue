@@ -7,47 +7,47 @@
       </div>
       
       <div class="error-message">
-        <h2>页面未找到</h2>
-        <p>抱歉，您访问的页面不存在或已被移动。</p>
+        <h2>{{ $t('notFound.title') }}</h2>
+        <p>{{ $t('notFound.message') }}</p>
       </div>
       
       <div class="error-actions">
         <el-button type="primary" @click="goHome">
           <ph-house :size="16" />
-          返回首页
+          {{ $t('notFound.backHome') }}
         </el-button>
         <el-button @click="goBack">
           <ph-arrow-left :size="16" />
-          返回上页
+          {{ $t('notFound.goBack') }}
         </el-button>
       </div>
       
       <div class="helpful-links">
-        <h3>您可能在寻找：</h3>
+        <h3>{{ $t('notFound.suggestions') }}</h3>
         <div class="link-grid">
           <router-link to="/dashboard" class="help-link">
             <ph-chart-pie :size="20" />
-            <span>数据仪表板</span>
+            <span>{{ $t('notFound.links.dashboard') }}</span>
           </router-link>
           <router-link to="/calendar" class="help-link">
             <ph-calendar :size="20" />
-            <span>面试日历</span>
+            <span>{{ $t('notFound.links.calendar') }}</span>
           </router-link>
           <router-link to="/interviews" class="help-link">
             <ph-briefcase :size="20" />
-            <span>面试管理</span>
+            <span>{{ $t('notFound.links.interviews') }}</span>
           </router-link>
           <router-link to="/companies" class="help-link">
             <ph-buildings :size="20" />
-            <span>公司管理</span>
+            <span>{{ $t('notFound.links.companies') }}</span>
           </router-link>
           <router-link to="/analysis" class="help-link">
             <ph-chart-line :size="20" />
-            <span>数据分析</span>
+            <span>{{ $t('notFound.links.analysis') }}</span>
           </router-link>
           <router-link to="/settings" class="help-link">
             <ph-gear :size="20" />
-            <span>系统设置</span>
+            <span>{{ $t('notFound.links.settings') }}</span>
           </router-link>
         </div>
       </div>
@@ -57,6 +57,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import {
   PhMagnifyingGlass,
   PhHouse,
@@ -70,6 +71,7 @@ import {
 } from '@phosphor-icons/vue'
 
 const router = useRouter()
+const { t } = useI18n()
 
 const goHome = () => {
   router.push('/dashboard')

@@ -7,7 +7,7 @@
         circle
         class="back-btn"
       />
-      <h1>{{ isEdit ? '编辑面试流程' : '添加面试流程' }}</h1>
+      <h1>{{ isEdit ? $t('interviewFormView.titles.edit') : $t('interviewFormView.titles.add') }}</h1>
     </div>
 
     <el-form 
@@ -19,13 +19,13 @@
     >
       <el-card>
         <template #header>
-          <span>基本信息</span>
+          <span>{{ $t('interviewFormView.cardTitles.basicInfo') }}</span>
         </template>
         
-        <el-form-item label="公司" prop="companyId">
+        <el-form-item :label="$t('interviewFormView.labels.company')" prop="companyId">
           <el-select 
             v-model="form.companyId" 
-            placeholder="选择公司"
+            :placeholder="$t('interviewFormView.placeholders.company')"
             filterable
             style="width: 100%"
           >
@@ -38,97 +38,97 @@
           </el-select>
         </el-form-item>
         
-        <el-form-item label="职位" prop="position">
+        <el-form-item :label="$t('interviewFormView.labels.position')" prop="position">
           <el-input 
             v-model="form.position" 
-            placeholder="请输入职位名称"
+            :placeholder="$t('interviewFormView.placeholders.position')"
           />
         </el-form-item>
         
-        <el-form-item label="城市" prop="city">
+        <el-form-item :label="$t('interviewFormView.labels.city')" prop="city">
           <el-input 
             v-model="form.city" 
-            placeholder="请输入城市"
+            :placeholder="$t('interviewFormView.placeholders.city')"
           />
         </el-form-item>
         
-        <el-form-item label="投递渠道" prop="sourceChannel">
+        <el-form-item :label="$t('interviewFormView.labels.sourceChannel')" prop="sourceChannel">
           <el-input 
             v-model="form.sourceChannel" 
-            placeholder="如：Boss直聘、拉勾网等"
+            :placeholder="$t('interviewFormView.placeholders.sourceChannel')"
           />
         </el-form-item>
         
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status" placeholder="选择状态">
-            <el-option label="投递中" value="投递中" />
-            <el-option label="评估中" value="评估中" />
-            <el-option label="面试中" value="面试中" />
-            <el-option label="已发Offer" value="已发Offer" />
-            <el-option label="已拒绝" value="已拒绝" />
-            <el-option label="已结束" value="已结束" />
+        <el-form-item :label="$t('interviewFormView.labels.status')" prop="status">
+          <el-select v-model="form.status" :placeholder="$t('interviewFormView.placeholders.status')">
+            <el-option :label="$t('interviewFormView.statusOptions.applying')" value="applying" />
+            <el-option :label="$t('interviewFormView.statusOptions.evaluating')" value="evaluating" />
+            <el-option :label="$t('interviewFormView.statusOptions.interviewing')" value="interviewing" />
+            <el-option :label="$t('interviewFormView.statusOptions.offered')" value="offered" />
+            <el-option :label="$t('interviewFormView.statusOptions.rejected')" value="rejected" />
+            <el-option :label="$t('interviewFormView.statusOptions.finished')" value="finished" />
           </el-select>
         </el-form-item>
 
-        <el-form-item label="结论" prop="conclusion">
-          <el-select v-model="form.conclusion" placeholder="选择结论">
-            <el-option label="未开始" value="未开始" />
-            <el-option label="进行中" value="进行中" />
-            <el-option label="通过" value="通过" />
-            <el-option label="未通过" value="未通过" />
-            <el-option label="待定" value="待定" />
+        <el-form-item :label="$t('interviewFormView.labels.conclusion')" prop="conclusion">
+          <el-select v-model="form.conclusion" :placeholder="$t('interviewFormView.placeholders.conclusion')">
+            <el-option :label="$t('interviewFormView.conclusionOptions.notStarted')" value="notStarted" />
+            <el-option :label="$t('interviewFormView.conclusionOptions.inProgress')" value="inProgress" />
+            <el-option :label="$t('interviewFormView.conclusionOptions.passed')" value="passed" />
+            <el-option :label="$t('interviewFormView.conclusionOptions.failed')" value="failed" />
+            <el-option :label="$t('interviewFormView.conclusionOptions.pending')" value="pending" />
           </el-select>
         </el-form-item>
       </el-card>
 
       <el-card style="margin-top: 20px;">
         <template #header>
-          <span>薪资信息</span>
+          <span>{{ $t('interviewFormView.cardTitles.salaryInfo') }}</span>
         </template>
         
-        <el-form-item label="期望薪资">
+        <el-form-item :label="$t('interviewFormView.labels.expectedSalary')">
           <div class="salary-range">
             <el-input-number 
               v-model="form.expectedSalary.min"
               :min="0"
               :max="999"
-              placeholder="最低"
+              :placeholder="$t('interviewFormView.placeholders.minSalary')"
             />
-            <span class="salary-separator">-</span>
+            <span class="salary-separator">{{ $t('interviewFormView.salarySeparator') }}</span>
             <el-input-number 
               v-model="form.expectedSalary.max"
               :min="0"
               :max="999"
-              placeholder="最高"
+              :placeholder="$t('interviewFormView.placeholders.maxSalary')"
             />
-            <span class="salary-unit">k</span>
+            <span class="salary-unit">{{ $t('interviewFormView.salaryUnit') }}</span>
           </div>
         </el-form-item>
       </el-card>
 
       <el-card style="margin-top: 20px;">
         <template #header>
-          <span>备注</span>
+          <span>{{ $t('interviewFormView.cardTitles.remarks') }}</span>
         </template>
         
-        <el-form-item label="备注">
+        <el-form-item :label="$t('interviewFormView.labels.remarks')">
           <el-input 
             v-model="form.remarks"
             type="textarea"
             :rows="4"
-            placeholder="请输入备注信息"
+            :placeholder="$t('interviewFormView.placeholders.remarks')"
           />
         </el-form-item>
       </el-card>
 
       <div class="form-actions">
-        <el-button @click="$router.go(-1)">取消</el-button>
+        <el-button @click="$router.go(-1)">{{ $t('interviewFormView.buttons.cancel') }}</el-button>
         <el-button 
           type="primary" 
           @click="handleSubmit"
           :loading="loading"
         >
-          {{ isEdit ? '更新' : '创建' }}
+          {{ isEdit ? $t('interviewFormView.buttons.update') : $t('interviewFormView.buttons.create') }}
         </el-button>
       </div>
     </el-form>
@@ -138,6 +138,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useI18n } from 'vue-i18n';
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useInterviewStore } from '@/stores/interview';
@@ -146,6 +147,7 @@ import type { InterviewStatus, InterviewConclusion } from '@/types';
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 const interviewStore = useInterviewStore();
 const companyStore = useCompanyStore();
 
@@ -157,8 +159,8 @@ const form = reactive({
   companyId: '',
   position: '',
   city: '',
-  status: '投递中' as InterviewStatus,
-  conclusion: '未开始' as InterviewConclusion,
+  status: 'applying' as InterviewStatus,
+  conclusion: 'notStarted' as InterviewConclusion,
   sourceChannel: '',
   expectedSalary: {
     min: 0,
@@ -169,22 +171,22 @@ const form = reactive({
 
 const rules: FormRules = {
   companyId: [
-    { required: true, message: '请选择公司', trigger: 'change' }
+    { required: true, message: t('interviewFormView.validation.companyRequired'), trigger: 'change' }
   ],
   position: [
-    { required: true, message: '请输入职位名称', trigger: 'blur' }
+    { required: true, message: t('interviewFormView.validation.positionRequired'), trigger: 'blur' }
   ],
   city: [
-    { required: true, message: '请输入城市', trigger: 'blur' }
+    { required: true, message: t('interviewFormView.validation.cityRequired'), trigger: 'blur' }
   ],
   status: [
-    { required: true, message: '请选择状态', trigger: 'change' }
+    { required: true, message: t('interviewFormView.validation.statusRequired'), trigger: 'change' }
   ],
   conclusion: [
-    { required: true, message: '请选择结论', trigger: 'change' }
+    { required: true, message: t('interviewFormView.validation.conclusionRequired'), trigger: 'change' }
   ],
   sourceChannel: [
-    { required: true, message: '请输入投递渠道', trigger: 'blur' }
+    { required: true, message: t('interviewFormView.validation.sourceChannelRequired'), trigger: 'blur' }
   ]
 };
 
@@ -206,15 +208,15 @@ const handleSubmit = async () => {
     if (isEdit.value) {
       const id = route.params.id as string;
       await interviewStore.updateInterview(id, data);
-      ElMessage.success('更新成功');
+      ElMessage.success(t('interviewFormView.messages.updateSuccess'));
     } else {
       await interviewStore.addInterview(data);
-      ElMessage.success('创建成功');
+      ElMessage.success(t('interviewFormView.messages.createSuccess'));
     }
     
     router.push('/interviews');
   } catch (error) {
-    console.error('保存失败:', error);
+    console.error(t('interviewFormView.messages.saveFailed') + ':', error);
   } finally {
     loading.value = false;
   }

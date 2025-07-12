@@ -9,24 +9,24 @@
     >
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="公司名称" prop="name">
+          <el-form-item :label="$t('companyForm.labels.name')" prop="name">
             <el-input
               v-model="formData.name"
-              placeholder="请输入公司名称"
+              :placeholder="$t('companyForm.placeholders.name')"
             />
           </el-form-item>
         </el-col>
         
         <el-col :span="12">
-          <el-form-item label="公司类型" prop="type">
-            <el-select v-model="formData.type" placeholder="选择公司类型" style="width: 100%">
-              <el-option label="初创公司" value="初创公司" />
-              <el-option label="中小企业" value="中小企业" />
-              <el-option label="大型企业" value="大型企业" />
-              <el-option label="外企" value="外企" />
-              <el-option label="国企" value="国企" />
-              <el-option label="上市公司" value="上市公司" />
-              <el-option label="独角兽" value="独角兽" />
+          <el-form-item :label="$t('companyForm.labels.type')" prop="type">
+            <el-select v-model="formData.type" :placeholder="$t('companyForm.placeholders.type')" style="width: 100%">
+              <el-option :label="$t('companyForm.companyTypes.startup')" value="startup" />
+              <el-option :label="$t('companyForm.companyTypes.sme')" value="sme" />
+              <el-option :label="$t('companyForm.companyTypes.large')" value="large" />
+              <el-option :label="$t('companyForm.companyTypes.foreign')" value="foreign" />
+              <el-option :label="$t('companyForm.companyTypes.stateOwned')" value="stateOwned" />
+              <el-option :label="$t('companyForm.companyTypes.listed')" value="listed" />
+              <el-option :label="$t('companyForm.companyTypes.unicorn')" value="unicorn" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -34,42 +34,42 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="所属行业">
+          <el-form-item :label="$t('companyForm.labels.industry')">
             <el-select
               v-model="formData.industry"
-              placeholder="选择所属行业"
+              :placeholder="$t('companyForm.placeholders.industry')"
               filterable
               allow-create
               style="width: 100%"
             >
-              <el-option label="互联网" value="互联网" />
-              <el-option label="软件开发" value="软件开发" />
-              <el-option label="人工智能" value="人工智能" />
-              <el-option label="金融科技" value="金融科技" />
-              <el-option label="电子商务" value="电子商务" />
-              <el-option label="游戏娱乐" value="游戏娱乐" />
-              <el-option label="企业服务" value="企业服务" />
-              <el-option label="教育培训" value="教育培训" />
-              <el-option label="医疗健康" value="医疗健康" />
-              <el-option label="新零售" value="新零售" />
-              <el-option label="汽车交通" value="汽车交通" />
-              <el-option label="房产建筑" value="房产建筑" />
-              <el-option label="制造业" value="制造业" />
-              <el-option label="其他" value="其他" />
+              <el-option :label="$t('companyForm.industries.internet')" value="internet" />
+              <el-option :label="$t('companyForm.industries.software')" value="software" />
+              <el-option :label="$t('companyForm.industries.ai')" value="ai" />
+              <el-option :label="$t('companyForm.industries.fintech')" value="fintech" />
+              <el-option :label="$t('companyForm.industries.ecommerce')" value="ecommerce" />
+              <el-option :label="$t('companyForm.industries.gaming')" value="gaming" />
+              <el-option :label="$t('companyForm.industries.enterprise')" value="enterprise" />
+              <el-option :label="$t('companyForm.industries.education')" value="education" />
+              <el-option :label="$t('companyForm.industries.healthcare')" value="healthcare" />
+              <el-option :label="$t('companyForm.industries.retail')" value="retail" />
+              <el-option :label="$t('companyForm.industries.automotive')" value="automotive" />
+              <el-option :label="$t('companyForm.industries.realestate')" value="realestate" />
+              <el-option :label="$t('companyForm.industries.manufacturing')" value="manufacturing" />
+              <el-option :label="$t('companyForm.industries.other')" value="other" />
             </el-select>
           </el-form-item>
         </el-col>
         
         <el-col :span="12">
-          <el-form-item label="公司规模">
-            <el-select v-model="formData.size" placeholder="选择公司规模" style="width: 100%">
-              <el-option label="1-20人" value="1-20人" />
-              <el-option label="20-99人" value="20-99人" />
-              <el-option label="100-499人" value="100-499人" />
-              <el-option label="500-999人" value="500-999人" />
-              <el-option label="1000-4999人" value="1000-4999人" />
-              <el-option label="5000-9999人" value="5000-9999人" />
-              <el-option label="10000人以上" value="10000人以上" />
+          <el-form-item :label="$t('companyForm.labels.size')">
+            <el-select v-model="formData.size" :placeholder="$t('companyForm.placeholders.size')" style="width: 100%">
+              <el-option :label="$t('companyForm.companySizes.tiny')" value="tiny" />
+              <el-option :label="$t('companyForm.companySizes.small')" value="small" />
+              <el-option :label="$t('companyForm.companySizes.medium')" value="medium" />
+              <el-option :label="$t('companyForm.companySizes.large')" value="large" />
+              <el-option :label="$t('companyForm.companySizes.xlarge')" value="xlarge" />
+              <el-option :label="$t('companyForm.companySizes.xxlarge')" value="xxlarge" />
+              <el-option :label="$t('companyForm.companySizes.huge')" value="huge" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -77,58 +77,58 @@
 
       <el-row :gutter="16">
         <el-col :span="12">
-          <el-form-item label="公司地址">
+          <el-form-item :label="$t('companyForm.labels.location')">
             <el-input
               v-model="formData.location"
-              placeholder="请输入公司地址"
+              :placeholder="$t('companyForm.placeholders.location')"
             />
           </el-form-item>
         </el-col>
         
         <el-col :span="12">
-          <el-form-item label="官方网站">
+          <el-form-item :label="$t('companyForm.labels.website')">
             <el-input
               v-model="formData.website"
-              placeholder="请输入官方网站地址"
+              :placeholder="$t('companyForm.placeholders.website')"
             />
           </el-form-item>
         </el-col>
       </el-row>
 
-      <el-form-item label="公司评分">
+      <el-form-item :label="$t('companyForm.labels.rating')">
         <el-rate
           v-model="formData.rating"
           show-score
           text-color="#ff9900"
-          score-template="{value} 分"
+          :score-template="$t('companyForm.ratingTemplate')"
         />
         <el-text type="info" size="small" style="margin-left: 12px;">
-          对公司的整体评价（工作环境、薪资待遇、发展前景等）
+          {{ $t('companyForm.ratingHint') }}
         </el-text>
       </el-form-item>
 
-      <el-form-item label="公司介绍">
+      <el-form-item :label="$t('companyForm.labels.description')">
         <el-input
           v-model="formData.description"
           type="textarea"
           :rows="4"
-          placeholder="请输入公司介绍（业务范围、发展历程、企业文化等）"
+          :placeholder="$t('companyForm.placeholders.description')"
         />
       </el-form-item>
 
-      <el-form-item label="备注信息">
+      <el-form-item :label="$t('companyForm.labels.notes')">
         <el-input
           v-model="formData.notes"
           type="textarea"
           :rows="3"
-          placeholder="请输入备注信息（个人感受、内推渠道、面试难度等）"
+          :placeholder="$t('companyForm.placeholders.notes')"
         />
       </el-form-item>
 
       <div class="form-actions">
-        <el-button @click="handleCancel">取消</el-button>
+        <el-button @click="handleCancel">{{ $t('companyForm.buttons.cancel') }}</el-button>
         <el-button type="primary" @click="handleSubmit" :loading="submitting">
-          {{ editMode ? '更新' : '创建' }}
+          {{ editMode ? $t('companyForm.buttons.update') : $t('companyForm.buttons.create') }}
         </el-button>
       </div>
     </el-form>
@@ -137,6 +137,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { Company } from '@/types'
@@ -152,6 +153,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { t } = useI18n()
 
 const formRef = ref<FormInstance>()
 const submitting = ref(false)
@@ -175,11 +177,11 @@ const editMode = computed(() => !!props.company)
 // 表单验证规则
 const formRules: FormRules = {
   name: [
-    { required: true, message: '请输入公司名称', trigger: 'blur' },
-    { min: 2, max: 50, message: '公司名称长度在 2 到 50 个字符', trigger: 'blur' }
+    { required: true, message: t('companyForm.validation.nameRequired'), trigger: 'blur' },
+    { min: 2, max: 50, message: t('companyForm.validation.nameLength'), trigger: 'blur' }
   ],
   type: [
-    { required: true, message: '请选择公司类型', trigger: 'change' }
+    { required: true, message: t('companyForm.validation.typeRequired'), trigger: 'change' }
   ]
 }
 
@@ -230,7 +232,7 @@ const handleSubmit = async () => {
     
     // 验证网站URL格式
     if (formData.value.website && !validateWebsite(formData.value.website)) {
-      ElMessage.error('请输入有效的网站地址')
+      ElMessage.error(t('companyForm.validation.invalidWebsite'))
       return
     }
     
@@ -252,7 +254,7 @@ const handleSubmit = async () => {
     
     emit('submit', submitData)
   } catch (error) {
-    ElMessage.error('请检查表单填写')
+    ElMessage.error(t('companyForm.validation.formValidationFailed'))
   } finally {
     submitting.value = false
   }

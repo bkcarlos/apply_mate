@@ -1,7 +1,7 @@
 <template>
   <div class="settings-view">
     <div class="settings-header">
-      <h2 class="page-title">系统设置</h2>
+      <h2 class="page-title">{{ $t('settings.title') }}</h2>
     </div>
 
     <el-row :gutter="24">
@@ -11,7 +11,7 @@
           <template #header>
             <div class="card-header">
               <ph-user :size="20" />
-              <span>个人信息</span>
+              <span>{{ $t('settings.profile.title') }}</span>
             </div>
           </template>
           
@@ -22,51 +22,51 @@
           >
             <el-row :gutter="16">
               <el-col :span="12">
-                <el-form-item label="姓名">
-                  <el-input v-model="userProfile.name" placeholder="请输入姓名" />
+                <el-form-item :label="$t('settings.profile.name')">
+                  <el-input v-model="userProfile.name" :placeholder="$t('settings.profile.namePlaceholder')" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="邮箱">
-                  <el-input v-model="userProfile.email" placeholder="请输入邮箱" />
+                <el-form-item :label="$t('settings.profile.email')">
+                  <el-input v-model="userProfile.email" :placeholder="$t('settings.profile.emailPlaceholder')" />
                 </el-form-item>
               </el-col>
             </el-row>
             
             <el-row :gutter="16">
               <el-col :span="12">
-                <el-form-item label="手机号">
-                  <el-input v-model="userProfile.phone" placeholder="请输入手机号" />
+                <el-form-item :label="$t('settings.profile.phone')">
+                  <el-input v-model="userProfile.phone" :placeholder="$t('settings.profile.phonePlaceholder')" />
                 </el-form-item>
               </el-col>
               <el-col :span="12">
-                <el-form-item label="所在城市">
-                  <el-input v-model="userProfile.location" placeholder="请输入所在城市" />
+                <el-form-item :label="$t('settings.profile.location')">
+                  <el-input v-model="userProfile.location" :placeholder="$t('settings.profile.locationPlaceholder')" />
                 </el-form-item>
               </el-col>
             </el-row>
             
-            <el-form-item label="求职方向">
-              <el-input v-model="userProfile.jobDirection" placeholder="如：前端开发工程师" />
+            <el-form-item :label="$t('settings.profile.jobDirection')">
+              <el-input v-model="userProfile.jobDirection" :placeholder="$t('settings.profile.jobDirectionPlaceholder')" />
             </el-form-item>
             
-            <el-form-item label="期望薪资">
-              <el-input v-model="userProfile.expectedSalary" placeholder="如：15K-25K" />
+            <el-form-item :label="$t('settings.profile.expectedSalary')">
+              <el-input v-model="userProfile.expectedSalary" :placeholder="$t('settings.profile.expectedSalaryPlaceholder')" />
             </el-form-item>
             
-            <el-form-item label="工作经验">
-              <el-select v-model="userProfile.experience" placeholder="选择工作经验" style="width: 200px">
-                <el-option label="应届毕业生" value="应届毕业生" />
-                <el-option label="1年以下" value="1年以下" />
-                <el-option label="1-3年" value="1-3年" />
-                <el-option label="3-5年" value="3-5年" />
-                <el-option label="5-10年" value="5-10年" />
-                <el-option label="10年以上" value="10年以上" />
+            <el-form-item :label="$t('settings.profile.experience')">
+              <el-select v-model="userProfile.experience" :placeholder="$t('settings.profile.experience')" style="width: 200px">
+                <el-option :label="$t('settings.profile.experienceOptions.fresh')" value="fresh" />
+                <el-option :label="$t('settings.profile.experienceOptions.under1')" value="under1" />
+                <el-option :label="$t('settings.profile.experienceOptions.1to3')" value="1to3" />
+                <el-option :label="$t('settings.profile.experienceOptions.3to5')" value="3to5" />
+                <el-option :label="$t('settings.profile.experienceOptions.5to10')" value="5to10" />
+                <el-option :label="$t('settings.profile.experienceOptions.over10')" value="over10" />
               </el-select>
             </el-form-item>
             
             <el-form-item>
-              <el-button type="primary" @click="saveUserProfile">保存个人信息</el-button>
+              <el-button type="primary" @click="saveUserProfile">{{ $t('settings.profile.save') }}</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -76,51 +76,51 @@
           <template #header>
             <div class="card-header">
               <ph-gear :size="20" />
-              <span>系统偏好</span>
+              <span>{{ $t('settings.system.title') }}</span>
             </div>
           </template>
           
           <el-form label-width="160px">
-            <el-form-item label="主题模式">
+            <el-form-item :label="$t('settings.system.theme')">
               <el-radio-group v-model="systemSettings.theme">
-                <el-radio label="light">浅色模式</el-radio>
-                <el-radio label="dark">深色模式</el-radio>
-                <el-radio label="auto">跟随系统</el-radio>
+                <el-radio label="light">{{ $t('settings.system.themeOptions.light') }}</el-radio>
+                <el-radio label="dark">{{ $t('settings.system.themeOptions.dark') }}</el-radio>
+                <el-radio label="auto">{{ $t('settings.system.themeOptions.auto') }}</el-radio>
               </el-radio-group>
             </el-form-item>
             
-            <el-form-item label="默认视图">
+            <el-form-item :label="$t('settings.system.defaultView')">
               <el-select v-model="systemSettings.defaultView" style="width: 200px">
-                <el-option label="仪表板" value="dashboard" />
-                <el-option label="面试日历" value="calendar" />
-                <el-option label="面试列表" value="interviews" />
-                <el-option label="公司管理" value="companies" />
+                <el-option :label="$t('settings.system.defaultViewOptions.dashboard')" value="dashboard" />
+                <el-option :label="$t('settings.system.defaultViewOptions.calendar')" value="calendar" />
+                <el-option :label="$t('settings.system.defaultViewOptions.interviews')" value="interviews" />
+                <el-option :label="$t('settings.system.defaultViewOptions.companies')" value="companies" />
               </el-select>
             </el-form-item>
             
-            <el-form-item label="自动保存">
+            <el-form-item :label="$t('settings.system.autoSave')">
               <el-switch v-model="systemSettings.autoSave" />
               <el-text type="info" size="small" style="margin-left: 12px;">
-                启用后将自动保存表单数据
+                {{ $t('settings.system.autoSaveDesc') }}
               </el-text>
             </el-form-item>
             
-            <el-form-item label="桌面通知">
+            <el-form-item :label="$t('settings.system.notifications')">
               <el-switch v-model="systemSettings.notifications" />
               <el-text type="info" size="small" style="margin-left: 12px;">
-                面试提醒等重要通知
+                {{ $t('settings.system.notificationsDesc') }}
               </el-text>
             </el-form-item>
             
-            <el-form-item label="数据备份">
+            <el-form-item :label="$t('settings.system.autoBackup')">
               <el-switch v-model="systemSettings.autoBackup" />
               <el-text type="info" size="small" style="margin-left: 12px;">
-                定期自动备份数据到本地
+                {{ $t('settings.system.autoBackupDesc') }}
               </el-text>
             </el-form-item>
             
             <el-form-item>
-              <el-button type="primary" @click="saveSystemSettings">保存系统设置</el-button>
+              <el-button type="primary" @click="saveSystemSettings">{{ $t('settings.system.save') }}</el-button>
             </el-form-item>
           </el-form>
         </el-card>
@@ -130,17 +130,17 @@
           <template #header>
             <div class="card-header">
               <ph-database :size="20" />
-              <span>数据管理</span>
+              <span>{{ $t('settings.dataManagement.title') }}</span>
             </div>
           </template>
           
           <div class="data-management">
             <div class="management-section">
-              <h4>数据导入导出</h4>
+              <h4>{{ $t('settings.dataManagement.importExport') }}</h4>
               <div class="action-buttons">
                 <el-button @click="exportAllData">
                   <ph-download :size="16" />
-                  导出所有数据
+                  {{ $t('settings.dataManagement.exportAll') }}
                 </el-button>
                 <el-upload
                   ref="uploadRef"
@@ -152,7 +152,7 @@
                 >
                   <el-button>
                     <ph-upload :size="16" />
-                    导入数据
+                    {{ $t('settings.dataManagement.importData') }}
                   </el-button>
                 </el-upload>
               </div>
@@ -161,11 +161,11 @@
             <el-divider />
             
             <div class="management-section">
-              <h4>数据清理</h4>
+              <h4>{{ $t('settings.dataManagement.dataCleaning') }}</h4>
               <div class="action-buttons">
-                <el-button @click="clearCompletedInterviews">清理已完成面试</el-button>
-                <el-button @click="clearCancelledInterviews">清理已取消面试</el-button>
-                <el-button type="danger" @click="clearAllData">清空所有数据</el-button>
+                <el-button @click="clearCompletedInterviews">{{ $t('settings.dataManagement.clearCompleted') }}</el-button>
+                <el-button @click="clearCancelledInterviews">{{ $t('settings.dataManagement.clearCancelled') }}</el-button>
+                <el-button type="danger" @click="clearAllData">{{ $t('settings.dataManagement.clearAll') }}</el-button>
               </div>
             </div>
           </div>
@@ -178,33 +178,33 @@
           <template #header>
             <div class="card-header">
               <ph-chart-pie :size="20" />
-              <span>使用统计</span>
+              <span>{{ $t('settings.stats.title') }}</span>
             </div>
           </template>
           
           <div class="usage-stats">
             <div class="stat-item">
-              <div class="stat-label">注册时间</div>
+              <div class="stat-label">{{ $t('settings.stats.registerTime') }}</div>
               <div class="stat-value">{{ formatDate(userProfile.createdAt) }}</div>
             </div>
             <div class="stat-item">
-              <div class="stat-label">总投递数</div>
+              <div class="stat-label">{{ $t('settings.stats.totalApplications') }}</div>
               <div class="stat-value">{{ totalApplications }}</div>
             </div>
             <div class="stat-item">
-              <div class="stat-label">总面试数</div>
+              <div class="stat-label">{{ $t('settings.stats.totalInterviews') }}</div>
               <div class="stat-value">{{ totalInterviews }}</div>
             </div>
             <div class="stat-item">
-              <div class="stat-label">收到Offer</div>
+              <div class="stat-label">{{ $t('settings.stats.totalOffers') }}</div>
               <div class="stat-value">{{ totalOffers }}</div>
             </div>
             <div class="stat-item">
-              <div class="stat-label">数据存储</div>
+              <div class="stat-label">{{ $t('settings.stats.dataStorage') }}</div>
               <div class="stat-value">{{ dataSize }}</div>
             </div>
             <div class="stat-item">
-              <div class="stat-label">最后使用</div>
+              <div class="stat-label">{{ $t('settings.stats.lastUsed') }}</div>
               <div class="stat-value">{{ formatDate(lastUsed) }}</div>
             </div>
           </div>
@@ -215,26 +215,26 @@
           <template #header>
             <div class="card-header">
               <ph-lightning :size="20" />
-              <span>快捷操作</span>
+              <span>{{ $t('settings.quickActions.title') }}</span>
             </div>
           </template>
           
           <div class="quick-actions">
             <el-button type="primary" @click="$router.push('/interviews/new')">
               <ph-plus :size="16" />
-              新增面试
+              {{ $t('settings.quickActions.newInterview') }}
             </el-button>
             <el-button @click="$router.push('/companies/new')">
               <ph-buildings :size="16" />
-              新增公司
+              {{ $t('settings.quickActions.newCompany') }}
             </el-button>
             <el-button @click="$router.push('/calendar')">
               <ph-calendar :size="16" />
-              查看日历
+              {{ $t('settings.quickActions.viewCalendar') }}
             </el-button>
             <el-button @click="$router.push('/analysis')">
               <ph-chart-line :size="16" />
-              数据分析
+              {{ $t('settings.quickActions.dataAnalysis') }}
             </el-button>
           </div>
         </el-card>
@@ -244,25 +244,25 @@
           <template #header>
             <div class="card-header">
               <ph-info :size="20" />
-              <span>系统信息</span>
+              <span>{{ $t('settings.systemInfo.title') }}</span>
             </div>
           </template>
           
           <div class="system-info">
             <div class="info-item">
-              <span class="label">应用版本:</span>
+              <span class="label">{{ $t('settings.systemInfo.appVersion') }}:</span>
               <span class="value">v1.4.0</span>
             </div>
             <div class="info-item">
-              <span class="label">构建时间:</span>
+              <span class="label">{{ $t('settings.systemInfo.buildTime') }}:</span>
               <span class="value">{{ buildTime }}</span>
             </div>
             <div class="info-item">
-              <span class="label">浏览器:</span>
+              <span class="label">{{ $t('settings.systemInfo.browser') }}:</span>
               <span class="value">{{ browserInfo }}</span>
             </div>
             <div class="info-item">
-              <span class="label">存储方式:</span>
+              <span class="label">{{ $t('settings.systemInfo.storage') }}:</span>
               <span class="value">LocalStorage</span>
             </div>
           </div>
@@ -274,6 +274,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
   PhUser,
@@ -295,6 +296,7 @@ import { useInterviewStore } from '@/stores/interview'
 import { useCompanyStore } from '@/stores/company'
 import { storageManager } from '@/utils/storage'
 
+const { t } = useI18n()
 const userStore = useUserStore()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
@@ -324,7 +326,7 @@ const systemSettings = ref({
 const totalApplications = computed(() => interviewStore.processes.length)
 const totalInterviews = computed(() => interviewStore.rounds.length)
 const totalOffers = computed(() => 
-  interviewStore.processes.filter((p: any) => p.status === '已发Offer').length
+  interviewStore.processes.filter((p: any) => p.status === 'offer').length
 )
 
 const dataSize = computed(() => {
@@ -352,7 +354,7 @@ const browserInfo = computed(() => {
 
 // 方法
 const formatDate = (dateStr: string) => {
-  if (!dateStr) return '未知'
+  if (!dateStr) return t('settings.stats.unknown')
   return dayjs(dateStr).format('YYYY-MM-DD')
 }
 
@@ -371,16 +373,16 @@ const saveUserProfile = async () => {
       createdAt: userProfile.value.createdAt ? new Date(userProfile.value.createdAt) : new Date()
     }
     await userStore.updateProfile(profileData)
-    ElMessage.success('个人信息保存成功')
+    ElMessage.success(t('messages.saveSuccess'))
   } catch (error) {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('messages.saveError'))
   }
 }
 
 const saveSystemSettings = () => {
   // TODO: 保存系统设置到本地存储
   localStorage.setItem('systemSettings', JSON.stringify(systemSettings.value))
-  ElMessage.success('系统设置保存成功')
+  ElMessage.success(t('messages.saveSuccess'))
 }
 
 const exportAllData = async () => {
@@ -404,9 +406,9 @@ const exportAllData = async () => {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
     
-    ElMessage.success('数据导出成功')
+    ElMessage.success(t('settings.dataManagement.exportSuccess'))
   } catch (error) {
-    ElMessage.error('导出失败')
+    ElMessage.error(t('settings.dataManagement.exportFailed'))
   }
 }
 
@@ -418,15 +420,15 @@ const handleImportData = (file: any) => {
       
       // 验证数据格式
       if (!data.companies || !data.processes || !data.rounds) {
-        throw new Error('数据格式不正确')
+        throw new Error(t('settings.dataManagement.dataFormatError'))
       }
       
       await ElMessageBox.confirm(
-        '导入数据将覆盖现有数据，确定要继续吗？',
-        '导入确认',
+        t('settings.dataManagement.importConfirm'),
+        t('settings.dataManagement.importTitle'),
         {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
+          confirmButtonText: t('common.confirm'),
+          cancelButtonText: t('common.cancel'),
           type: 'warning',
         }
       )
@@ -442,10 +444,10 @@ const handleImportData = (file: any) => {
         userStore.loadProfile()
       ])
       
-      ElMessage.success('数据导入成功')
+      ElMessage.success(t('settings.dataManagement.importSuccess'))
     } catch (error) {
       if (error !== 'cancel') {
-        ElMessage.error('导入失败: ' + error)
+        ElMessage.error(t('settings.dataManagement.importFailed') + ': ' + error)
       }
     }
   }
@@ -455,24 +457,24 @@ const handleImportData = (file: any) => {
 const clearCompletedInterviews = async () => {
   try {
     await ElMessageBox.confirm(
-      '确定要清理所有已完成的面试记录吗？',
-      '清理确认',
+      t('settings.dataManagement.clearCompletedConfirm'),
+      t('settings.dataManagement.clearTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning',
       }
     )
     
-    const completedRounds = interviewStore.rounds.filter((r: any) => r.conclusion === '通过')
+    const completedRounds = interviewStore.rounds.filter((r: any) => r.conclusion === 'passed')
     for (const round of completedRounds) {
       await interviewStore.deleteRound(round.id)
     }
     
-    ElMessage.success(`已清理 ${completedRounds.length} 条已完成面试记录`)
+    ElMessage.success(t('settings.dataManagement.clearedRecords', { count: completedRounds.length }))
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('清理失败')
+      ElMessage.error(t('settings.dataManagement.clearFailed'))
     }
   }
 }
@@ -480,24 +482,24 @@ const clearCompletedInterviews = async () => {
 const clearCancelledInterviews = async () => {
   try {
     await ElMessageBox.confirm(
-      '确定要清理所有已取消的面试记录吗？',
-      '清理确认',
+      t('settings.dataManagement.clearCancelledConfirm'),
+      t('settings.dataManagement.clearTitle'),
       {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
         type: 'warning',
       }
     )
     
-    const cancelledRounds = interviewStore.rounds.filter((r: any) => r.status === '已拒绝')
+    const cancelledRounds = interviewStore.rounds.filter((r: any) => r.status === 'cancelled')
     for (const round of cancelledRounds) {
       await interviewStore.deleteRound(round.id)
     }
     
-    ElMessage.success(`已清理 ${cancelledRounds.length} 条已取消面试记录`)
+    ElMessage.success(t('settings.dataManagement.clearedRecords', { count: cancelledRounds.length }))
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('清理失败')
+      ElMessage.error(t('settings.dataManagement.clearFailed'))
     }
   }
 }
@@ -505,21 +507,21 @@ const clearCancelledInterviews = async () => {
 const clearAllData = async () => {
   try {
     await ElMessageBox.confirm(
-      '确定要清空所有数据吗？此操作不可恢复！',
-      '危险操作确认',
+      t('settings.dataManagement.clearAllConfirm'),
+      t('settings.dataManagement.clearDangerTitle'),
       {
-        confirmButtonText: '确定清空',
-        cancelButtonText: '取消',
+        confirmButtonText: t('settings.dataManagement.clearAll'),
+        cancelButtonText: t('common.cancel'),
         type: 'error',
       }
     )
     
     await ElMessageBox.confirm(
-      '请再次确认，这将删除所有公司、面试、投递记录！',
-      '最终确认',
+      t('settings.dataManagement.clearAllFinalConfirm'),
+      t('settings.dataManagement.clearFinalTitle'),
       {
-        confirmButtonText: '确定删除',
-        cancelButtonText: '取消',
+        confirmButtonText: t('common.delete'),
+        cancelButtonText: t('common.cancel'),
         type: 'error',
       }
     )
@@ -534,10 +536,10 @@ const clearAllData = async () => {
       userStore.loadProfile()
     ])
     
-    ElMessage.success('所有数据已清空')
+    ElMessage.success(t('settings.dataManagement.clearSuccess'))
   } catch (error) {
     if (error !== 'cancel') {
-      ElMessage.error('清空失败')
+      ElMessage.error(t('settings.dataManagement.clearFailed'))
     }
   }
 }

@@ -1,25 +1,25 @@
 <template>
   <div class="calendar-view">
     <div class="calendar-header">
-      <h2 class="page-title">面试日历</h2>
+      <h2 class="page-title">{{ $t('calendar.title') }}</h2>
       <div class="calendar-controls">
         <el-button-group class="view-controls">
           <el-button
             :type="viewMode === 'month' ? 'primary' : 'default'"
             @click="viewMode = 'month'"
           >
-            月视图
+            {{ $t('calendar.monthView') }}
           </el-button>
           <el-button
             :type="viewMode === 'week' ? 'primary' : 'default'"
             @click="viewMode = 'week'"
           >
-            周视图
+            {{ $t('calendar.weekView') }}
           </el-button>
         </el-button-group>
         <el-button type="primary" @click="showAddDialog = true">
           <ph-plus :size="16" />
-          新增面试
+          {{ $t('calendar.addInterview') }}
         </el-button>
       </div>
     </div>
@@ -28,7 +28,7 @@
       <el-button @click="previousPeriod" :icon="ArrowLeft" circle />
       <h3 class="current-period">{{ currentPeriodText }}</h3>
       <el-button @click="nextPeriod" :icon="ArrowRight" circle />
-      <el-button @click="goToToday" type="primary" plain>今天</el-button>
+      <el-button @click="goToToday" type="primary" plain>{{ $t('calendar.today') }}</el-button>
     </div>
 
     <div class="calendar-grid" :class="`calendar-${viewMode}`">
@@ -60,7 +60,7 @@
               @click.stop="viewInterview(interview)"
             >
               <div class="event-time">{{ formatTime(interview.scheduledTime) }}</div>
-              <div class="event-title">{{ interview.company?.name || '未知公司' }}</div>
+              <div class="event-title">{{ interview.company?.name || $t('calendar.unknownCompany') }}</div>
               <div class="event-position">{{ interview.position }}</div>
             </div>
           </div>
@@ -71,43 +71,43 @@
     <!-- 面试详情弹框 -->
     <el-dialog
       v-model="showInterviewDialog"
-      title="面试详情"
+      :title="$t('calendar.interviewDetail')"
       width="600px"
     >
       <div v-if="selectedInterview" class="interview-detail">
         <el-descriptions :column="2" border>
-          <el-descriptions-item label="公司">
-            {{ selectedInterview.company?.name || '未知公司' }}
+          <el-descriptions-item :label="$t('calendar.company')">
+            {{ selectedInterview.company?.name || $t('calendar.unknownCompany') }}
           </el-descriptions-item>
-          <el-descriptions-item label="职位">
+          <el-descriptions-item :label="$t('calendar.position')">
             {{ selectedInterview.position }}
           </el-descriptions-item>
-          <el-descriptions-item label="面试时间">
+          <el-descriptions-item :label="$t('calendar.interviewTime')">
             {{ formatDateTime(selectedInterview.scheduledTime) }}
           </el-descriptions-item>
-          <el-descriptions-item label="面试轮次">
-            第{{ selectedInterview.round }}轮
+          <el-descriptions-item :label="$t('calendar.round')">
+            {{ $t('calendar.roundNumber', { number: selectedInterview.round }) }}
           </el-descriptions-item>
-          <el-descriptions-item label="面试方式">
-            {{ selectedInterview.type }}
+          <el-descriptions-item :label="$t('calendar.interviewType')">
+            {{ translateInterviewType(selectedInterview.type) }}
           </el-descriptions-item>
-          <el-descriptions-item label="状态">
+          <el-descriptions-item :label="$t('calendar.statusLabel')">
             <el-tag :type="getStatusTagType(selectedInterview.status)">
               {{ formatStatus(selectedInterview.status) }}
             </el-tag>
           </el-descriptions-item>
-          <el-descriptions-item label="面试官" :span="2">
-            {{ selectedInterview.interviewer || '未知' }}
+          <el-descriptions-item :label="$t('calendar.interviewer')" :span="2">
+            {{ selectedInterview.interviewer || $t('calendar.unknown') }}
           </el-descriptions-item>
-          <el-descriptions-item label="备注" :span="2">
-            {{ selectedInterview.notes || selectedInterview.feedback || '暂无备注' }}
+          <el-descriptions-item :label="$t('calendar.notes')" :span="2">
+            {{ selectedInterview.notes || selectedInterview.feedback || $t('calendar.noNotes') }}
           </el-descriptions-item>
         </el-descriptions>
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="showInterviewDialog = false">关闭</el-button>
-          <el-button type="primary" @click="editInterview">编辑</el-button>
+          <el-button @click="showInterviewDialog = false">{{ $t('calendar.close') }}</el-button>
+          <el-button type="primary" @click="editInterview">{{ $t('calendar.edit') }}</el-button>
         </span>
       </template>
     </el-dialog>
@@ -115,7 +115,7 @@
     <!-- 新增面试弹框 -->
     <el-dialog
       v-model="showAddDialog"
-      title="新增面试"
+      :title="$t('calendar.addInterview')"
       width="600px"
     >
       <interview-form
@@ -130,6 +130,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { PhPlus } from '@phosphor-icons/vue'
 import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
@@ -137,6 +138,7 @@ import { useCompanyStore } from '@/stores/company'
 import type { InterviewRound } from '@/types'
 import InterviewForm from '@/components/InterviewForm.vue'
 
+const { t } = useI18n()
 const companyStore = useCompanyStore()
 
 // 响应式数据
@@ -148,7 +150,15 @@ const showAddDialog = ref(false)
 const selectedInterview = ref<InterviewRound | null>(null)
 
 // 周天数组
-const weekdays = ['日', '一', '二', '三', '四', '五', '六']
+const weekdays = computed(() => [
+  t('calendar.weekdays.sun'),
+  t('calendar.weekdays.mon'),
+  t('calendar.weekdays.tue'),
+  t('calendar.weekdays.wed'),
+  t('calendar.weekdays.thu'),
+  t('calendar.weekdays.fri'),
+  t('calendar.weekdays.sat')
+])
 
 // 计算属性
 const currentPeriodText = computed(() => {
@@ -235,18 +245,18 @@ const getInterviewsForDate = (date: Date) => {
       id: '1',
       processId: 'process-1',
       companyId: '1',
-      roundName: '技术面试',
+      roundName: t('calendar.mockData.technicalInterview'),
       scheduledTime: dayjs(date).hour(10).minute(0).toDate(),
       status: 'scheduled',
-      interviewer: '张工程师',
+      interviewer: t('calendar.mockData.engineer'),
       feedback: '',
       createdAt: new Date(),
       updatedAt: new Date(),
-      company: { id: '1', name: '阿里巴巴', industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
-      position: '前端工程师',
+      company: { id: '1', name: t('calendar.mockData.alibaba'), industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
+      position: t('calendar.mockData.frontendEngineer'),
       round: 1,
-      type: '线上面试',
-      notes: '准备算法题和项目介绍'
+      type: 'online',
+      notes: t('calendar.mockData.prepareAlgorithm')
     })
   }
   
@@ -256,18 +266,18 @@ const getInterviewsForDate = (date: Date) => {
       id: '2',
       processId: 'process-2',
       companyId: '2',
-      roundName: 'HR面试',
+      roundName: t('calendar.mockData.hrInterview'),
       scheduledTime: dayjs(date).hour(14).minute(30).toDate(),
       status: 'scheduled',
-      interviewer: '李HR',
+      interviewer: t('calendar.mockData.hrManager'),
       feedback: '',
       createdAt: new Date(),
       updatedAt: new Date(),
-      company: { id: '2', name: '腾讯', industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
-      position: 'React开发工程师',
+      company: { id: '2', name: t('calendar.mockData.tencent'), industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
+      position: t('calendar.mockData.reactDeveloper'),
       round: 2,
-      type: '现场面试',
-      notes: '薪资谈判和福利讨论'
+      type: 'onsite',
+      notes: t('calendar.mockData.salaryNegotiation')
     })
   }
   
@@ -277,18 +287,18 @@ const getInterviewsForDate = (date: Date) => {
       id: '3',
       processId: 'process-3',
       companyId: '3',
-      roundName: '总监面试',
+      roundName: t('calendar.mockData.finalInterview'),
       scheduledTime: dayjs(date).hour(16).minute(0).toDate(),
       status: 'scheduled',
-      interviewer: '王总监',
+      interviewer: t('calendar.mockData.director'),
       feedback: '',
       createdAt: new Date(),
       updatedAt: new Date(),
-      company: { id: '3', name: '字节跳动', industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
-      position: '高级前端工程师',
+      company: { id: '3', name: t('calendar.mockData.bytedance'), industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
+      position: t('calendar.mockData.seniorFrontend'),
       round: 3,
-      type: '线上面试',
-      notes: '团队文化和发展规划'
+      type: 'online',
+      notes: t('calendar.mockData.teamCulture')
     })
   }
   
@@ -298,18 +308,18 @@ const getInterviewsForDate = (date: Date) => {
       id: '4',
       processId: 'process-4',
       companyId: '4',
-      roundName: '初试',
+      roundName: t('calendar.mockData.initialInterview'),
       scheduledTime: dayjs(date).hour(9).minute(30).toDate(),
       status: 'completed',
-      interviewer: '陈技术经理',
-      feedback: '技术能力符合要求，沟通表达良好',
+      interviewer: t('calendar.mockData.techManager'),
+      feedback: t('calendar.mockData.positiveFeedback'),
       createdAt: new Date(),
       updatedAt: new Date(),
-      company: { id: '4', name: '美团', industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
-      position: 'Vue.js工程师',
+      company: { id: '4', name: t('calendar.mockData.meituan'), industry: 'IT', createdAt: new Date(), updatedAt: new Date() },
+      position: t('calendar.mockData.vueEngineer'),
       round: 1,
-      type: '视频面试',
-      notes: '已通过，等待复试通知'
+      type: 'video',
+      notes: t('calendar.mockData.passedWaitingNext')
     })
   }
   
@@ -325,27 +335,39 @@ const formatDateTime = (dateTime: string | Date) => {
 }
 
 const formatStatus = (status: string) => {
-  const statusMap: Record<string, string> = {
-    '已安排': '已安排',
-    '已完成': '已完成',
-    '已取消': '已取消',
-    '待安排': '待安排',
-    // 兼容英文状态
-    'scheduled': '已安排',
-    'completed': '已完成',
-    'cancelled': '已取消',
-    'pending': '待安排'
+  switch (status) {
+    case 'scheduled':
+      return t('calendar.status.scheduled')
+    case 'completed':
+      return t('calendar.status.completed')
+    case 'cancelled':
+      return t('calendar.status.cancelled')
+    case 'pending':
+      return t('calendar.status.pending')
+    default:
+      return status
   }
-  return statusMap[status] || status
+}
+
+const translateInterviewType = (type?: string) => {
+  if (!type) return t('calendar.unknown')
+  
+  switch (type) {
+    case 'online':
+      return t('calendar.types.online')
+    case 'onsite':
+      return t('calendar.types.onsite')
+    case 'video':
+      return t('calendar.types.video')
+    case 'phone':
+      return t('calendar.types.phone')
+    default:
+      return type
+  }
 }
 
 const getStatusTagType = (status: string): 'primary' | 'success' | 'info' | 'warning' | 'danger' => {
   const typeMap: Record<string, 'primary' | 'success' | 'info' | 'warning' | 'danger'> = {
-    '已安排': 'primary',
-    '已完成': 'success',
-    '已取消': 'danger',
-    '待安排': 'warning',
-    // 兼容英文状态
     'scheduled': 'primary',
     'completed': 'success',
     'cancelled': 'danger',
@@ -498,22 +520,22 @@ onMounted(async () => {
           font-size: 12px;
           cursor: pointer;
           
-          &.interview-已安排 {
+          &.interview-scheduled {
             background: var(--primary-color-light-9);
             color: var(--primary-color);
           }
           
-          &.interview-已完成 {
+          &.interview-completed {
             background: var(--success-color-light-9);
             color: var(--success-color);
           }
           
-          &.interview-已取消 {
+          &.interview-cancelled {
             background: var(--error-color-light-9);
             color: var(--error-color);
           }
           
-          &.interview-待安排 {
+          &.interview-pending {
             background: var(--warning-color-light-9);
             color: var(--warning-color);
           }

@@ -4,43 +4,34 @@
       <!-- Logo和品牌名 -->
       <div class="brand" @click="goHome">
         <div class="logo">
-          <el-icon :size="32" color="#F28A31">
-            <Briefcase />
-          </el-icon>
+          <img src="/src/assets/images/logo.svg" alt="ApplyMate Logo" class="logo-image" />
         </div>
         <h1 class="brand-name">Apply Mate</h1>
       </div>
     </div>
     
     <div class="header-center">
-      <!-- 搜索框 -->
-      <div class="search-box">
-        <el-input
-          v-model="searchKeyword"
-          placeholder="搜索面试、公司..."
-          :prefix-icon="Search"
-          size="default"
-          style="width: 300px"
-          @keyup.enter="handleSearch"
-          @input="handleSearchInput"
-        />
-        
-        <!-- 搜索建议 -->
-        <div v-if="showSuggestions && suggestions.length > 0" class="search-suggestions">
-          <div
-            v-for="suggestion in suggestions"
-            :key="suggestion.id"
-            class="suggestion-item"
-            @click="selectSuggestion(suggestion)"
-          >
-            <el-icon class="suggestion-icon">
-              <component :is="suggestion.type === 'company' ? 'OfficeBuilding' : 'Document'" />
-            </el-icon>
-            <span class="suggestion-text">{{ suggestion.label }}</span>
-            <span class="suggestion-type">{{ suggestion.type === 'company' ? '公司' : '面试' }}</span>
-          </div>
-        </div>
-      </div>
+      <!-- 导航菜单 -->
+      <el-menu
+        :default-active="activeMenu"
+        mode="horizontal"
+        router
+        class="header-menu"
+      >
+        <el-menu-item
+          v-for="menu in menuItems"
+          :key="menu.name"
+          :index="menu.path"
+          :class="{ active: isActiveMenu(menu.name) }"
+        >
+          <el-icon>
+            <component :is="menu.icon" />
+          </el-icon>
+          <template #title>
+            <span>{{ menu.title }}</span>
+          </template>
+        </el-menu-item>
+      </el-menu>
     </div>
     
     <div class="header-right">
@@ -52,7 +43,7 @@
             :icon="Plus"
             @click="createInterview"
           >
-            新建
+            新建面试
           </el-button>
         </el-tooltip>
         
@@ -83,7 +74,6 @@
           <el-avatar :size="32" src="">
             <el-icon><User /></el-icon>
           </el-avatar>
-          <el-icon class="dropdown-icon"><ArrowDown /></el-icon>
         </div>
         
         <template #dropdown>
@@ -109,40 +99,73 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
-  Search,
   Plus,
   Calendar,
   Bell,
   User,
-  ArrowDown,
   Setting,
   InfoFilled,
-  Briefcase
+  House,
+  Document,
+  OfficeBuilding,
+  DataAnalysis
 } from '@element-plus/icons-vue'
-import { useCompanyStore } from '@/stores/company'
 import { useInterviewStore } from '@/stores/interview'
 import { useRoundStore } from '@/stores/round'
-import { debounce } from '@/utils'
+import { formatFileSize } from '@/utils'
 
 const router = useRouter()
-const companyStore = useCompanyStore()
+const route = useRoute()
 const interviewStore = useInterviewStore()
 const roundStore = useRoundStore()
 
-// 搜索相关
-const searchKeyword = ref('')
-const showSuggestions = ref(false)
-const suggestions = ref<Array<{
-  id: string
-  label: string
-  type: 'company' | 'interview'
-  data: any
-}>>([])
+// 菜单项配置
+const menuItems = ref([
+  {
+    name: 'Dashboard',
+    path: '/dashboard',
+    title: '工作台',
+    icon: 'House'
+  },
+  {
+    name: 'Calendar',
+    path: '/calendar',
+    title: '面试日历',
+    icon: 'Calendar'
+  },
+  {
+    name: 'InterviewList',
+    path: '/interviews',
+    title: '面试管理',
+    icon: 'Document'
+  },
+  {
+    name: 'CompanyList',
+    path: '/companies',
+    title: '公司管理',
+    icon: 'OfficeBuilding'
+  },
+  {
+    name: 'Analysis',
+    path: '/analysis',
+    title: '数据分析',
+    icon: 'DataAnalysis'
+  }
+])
 
 // 计算属性
+const activeMenu = computed(() => {
+  // 根据当前路由确定激活的菜单项
+  const path = route.path
+  if (path.startsWith('/interviews')) {
+    return '/interviews'
+  }
+  return path
+})
+
 const todayInterviewsCount = computed(() => {
   return roundStore.getTodayRounds.length
 })
@@ -154,71 +177,12 @@ const notificationCount = computed(() => {
   return upcomingRounds.length + pendingInterviews
 })
 
-// 搜索处理
-const handleSearchInput = debounce(async (value: string) => {
-  if (!value.trim()) {
-    showSuggestions.value = false
-    return
+// 方法
+const isActiveMenu = (menuName: string): boolean => {
+  if (menuName === 'InterviewList') {
+    return route.name?.toString().startsWith('Interview') || false
   }
-  
-  try {
-    // 搜索公司
-    const companies = await companyStore.searchCompanies(value)
-    const companySuggestions = companies.slice(0, 3).map(company => ({
-      id: company.id,
-      label: company.name,
-      type: 'company' as const,
-      data: company
-    }))
-    
-    // 搜索面试
-    const interviews = await interviewStore.filterInterviews({ keyword: value })
-    const interviewSuggestions = interviews.slice(0, 3).map(interview => ({
-      id: interview.id,
-      label: `${interview.position} - ${interview.companyId}`,
-      type: 'interview' as const,
-      data: interview
-    }))
-    
-    suggestions.value = [...companySuggestions, ...interviewSuggestions]
-    showSuggestions.value = suggestions.value.length > 0
-  } catch (error) {
-    console.error('搜索失败:', error)
-  }
-}, 300)
-
-const handleSearch = () => {
-  if (searchKeyword.value.trim()) {
-    router.push({
-      name: 'InterviewList',
-      query: { keyword: searchKeyword.value }
-    })
-    showSuggestions.value = false
-  }
-}
-
-const selectSuggestion = (suggestion: any) => {
-  if (suggestion.type === 'company') {
-    router.push({
-      name: 'CompanyList',
-      query: { companyId: suggestion.id }
-    })
-  } else {
-    router.push({
-      name: 'InterviewDetail',
-      params: { id: suggestion.id }
-    })
-  }
-  showSuggestions.value = false
-  searchKeyword.value = ''
-}
-
-// 点击外部关闭建议框
-const handleClickOutside = (event: Event) => {
-  const searchBox = document.querySelector('.search-box')
-  if (searchBox && !searchBox.contains(event.target as Node)) {
-    showSuggestions.value = false
-  }
+  return route.name === menuName
 }
 
 // 快捷操作
@@ -259,14 +223,6 @@ const handleCommand = (command: string) => {
       break
   }
 }
-
-onMounted(() => {
-  document.addEventListener('click', handleClickOutside)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside)
-})
 </script>
 
 <style lang="scss" scoped>
@@ -299,6 +255,12 @@ onUnmounted(() => {
     
     .logo {
       margin-right: $spacing-sm;
+      
+      .logo-image {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+      }
     }
     
     .brand-name {
@@ -308,7 +270,7 @@ onUnmounted(() => {
       color: $primary-orange;
       margin: 0;
       
-      @media (max-width: $breakpoint-sm) {
+      @media (max-width: 480px) {
         display: none;
       }
     }
@@ -319,57 +281,61 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   justify-content: center;
+  min-width: 0;
+  overflow: visible;
   
-  .search-box {
-    position: relative;
+  @media (max-width: $breakpoint-md) {
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .header-menu {
+    border: none;
+    background: transparent;
+    width: auto;
+    overflow: visible;
     
-    @media (max-width: $breakpoint-md) {
-      width: 100%;
-      max-width: 300px;
-    }
-    
-    .search-suggestions {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      background: $color-white;
-      border: 1px solid $border-light;
+    :deep(.el-menu-item) {
+      height: 64px;
+      line-height: 64px;
+      padding: 0 $spacing-md;
       border-radius: $border-radius-md;
-      box-shadow: $shadow-deep;
-      z-index: $z-dropdown;
-      margin-top: 4px;
-      max-height: 300px;
-      overflow-y: auto;
+      margin: 0 $spacing-xs;
+      transition: all $transition-base;
+      display: flex !important;
+      visibility: visible !important;
       
-      .suggestion-item {
-        display: flex;
-        align-items: center;
-        padding: $spacing-sm $spacing-md;
-        cursor: pointer;
-        transition: background-color $transition-fast;
+      &:hover {
+        background-color: lighten($primary-orange, 45%);
+        color: $primary-orange;
+      }
+      
+      &.is-active,
+      &.active {
+        background-color: lighten($primary-orange, 30%);
+        color: $primary-orange;
+        font-weight: $font-weight-medium;
         
-        &:hover {
-          background-color: $bg-light;
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 24px;
+          height: 3px;
+          background-color: $primary-orange;
+          border-radius: 2px 2px 0 0;
         }
-        
-        .suggestion-icon {
-          margin-right: $spacing-sm;
-          color: $color-text-secondary;
-        }
-        
-        .suggestion-text {
-          flex: 1;
-          color: $color-text-primary;
-        }
-        
-        .suggestion-type {
-          font-size: $font-size-xs;
-          color: $color-text-secondary;
-          background: $bg-section;
-          padding: 2px 6px;
-          border-radius: $border-radius-sm;
-        }
+      }
+      
+      .el-icon {
+        margin-right: $spacing-xs;
+        font-size: 16px;
+      }
+      
+      span {
+        font-size: $font-size-sm;
       }
     }
   }
@@ -385,18 +351,13 @@ onUnmounted(() => {
     align-items: center;
     gap: $spacing-sm;
     
-    @media (max-width: $breakpoint-sm) {
-      .el-button span {
-        display: none;
-      }
-    }
+
   }
   
   .user-menu {
     .user-avatar {
       display: flex;
       align-items: center;
-      gap: $spacing-xs;
       cursor: pointer;
       padding: $spacing-xs;
       border-radius: $border-radius-md;
@@ -405,19 +366,45 @@ onUnmounted(() => {
       &:hover {
         background-color: $bg-light;
       }
-      
-      .dropdown-icon {
-        font-size: 12px;
-        color: $color-text-secondary;
-      }
     }
   }
 }
 
-// 响应式隐藏
-@media (max-width: $breakpoint-sm) {
+// 响应式处理 - 保持所有内容始终显示
+@media (max-width: $breakpoint-md) {
+  .app-header {
+    padding: 0 $spacing-sm;
+  }
+  
   .header-center {
-    display: none;
+    .header-menu {
+      :deep(.el-menu-item) {
+        padding: 0 $spacing-sm;
+        margin: 0 2px;
+        display: flex !important;
+        visibility: visible !important;
+        
+        .el-icon {
+          font-size: 14px;
+        }
+        
+        span {
+          font-size: $font-size-xs;
+          display: inline !important;
+        }
+      }
+    }
+  }
+  
+  .header-right {
+    .quick-actions {
+      gap: $spacing-xs;
+      
+      .el-button {
+        padding: $spacing-xs $spacing-sm;
+        font-size: $font-size-xs;
+      }
+    }
   }
 }
 </style>

@@ -1,34 +1,42 @@
 <template>
-  <div class="dashboard">
+  <div class="dashboard-view">
     <!-- 页面标题 -->
-    <div class="page-header">
-      <h1 class="page-title">仪表盘</h1>
-      <p class="page-subtitle">今日求职状态概览</p>
+    <div class="dashboard-header">
+      <h2 class="page-title">工作台</h2>
+      <div class="header-actions">
+        <el-button type="primary" :icon="Plus" @click="createInterview">
+          新建面试
+        </el-button>
+        <el-button :icon="Calendar" @click="goToCalendar">
+          查看日历
+        </el-button>
+      </div>
     </div>
     
     <!-- 统计卡片区域 -->
-    <div class="stats-grid">
-      <DashboardCard
-        v-for="stat in stats"
-        :key="stat.key"
-        :title="stat.title"
-        :value="stat.value"
-        :icon="stat.icon"
-        :color="stat.color"
-        :trend="stat.trend"
-        :clickable="true"
-        @click="handleCardClick(stat.key)"
-      />
+    <div class="dashboard-stats">
+      <el-row :gutter="16">
+        <el-col :span="6" v-for="stat in stats" :key="stat.key">
+          <el-card class="stat-card" :class="{ clickable: true }" @click="handleCardClick(stat.key)">
+            <div class="stat-content">
+              <div class="stat-number">{{ stat.value }}</div>
+              <div class="stat-label">{{ stat.title }}</div>
+            </div>
+                         <div class="stat-icon" :style="{ backgroundColor: stat.color }">
+             </div>
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
     
     <!-- 主要内容区域 -->
-    <div class="dashboard-content">
+    <el-row :gutter="16">
       <!-- 近期面试安排 -->
-      <div class="content-section">
-        <el-card class="section-card">
+      <el-col :span="12">
+        <el-card class="content-card">
           <template #header>
-            <div class="section-header">
-              <h3>近期面试安排</h3>
+            <div class="card-header">
+              <span>近期面试安排</span>
               <el-button type="text" @click="goToCalendar">查看全部</el-button>
             </div>
           </template>
@@ -37,14 +45,14 @@
             <UpcomingInterviews :max-items="5" />
           </div>
         </el-card>
-      </div>
+      </el-col>
       
       <!-- Offer薪资对比 -->
-      <div class="content-section">
-        <el-card class="section-card">
+      <el-col :span="12">
+        <el-card class="content-card">
           <template #header>
-            <div class="section-header">
-              <h3>Offer 薪资对比</h3>
+            <div class="card-header">
+              <span>Offer 薪资对比</span>
               <el-button type="text" @click="goToAnalysis">详细分析</el-button>
             </div>
           </template>
@@ -53,51 +61,50 @@
             <OfferChart :height="300" />
           </div>
         </el-card>
-      </div>
-    </div>
+      </el-col>
+    </el-row>
     
     <!-- 快速操作区域 -->
-    <div class="quick-actions">
-      <el-card class="action-card">
-        <template #header>
-          <h3>快速开始</h3>
-        </template>
-        
-        <div class="action-buttons">
-          <el-button
-            type="primary"
-            size="large"
-            :icon="Plus"
-            @click="createInterview"
-          >
-            新建面试流程
-          </el-button>
-          
-          <el-button
-            size="large"
-            :icon="OfficeBuilding"
-            @click="manageCompanies"
-          >
-            管理公司
-          </el-button>
-          
-          <el-button
-            size="large"
-            :icon="Calendar"
-            @click="goToCalendar"
-          >
-            查看日历
-          </el-button>
+    <el-card class="quick-actions-card">
+      <template #header>
+        <div class="card-header">
+          <span>快速开始</span>
         </div>
-      </el-card>
-    </div>
+      </template>
+      
+      <div class="action-buttons">
+        <el-button
+          type="primary"
+          size="large"
+          :icon="Plus"
+          @click="createInterview"
+        >
+          新建面试流程
+        </el-button>
+        
+        <el-button
+          size="large"
+          :icon="OfficeBuilding"
+          @click="manageCompanies"
+        >
+          管理公司
+        </el-button>
+        
+        <el-button
+          size="large"
+          :icon="Calendar"
+          @click="goToCalendar"
+        >
+          查看日历
+        </el-button>
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
 import {
   Plus,
   OfficeBuilding,
@@ -122,7 +129,6 @@ const stats = computed(() => {
       key: 'ongoing',
       title: '进行中的面试',
       value: dashboardStats.ongoingInterviews,
-      icon: 'Document',
       color: '#F28A31',
       trend: null
     },
@@ -130,7 +136,6 @@ const stats = computed(() => {
       key: 'pending',
       title: '待安排的面试',
       value: roundStore.getRoundsByStatus('pending').length,
-      icon: 'Calendar',
       color: '#6975A7',
       trend: null
     },
@@ -138,7 +143,6 @@ const stats = computed(() => {
       key: 'offers',
       title: '已收到 Offer',
       value: dashboardStats.receivedOffers,
-      icon: 'Trophy',
       color: '#67C23A',
       trend: null
     },
@@ -146,7 +150,6 @@ const stats = computed(() => {
       key: 'total',
       title: '总投递数量',
       value: dashboardStats.totalApplications,
-      icon: 'TrendCharts',
       color: '#E6A23C',
       trend: null
     }
@@ -194,122 +197,174 @@ const goToAnalysis = () => {
 }
 
 onMounted(() => {
-  // 页面加载完成时的欢迎提示
-  setTimeout(() => {
-    if (interviewStore.interviews.length === 0) {
-      ElMessage({
-        message: '欢迎使用 Apply Mate！开始创建您的第一个面试流程吧 🎉',
-        type: 'success',
-        duration: 3000
-      })
-    }
-  }, 1000)
+  // 页面加载完成时的初始化
+  // 移除了欢迎提示弹窗
 })
 </script>
 
 <style lang="scss" scoped>
-.dashboard {
-  max-width: 1400px;
-  margin: 0 auto;
+.dashboard-view {
+  // 页面容器样式与其他页面保持一致
 }
 
-.page-header {
-  margin-bottom: $spacing-xl;
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $spacing-lg;
   
   .page-title {
-    font-size: $font-size-4xl;
+    font-size: $font-size-2xl;
     font-weight: $font-weight-bold;
     color: $color-text-primary;
-    margin-bottom: $spacing-xs;
-    
-    @media (max-width: $breakpoint-md) {
-      font-size: $font-size-3xl;
-    }
-  }
-  
-  .page-subtitle {
-    font-size: $font-size-lg;
-    color: $color-text-secondary;
     margin: 0;
   }
+  
+  .header-actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: $spacing-lg;
-  margin-bottom: $spacing-xl;
+.dashboard-stats {
+  margin-bottom: $spacing-lg;
   
-  @media (max-width: $breakpoint-sm) {
-    grid-template-columns: 1fr;
+  .stat-card {
+    cursor: pointer;
+    transition: all $transition-base;
+    
+    &:hover {
+      box-shadow: $shadow-deep;
+      transform: translateY(-2px);
+    }
+    
+    &.clickable {
+      cursor: pointer;
+    }
+    
+    .stat-content {
+      display: flex;
+      flex-direction: column;
+      
+      .stat-number {
+        font-size: $font-size-3xl;
+        font-weight: $font-weight-bold;
+        color: $color-text-primary;
+        margin-bottom: $spacing-xs;
+      }
+      
+      .stat-label {
+        font-size: $font-size-sm;
+        color: $color-text-secondary;
+        font-weight: $font-weight-medium;
+      }
+    }
+    
+         .stat-icon {
+       position: absolute;
+       top: $spacing-md;
+       right: $spacing-md;
+       width: 8px;
+       height: 8px;
+       border-radius: 50%;
+       opacity: 0.8;
+     }
+    
+    :deep(.el-card__body) {
+      position: relative;
+      padding: $spacing-lg;
+    }
+  }
+}
+
+.content-card {
+  margin-bottom: $spacing-lg;
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    span {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+    }
+  }
+  
+  .timeline-container {
+    min-height: 300px;
+  }
+  
+  .chart-container {
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.quick-actions-card {
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    span {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+    }
+  }
+  
+  .action-buttons {
+    display: flex;
     gap: $spacing-md;
-  }
-}
-
-.dashboard-content {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-lg;
-  margin-bottom: $spacing-xl;
-  
-  @media (max-width: $breakpoint-lg) {
-    grid-template-columns: 1fr;
-  }
-  
-  .content-section {
-    .section-card {
-      height: 100%;
-      
-      .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        
-        h3 {
-          margin: 0;
-          font-size: $font-size-xl;
-          font-weight: $font-weight-semibold;
-          color: $color-text-primary;
-        }
-      }
-    }
+    justify-content: center;
+    flex-wrap: wrap;
     
-    .timeline-container {
-      min-height: 300px;
-    }
-    
-    .chart-container {
-      min-height: 300px;
-      display: flex;
+    @media (max-width: $breakpoint-sm) {
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      
+      .el-button {
+        width: 100%;
+        max-width: 300px;
+      }
     }
   }
 }
 
-.quick-actions {
-  .action-card {
-    .action-buttons {
-      display: flex;
-      gap: $spacing-md;
-      justify-content: center;
-      flex-wrap: wrap;
-      
-      @media (max-width: $breakpoint-sm) {
-        flex-direction: column;
-        align-items: center;
-        
-        .el-button {
-          width: 100%;
-          max-width: 300px;
-        }
-      }
+// 响应式处理
+@media (max-width: $breakpoint-lg) {
+  .dashboard-stats {
+    .stat-card {
+      margin-bottom: $spacing-md;
+    }
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+    
+    .header-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+  
+  .dashboard-stats {
+    :deep(.el-col) {
+      margin-bottom: $spacing-md;
     }
   }
 }
 
 // 入场动画
-.dashboard {
+.dashboard-view {
   animation: fadeInUp 0.6s ease-out;
 }
 

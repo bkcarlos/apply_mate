@@ -1,0 +1,174 @@
+@import './variables.scss';
+
+// 全局基础样式重置
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: $font-family-body;
+  font-size: $font-size-base;
+  font-weight: $font-weight-normal;
+  line-height: $line-height-normal;
+  color: $color-text-primary;
+  background-color: $color-white;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// 标题样式系统
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-heading;
+  font-weight: $font-weight-bold;
+  line-height: $line-height-tight;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+h1 {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-bold;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-4xl;
+  }
+}
+
+h2 {
+  font-size: $font-size-4xl;
+  font-weight: $font-weight-semibold;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-3xl;
+  }
+}
+
+h3 {
+  font-family: $font-family-body;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-semibold;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-xl;
+  }
+}
+
+// 段落和文本样式
+p {
+  margin-bottom: $spacing-md;
+  line-height: $line-height-relaxed;
+}
+
+// 链接样式
+a {
+  color: $accent-blue;
+  text-decoration: none;
+  transition: color $transition-fast;
+  
+  &:hover {
+    color: darken($accent-blue, 18.75%);
+    text-decoration: underline;
+  }
+  
+  &:focus {
+    outline: 2px solid $accent-blue;
+    outline-offset: 2px;
+  }
+}
+
+// 按钮基础样式
+button {
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// 表单元素样式
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  border: none;
+  outline: none;
+  
+  &:focus {
+    outline: 2px solid $accent-blue;
+    outline-offset: 2px;
+  }
+}
+
+// 列表样式
+ul, ol {
+  margin-bottom: $spacing-md;
+  padding-left: $spacing-lg;
+}
+
+li {
+  margin-bottom: $spacing-xs;
+}
+
+// 图片样式
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+// 滚动条样式
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $bg-light;
+}
+
+::-webkit-scrollbar-thumb {
+  background: lighten($color-text-secondary, 32.69%);
+  border-radius: 4px;
+  
+  &:hover {
+    background: $color-text-secondary;
+  }
+}
+
+// 选择文本样式
+::selection {
+  background-color: lighten($primary-orange, 69.86%);
+  color: $color-text-primary;
+}
+
+::-moz-selection {
+  background-color: lighten($primary-orange, 69.86%);
+  color: $color-text-primary;
+}
+
+// 动画减少偏好设置
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

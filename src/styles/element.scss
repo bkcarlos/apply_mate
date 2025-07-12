@@ -1,0 +1,202 @@
+@import './variables.scss';
+
+// Element Plus 主题定制
+:root {
+  // 主色彩
+  --el-color-primary: #{$primary-orange};
+  --el-color-primary-light-3: #{lighten($primary-orange, 34.93%)};
+  --el-color-primary-light-5: #{lighten($primary-orange, 58.22%)};
+  --el-color-primary-light-7: #{lighten($primary-orange, 81.51%)};
+  --el-color-primary-light-8: #{lighten($primary-orange, 93.15%)};
+  --el-color-primary-light-9: #{lighten($primary-orange, 100%)};
+  --el-color-primary-dark-2: #{darken($primary-orange, 18.75%)};
+  
+  // 成功色
+  --el-color-success: #{$color-success};
+  --el-color-warning: #{$color-warning};
+  --el-color-danger: #{$color-danger};
+  --el-color-info: #{$accent-blue};
+  
+  // 文本颜色
+  --el-text-color-primary: #{$color-text-primary};
+  --el-text-color-regular: #{$color-text-primary};
+  --el-text-color-secondary: #{$color-text-secondary};
+  --el-text-color-placeholder: #{lighten($color-text-secondary, 32.69%)};
+  
+  // 边框颜色
+  --el-border-color: #{$border-base};
+  --el-border-color-light: #{$border-light};
+  --el-border-color-lighter: #{lighten($border-light, 8.33%)};
+  
+  // 背景颜色
+  --el-bg-color: #{$color-white};
+  --el-bg-color-page: #{$bg-light};
+  --el-bg-color-overlay: #{$bg-section};
+  
+  // 字体
+  --el-font-family: #{$font-family-body};
+  --el-font-size-base: #{$font-size-base};
+  
+  // 圆角
+  --el-border-radius-base: #{$border-radius-md};
+  --el-border-radius-small: #{$border-radius-sm};
+  --el-border-radius-round: 20px;
+  
+  // 阴影
+  --el-box-shadow: #{$shadow-base};
+  --el-box-shadow-light: #{$shadow-light};
+  --el-box-shadow-dark: #{$shadow-deep};
+}
+
+// 按钮组件样式定制
+.el-button {
+  font-family: $font-family-body;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-md;
+  transition: all $transition-base;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-hover;
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  &--primary {
+    background-color: $primary-orange;
+    border-color: $primary-orange;
+    color: $color-text-primary;
+    
+    &:hover {
+      background-color: darken($primary-orange, 9.38%);
+      border-color: darken($primary-orange, 9.38%);
+    }
+  }
+  
+  &--default {
+    border-color: $border-base;
+    color: $color-text-primary;
+    
+    &:hover {
+      border-color: $primary-orange;
+      color: $primary-orange;
+    }
+  }
+}
+
+// 卡片组件样式
+.el-card {
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-light;
+  transition: all $transition-base;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-deep;
+  }
+  
+  .el-card__header {
+    background-color: $bg-light;
+    border-bottom: 1px solid $border-light;
+    padding: $spacing-lg;
+    
+    h3 {
+      margin-bottom: 0;
+      color: $color-text-primary;
+    }
+  }
+  
+  .el-card__body {
+    padding: $spacing-lg;
+  }
+}
+
+// 表格组件样式
+.el-table {
+  .el-table__header-wrapper {
+    th {
+      background-color: $bg-section;
+      color: $color-text-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+  
+  .el-table__body-wrapper {
+    tr:hover > td {
+      background-color: lighten($primary-orange, 100%);
+    }
+  }
+}
+
+// 表单组件样式
+.el-form {
+  .el-form-item__label {
+    color: $color-text-primary;
+    font-weight: $font-weight-medium;
+  }
+  
+  .el-input__wrapper {
+    border-radius: $border-radius-md;
+    transition: all $transition-base;
+    
+    &:hover {
+      box-shadow: 0 0 0 1px lighten($primary-orange, 46.58%);
+    }
+    
+    &.is-focus {
+      box-shadow: 0 0 0 1px $accent-blue;
+    }
+  }
+  
+  .el-textarea__inner {
+    border-radius: $border-radius-md;
+  }
+  
+  .el-select .el-input.is-focus .el-input__wrapper {
+    box-shadow: 0 0 0 1px $accent-blue;
+  }
+}
+
+// 消息提示样式
+.el-message {
+  border-radius: $border-radius-md;
+  box-shadow: $shadow-deep;
+  
+  &--success {
+    background-color: lighten($color-success, 100%);
+    border-color: lighten($color-success, 69.86%);
+  }
+  
+  &--warning {
+    background-color: lighten($color-warning, 100%);
+    border-color: lighten($color-warning, 69.86%);
+  }
+  
+  &--error {
+    background-color: lighten($color-danger, 100%);
+    border-color: lighten($color-danger, 69.86%);
+  }
+}
+
+// 对话框样式
+.el-dialog {
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-deep;
+  
+  .el-dialog__header {
+    padding: $spacing-xl $spacing-xl $spacing-lg;
+    
+    .el-dialog__title {
+      font-family: $font-family-heading;
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-semibold;
+      color: $color-text-primary;
+    }
+  }
+  
+  .el-dialog__body {
+    padding: 0 $spacing-xl $spacing-xl;
+  }
+}

@@ -1,0 +1,88 @@
+// 色彩系统 - 橙色系年轻趣味风格
+// 主色板
+$primary-orange: #F28A31;  // 主橙色 - 镉橙色
+$accent-blue: #6975A7;     // 强调蓝 - 深蓝灰色
+
+// 中性色
+$color-white: #FFFFFF;      // 背景色
+$color-text-primary: #1F1F1F;  // 主文字色 - 近黑色
+$color-text-secondary: #666460; // 次要文字/边框色 - 暖灰色
+
+// 语义化颜色
+$color-success: #67C23A;
+$color-warning: #E6A23C;
+$color-danger: #F56C6C;
+$color-info: $accent-blue;
+
+// 背景色变体
+$bg-light: #FAFAFA;
+$bg-section: #F8F9FA;
+$border-light: #E4E7ED;
+$border-base: #DCDFE6;
+
+// 间距系统 - 基于8px网格
+$spacing-xs: 4px;   // 0.25rem
+$spacing-sm: 8px;   // 0.5rem
+$spacing-md: 16px;  // 1rem
+$spacing-lg: 24px;  // 1.5rem
+$spacing-xl: 32px;  // 2rem
+$spacing-xxl: 48px; // 3rem
+
+// 圆角
+$border-radius-sm: 4px;
+$border-radius-md: 8px;
+$border-radius-lg: 12px;
+$border-radius-xl: 16px;
+
+// 阴影
+$shadow-light: 0 2px 4px rgba(0, 0, 0, 0.05);
+$shadow-base: 0 4px 8px rgba(0, 0, 0, 0.1);
+$shadow-deep: 0 8px 16px rgba(0, 0, 0, 0.15);
+$shadow-hover: 0 8px 24px rgba(242, 138, 49, 0.15);
+
+// 字体系统
+$font-family-heading: 'Gluten', sans-serif;  // 标题字体 - 趣味性
+$font-family-body: 'Poppins', sans-serif;    // 正文字体 - 现代简洁
+
+// 字体大小
+$font-size-xs: 12px;   // 0.75rem
+$font-size-sm: 14px;   // 0.875rem
+$font-size-base: 16px; // 1rem
+$font-size-lg: 18px;   // 1.125rem
+$font-size-xl: 20px;   // 1.25rem
+$font-size-2xl: 24px;  // 1.5rem
+$font-size-3xl: 30px;  // 1.875rem
+$font-size-4xl: 36px;  // 2.25rem
+$font-size-5xl: 48px;  // 3rem
+
+// 字重
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// 行高
+$line-height-tight: 1.2;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.6;
+
+// 过渡动画
+$transition-fast: 0.15s ease-out;
+$transition-base: 0.3s ease-out;
+$transition-slow: 0.5s ease-out;
+
+// 响应式断点
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Z-index层级
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;

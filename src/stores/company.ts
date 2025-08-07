@@ -187,5 +187,15 @@ export const useCompanyStore = defineStore('company', {
     async exportCompanies(): Promise<Company[]> {
       return [...this.companies];
     },
+
+    async clearAll(): Promise<boolean> {
+      try {
+        this.companies = [];
+        return await this.saveCompanies();
+      } catch (error) {
+        console.error('清空公司数据失败:', error);
+        return false;
+      }
+    },
   },
 });

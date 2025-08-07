@@ -345,5 +345,15 @@ export const useInterviewStore = defineStore('interview', {
     async deleteRound(id: string) {
       return this.deleteInterview(id);
     },
+
+    async clearAll(): Promise<boolean> {
+      try {
+        this.interviews = [];
+        return await this.saveInterviews();
+      } catch (error) {
+        console.error('清空面试数据失败:', error);
+        return false;
+      }
+    },
   },
 });

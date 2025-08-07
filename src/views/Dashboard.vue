@@ -247,29 +247,56 @@ const generateTestData = async () => {
     
     generatingData.value = true
     
-    // 生成测试数据
-    const testData = generateCompleteTestData()
-    
-    // 导入到各个store
-    await companyStore.importCompanies(testData.companies)
-    await interviewStore.importInterviews(testData.interviews)
-    
-    // 保存面试轮次数据到localStorage
-    localStorage.setItem('apply-mate-interview-rounds', JSON.stringify(testData.rounds))
-    
-    ElMessage.success(t('dashboard.testDataGenerated'))
-    
-    // 刷新页面数据
-    setTimeout(() => {
-      window.location.reload()
-    }, 1000)
+    try {
+      // 首先清空现有数据，避免ID关联问题
+      console.log('🧹 清空现有数据...')
+      await companyStore.clearAll()
+      await interviewStore.clearAll()
+      await roundStore.clearAll()
+      
+      // 生成测试数据
+      console.log('📊 生成新的测试数据...')
+      const testData = generateCompleteTestData()
+      
+      // 调试信息：检查数据关联
+      console.log('🏢 生成的公司数量:', testData.companies.length)
+      console.log('📋 生成的面试数量:', testData.interviews.length)
+      console.log('🔄 生成的轮次数量:', testData.rounds.length)
+      
+      // 检查面试数据的公司关联
+      const companyIds = new Set(testData.companies.map(c => c.id))
+      const orphanInterviews = testData.interviews.filter(i => !companyIds.has(i.companyId))
+      
+      console.log('🏢 公司ID列表:', Array.from(companyIds))
+      console.log('📋 孤立的面试流程 (未关联公司):', orphanInterviews.length)
+      
+      if (orphanInterviews.length > 0) {
+        console.warn('⚠️ 发现未关联公司的面试流程:', orphanInterviews)
+      }
+      
+      // 导入到各个store
+      console.log('💾 保存数据到存储...')
+      await companyStore.importCompanies(testData.companies)
+      await interviewStore.importInterviews(testData.interviews)
+      await roundStore.importRounds(testData.rounds)
+      
+      ElMessage.success(t('dashboard.testDataGenerated'))
+      
+      // 刷新页面数据
+      setTimeout(() => {
+        window.location.reload()
+      }, 1000)
+    } catch (error) {
+      ElMessage.error(t('dashboard.testDataGenerationFailed'))
+      console.error('测试数据生成失败:', error)
+    } finally {
+      generatingData.value = false
+    }
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error(t('dashboard.testDataGenerationFailed'))
       console.error(error)
     }
-  } finally {
-    generatingData.value = false
   }
 }
 

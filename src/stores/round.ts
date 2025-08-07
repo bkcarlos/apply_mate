@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { InterviewRound } from '@/types';
+import type { InterviewRound, RoundStatus } from '@/types';
 import { storageManager, STORAGE_KEYS } from '@/utils/storage';
 import { generateId } from '@/utils';
 
@@ -50,8 +50,41 @@ export const useRoundStore = defineStore('round', {
         .sort((a, b) => new Date(a.scheduledTime).getTime() - new Date(b.scheduledTime).getTime());
     },
 
-    getRoundsByStatus: (state) => (status: InterviewRound['status']): InterviewRound[] => {
-      return state.rounds.filter(round => round.status === status);
+    getRoundsByStatus: (state) => (status: RoundStatus): InterviewRound[] => {
+      return state.rounds
+        .filter(round => round.status === status)
+        .sort((a, b) => new Date(a.scheduledTime).getTime() - new Date(b.scheduledTime).getTime());
+    },
+
+    getRoundStats: (state) => () => {
+      const statusCount = state.rounds.reduce((acc, round) => {
+        acc[round.status] = (acc[round.status] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      return {
+        total: state.rounds.length,
+        byStatus: statusCount,
+        completed: statusCount['已完成'] || 0,
+        scheduled: statusCount['已安排'] || 0,
+        pending: statusCount['待安排'] || 0,
+        cancelled: statusCount['已取消'] || 0,
+      };
+    },
+
+    getInterviewerStats: (state) => () => {
+      const interviewerMap = new Map<string, number>();
+      
+      state.rounds
+        .filter(round => round.interviewer && round.status === 'completed')
+        .forEach(round => {
+          const interviewer = round.interviewer!;
+          interviewerMap.set(interviewer, (interviewerMap.get(interviewer) || 0) + 1);
+        });
+
+      return Array.from(interviewerMap.entries())
+        .map(([interviewer, count]) => ({ interviewer, count }))
+        .sort((a, b) => b.count - a.count);
     },
   },
 
@@ -260,36 +293,14 @@ export const useRoundStore = defineStore('round', {
       return [...this.rounds];
     },
 
-    // 统计功能
-    getRoundStats() {
-      const statusCount = this.rounds.reduce((acc, round) => {
-        acc[round.status] = (acc[round.status] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>);
-
-      return {
-        total: this.rounds.length,
-        byStatus: statusCount,
-        completed: statusCount['已完成'] || 0,
-        scheduled: statusCount['已安排'] || 0,
-        pending: statusCount['待安排'] || 0,
-        cancelled: statusCount['已取消'] || 0,
-      };
-    },
-
-    getInterviewerStats() {
-      const interviewerMap = new Map<string, number>();
-      
-      this.rounds
-        .filter(round => round.interviewer && round.status === 'completed')
-        .forEach(round => {
-          const interviewer = round.interviewer!;
-          interviewerMap.set(interviewer, (interviewerMap.get(interviewer) || 0) + 1);
-        });
-
-      return Array.from(interviewerMap.entries())
-        .map(([interviewer, count]) => ({ interviewer, count }))
-        .sort((a, b) => b.count - a.count);
+    async clearAll(): Promise<boolean> {
+      try {
+        this.rounds = [];
+        return await this.saveRounds();
+      } catch (error) {
+        console.error('清空轮次数据失败:', error);
+        return false;
+      }
     },
   },
 });

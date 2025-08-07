@@ -216,7 +216,7 @@ export const generateTestInterviews = (companies: Company[]): InterviewProcess[]
 }
 
 // 测试面试轮次数据
-export const generateTestRounds = (interviews: InterviewProcess[], companies: Company[]): InterviewRound[] => {
+export const generateTestRounds = (interviews: InterviewProcess[]): InterviewRound[] => {
   const rounds: InterviewRound[] = []
   const roundNames = ['初试', '技术面试', 'HR面试', '总监面试', '终面']
   const interviewTypes = ['现场面试', '视频面试', '电话面试', '线上面试']
@@ -228,7 +228,6 @@ export const generateTestRounds = (interviews: InterviewProcess[], companies: Co
   
   // 为每个面试流程生成1-4个面试轮次
   interviews.forEach(interview => {
-    const company = companies.find(c => c.id === interview.companyId)
     const roundCount = Math.floor(Math.random() * 4) + 1
     
     for (let i = 0; i < roundCount; i++) {
@@ -253,8 +252,7 @@ export const generateTestRounds = (interviews: InterviewProcess[], companies: Co
         feedback: status === 'completed' ? '面试表现良好，技术能力符合要求' : '',
         createdAt: new Date(),
         updatedAt: new Date(),
-        // 扩展字段
-        company,
+        // 扩展字段 - 不直接存储 Company 对象，避免循环引用
         position: interview.position,
         round: i + 1,
         type,
@@ -282,7 +280,7 @@ export const clearAllTestData = () => {
 export const generateCompleteTestData = () => {
   const companies = generateTestCompanies()
   const interviews = generateTestInterviews(companies)
-  const rounds = generateTestRounds(interviews, companies)
+  const rounds = generateTestRounds(interviews)
   
   return {
     companies,

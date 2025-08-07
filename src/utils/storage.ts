@@ -23,11 +23,37 @@ export const STORAGE_KEYS = {
  */
 class StorageManager {
   /**
+   * 序列化数据，处理Date对象
+   */
+  private serializeData(data: any): any {
+    return JSON.parse(JSON.stringify(data, (_key, value) => {
+      if (value instanceof Date) {
+        return { __type: 'Date', value: value.toISOString() };
+      }
+      return value;
+    }));
+  }
+
+  /**
+   * 反序列化数据，恢复Date对象
+   */
+  private deserializeData(data: any): any {
+    if (!data) return data;
+    return JSON.parse(JSON.stringify(data), (_key, value) => {
+      if (value && typeof value === 'object' && value.__type === 'Date') {
+        return new Date(value.value);
+      }
+      return value;
+    });
+  }
+
+  /**
    * 获取数据
    */
   async get<T>(key: string): Promise<T | null> {
     try {
-      return await localforage.getItem<T>(key);
+      const data = await localforage.getItem<T>(key);
+      return this.deserializeData(data);
     } catch (error) {
       console.error(`获取数据失败 [${key}]:`, error);
       return null;
@@ -39,7 +65,8 @@ class StorageManager {
    */
   async set<T>(key: string, value: T): Promise<boolean> {
     try {
-      await localforage.setItem(key, value);
+      const serializedData = this.serializeData(value);
+      await localforage.setItem(key, serializedData);
       return true;
     } catch (error) {
       console.error(`存储数据失败 [${key}]:`, error);

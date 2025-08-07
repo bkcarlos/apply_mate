@@ -1,4 +1,5 @@
-@import './variables.scss';
+@use './variables.scss' as *;
+@use 'sass:color';
 
 // 全局基础样式重置
 * {
@@ -76,7 +77,7 @@ a {
   transition: color $transition-fast;
   
   &:hover {
-    color: darken($accent-blue, 18.75%);
+    color: color.adjust($accent-blue, $lightness: -18.75%);
     text-decoration: underline;
   }
   
@@ -142,7 +143,7 @@ img {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: lighten($color-text-secondary, 32.69%);
+  background: color.adjust($color-text-secondary, $lightness: 32.69%);
   border-radius: 4px;
   
   &:hover {
@@ -152,12 +153,12 @@ img {
 
 // 选择文本样式
 ::selection {
-  background-color: lighten($primary-orange, 69.86%);
+  background-color: color.adjust($primary-orange, $lightness: 69.86%);
   color: $color-text-primary;
 }
 
 ::-moz-selection {
-  background-color: lighten($primary-orange, 69.86%);
+  background-color: color.adjust($primary-orange, $lightness: 69.86%);
   color: $color-text-primary;
 }
 

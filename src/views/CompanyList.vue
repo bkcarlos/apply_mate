@@ -330,7 +330,8 @@ const filteredCompanies = computed(() => {
 })
 
 // 方法
-const getCompanyTypeText = (type: string): string => {
+const getCompanyTypeText = (type?: string): string => {
+  if (!type) return '';
   switch (type) {
     case 'startup':
       return t('companyForm.companyTypes.startup')

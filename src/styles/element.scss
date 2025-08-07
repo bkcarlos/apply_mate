@@ -1,15 +1,16 @@
-@import './variables.scss';
+@use './variables.scss' as *;
+@use 'sass:color';
 
 // Element Plus 主题定制
 :root {
   // 主色彩
   --el-color-primary: #{$primary-orange};
-  --el-color-primary-light-3: #{lighten($primary-orange, 34.93%)};
-  --el-color-primary-light-5: #{lighten($primary-orange, 58.22%)};
-  --el-color-primary-light-7: #{lighten($primary-orange, 81.51%)};
-  --el-color-primary-light-8: #{lighten($primary-orange, 93.15%)};
-  --el-color-primary-light-9: #{lighten($primary-orange, 100%)};
-  --el-color-primary-dark-2: #{darken($primary-orange, 18.75%)};
+  --el-color-primary-light-3: #{color.adjust($primary-orange, $lightness: 34.93%)};
+  --el-color-primary-light-5: #{color.adjust($primary-orange, $lightness: 58.22%)};
+  --el-color-primary-light-7: #{color.adjust($primary-orange, $lightness: 81.51%)};
+  --el-color-primary-light-8: #{color.adjust($primary-orange, $lightness: 93.15%)};
+  --el-color-primary-light-9: #{color.adjust($primary-orange, $lightness: 100%)};
+  --el-color-primary-dark-2: #{color.adjust($primary-orange, $lightness: -18.75%)};
   
   // 成功色
   --el-color-success: #{$color-success};
@@ -21,12 +22,12 @@
   --el-text-color-primary: #{$color-text-primary};
   --el-text-color-regular: #{$color-text-primary};
   --el-text-color-secondary: #{$color-text-secondary};
-  --el-text-color-placeholder: #{lighten($color-text-secondary, 32.69%)};
+  --el-text-color-placeholder: #{color.adjust($color-text-secondary, $lightness: 32.69%)};
   
   // 边框颜色
   --el-border-color: #{$border-base};
   --el-border-color-light: #{$border-light};
-  --el-border-color-lighter: #{lighten($border-light, 8.33%)};
+  --el-border-color-lighter: #{color.adjust($border-light, $lightness: 8.33%)};
   
   // 背景颜色
   --el-bg-color: #{$color-white};
@@ -70,8 +71,8 @@
     color: $color-text-primary;
     
     &:hover {
-      background-color: darken($primary-orange, 9.38%);
-      border-color: darken($primary-orange, 9.38%);
+      background-color: color.adjust($primary-orange, $lightness: -9.38%);
+      border-color: color.adjust($primary-orange, $lightness: -9.38%);
     }
   }
   
@@ -125,7 +126,7 @@
   
   .el-table__body-wrapper {
     tr:hover > td {
-      background-color: lighten($primary-orange, 100%);
+      background-color: color.adjust($primary-orange, $lightness: 100%);
     }
   }
 }
@@ -142,7 +143,7 @@
     transition: all $transition-base;
     
     &:hover {
-      box-shadow: 0 0 0 1px lighten($primary-orange, 46.58%);
+      box-shadow: 0 0 0 1px color.adjust($primary-orange, $lightness: 46.58%);
     }
     
     &.is-focus {
@@ -165,18 +166,18 @@
   box-shadow: $shadow-deep;
   
   &--success {
-    background-color: lighten($color-success, 100%);
-    border-color: lighten($color-success, 69.86%);
+    background-color: color.adjust($color-success, $lightness: 100%);
+    border-color: color.adjust($color-success, $lightness: 69.86%);
   }
   
   &--warning {
-    background-color: lighten($color-warning, 100%);
-    border-color: lighten($color-warning, 69.86%);
+    background-color: color.adjust($color-warning, $lightness: 100%);
+    border-color: color.adjust($color-warning, $lightness: 69.86%);
   }
   
   &--error {
-    background-color: lighten($color-danger, 100%);
-    border-color: lighten($color-danger, 69.86%);
+    background-color: color.adjust($color-danger, $lightness: 100%);
+    border-color: color.adjust($color-danger, $lightness: 69.86%);
   }
 }
 

@@ -102,7 +102,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -111,15 +111,10 @@ import {
   Bell,
   User,
   Setting,
-  InfoFilled,
-  House,
-  Document,
-  OfficeBuilding,
-  DataAnalysis
+  InfoFilled
 } from '@element-plus/icons-vue'
 import { useInterviewStore } from '@/stores/interview'
 import { useRoundStore } from '@/stores/round'
-import { formatFileSize } from '@/utils'
 import LanguageSwitcher from '@/components/LanguageSwitcher.vue'
 
 const router = useRouter()
@@ -311,13 +306,13 @@ const handleCommand = (command: string) => {
       visibility: visible !important;
       
       &:hover {
-        background-color: lighten($primary-orange, 45%);
+        background-color: color.adjust($primary-orange, $lightness: 45%);
         color: $primary-orange;
       }
       
       &.is-active,
       &.active {
-        background-color: lighten($primary-orange, 30%);
+        background-color: color.adjust($primary-orange, $lightness: 30%);
         color: $primary-orange;
         font-weight: $font-weight-medium;
         

@@ -124,7 +124,7 @@ const handleClick = () => {
     &:hover {
       box-shadow: $shadow-deep;
       transform: translateY(-2px);
-      border-color: lighten($primary-orange, 20%);
+      border-color: color.adjust($primary-orange, $lightness: 20%);
     }
     
     &:active {
@@ -189,12 +189,12 @@ const handleClick = () => {
         font-weight: $font-weight-medium;
         
         &.trend-up {
-          background-color: lighten($color-success, 45%);
+          background-color: color.adjust($color-success, $lightness: 45%);
           color: $color-success;
         }
         
         &.trend-down {
-          background-color: lighten($color-danger, 45%);
+          background-color: color.adjust($color-danger, $lightness: 45%);
           color: $color-danger;
         }
         

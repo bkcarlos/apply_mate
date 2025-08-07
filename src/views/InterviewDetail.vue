@@ -192,8 +192,6 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/styles/variables.scss";
-
 .interview-detail {
   .detail-header {
     display: flex;

@@ -304,7 +304,7 @@ onMounted(async () => {
           }
           
           &:hover {
-            border-color: lighten($primary-orange, 20%);
+            border-color: color.adjust($primary-orange, $lightness: 20%);
             box-shadow: $shadow-light;
             transform: translateY(-1px);
           }

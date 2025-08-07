@@ -166,7 +166,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/styles/variables.scss";
 .app-sidebar {
   height: 100%;
   display: flex;
@@ -200,13 +199,13 @@ onMounted(() => {
     transition: all $transition-base;
     
     &:hover {
-      background-color: lighten($primary-orange, 45%);
+      background-color: color.adjust($primary-orange, $lightness: 45%);
       color: $primary-orange;
     }
     
     &.is-active,
     &.active {
-      background-color: lighten($primary-orange, 30%);
+      background-color: color.adjust($primary-orange, $lightness: 30%);
       color: $primary-orange;
       font-weight: $font-weight-medium;
       

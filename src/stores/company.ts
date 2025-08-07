@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import type { Company } from '@/types';
 import { storageManager, STORAGE_KEYS } from '@/utils/storage';
 import { generateId } from '@/utils';
+import { createError, ERROR_CODES } from '@/utils/errors';
 
 export const useCompanyStore = defineStore('company', {
   state: () => ({
@@ -44,8 +45,9 @@ export const useCompanyStore = defineStore('company', {
         const companies = await storageManager.get<Company[]>(STORAGE_KEYS.COMPANIES);
         this.companies = companies || [];
       } catch (error) {
-        this.error = '加载公司数据失败';
-        console.error('加载公司数据失败:', error);
+  const appErr = createError(ERROR_CODES.STORE_SAVE_FAILED, '加载公司数据失败', error);
+  this.error = appErr.message;
+  console.error(appErr);
       } finally {
         this.loading = false;
       }
@@ -56,8 +58,9 @@ export const useCompanyStore = defineStore('company', {
         await storageManager.set(STORAGE_KEYS.COMPANIES, this.companies);
         return true;
       } catch (error) {
-        this.error = '保存公司数据失败';
-        console.error('保存公司数据失败:', error);
+  const appErr = createError(ERROR_CODES.STORE_SAVE_FAILED, '保存公司数据失败', error);
+  this.error = appErr.message;
+  console.error(appErr);
         return false;
       }
     },
@@ -78,14 +81,14 @@ export const useCompanyStore = defineStore('company', {
       } else {
         // 回滚操作
         this.companies.pop();
-        throw new Error('添加公司失败');
+  throw createError(ERROR_CODES.STORE_SAVE_FAILED, '添加公司失败');
       }
     },
 
     async updateCompany(id: string, updates: Partial<Company>) {
       const index = this.companies.findIndex(company => company.id === id);
       if (index === -1) {
-        throw new Error('公司不存在');
+  throw createError(ERROR_CODES.STORE_ENTITY_NOT_FOUND, '公司不存在', undefined, { id });
       }
 
       const originalCompany = { ...this.companies[index] };
@@ -104,14 +107,14 @@ export const useCompanyStore = defineStore('company', {
       } else {
         // 回滚操作
         this.companies[index] = originalCompany;
-        throw new Error('更新公司失败');
+  throw createError(ERROR_CODES.STORE_SAVE_FAILED, '更新公司失败');
       }
     },
 
     async deleteCompany(id: string) {
       const index = this.companies.findIndex(company => company.id === id);
       if (index === -1) {
-        throw new Error('公司不存在');
+  throw createError(ERROR_CODES.STORE_ENTITY_NOT_FOUND, '公司不存在', undefined, { id });
       }
 
       const deletedCompany = this.companies.splice(index, 1)[0];
@@ -120,7 +123,7 @@ export const useCompanyStore = defineStore('company', {
       if (!success) {
         // 回滚操作
         this.companies.splice(index, 0, deletedCompany);
-        throw new Error('删除公司失败');
+  throw createError(ERROR_CODES.STORE_SAVE_FAILED, '删除公司失败');
       }
       
       return true;
@@ -174,7 +177,7 @@ export const useCompanyStore = defineStore('company', {
         if (mode === 'replace') {
           this.companies = [...companies];
           const success = await this.saveCompanies();
-          if (!success) throw new Error('导入失败');
+          if (!success) throw createError(ERROR_CODES.STORE_SAVE_FAILED, '导入失败');
           return { imported: companies.length, skipped: 0, mode };
         }
 
@@ -226,7 +229,7 @@ export const useCompanyStore = defineStore('company', {
             }
           });
           const success = await this.saveCompanies();
-          if (!success) throw new Error('导入失败');
+          if (!success) throw createError(ERROR_CODES.STORE_SAVE_FAILED, '导入失败');
           return { imported, merged, skipped, mode } as any;
         }
       } catch (error) {
@@ -240,7 +243,7 @@ export const useCompanyStore = defineStore('company', {
       const success = await this.saveCompanies();
       if (!success) {
         this.companies = original;
-        throw new Error('导入失败');
+  throw createError(ERROR_CODES.STORE_SAVE_FAILED, '导入失败');
       }
       return { imported, skipped, mode };
     },

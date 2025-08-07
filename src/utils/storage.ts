@@ -1,6 +1,7 @@
 import localforage from 'localforage';
 import type { Company, InterviewProcess, InterviewRound, UserProfile, ExportData } from '@/types';
 import { APP_VERSION } from '@/constants';
+import { createError, ERROR_CODES } from '@/utils/errors';
 
 // 配置 localforage
 localforage.config({
@@ -56,7 +57,7 @@ class StorageManager {
       const data = await localforage.getItem<T>(key);
       return this.deserializeData(data);
     } catch (error) {
-      console.error(`获取数据失败 [${key}]:`, error);
+      console.error(createError(ERROR_CODES.STORAGE_GET_FAILED, `获取数据失败 [${key}]`, error));
       return null;
     }
   }
@@ -70,7 +71,7 @@ class StorageManager {
       await localforage.setItem(key, serializedData);
       return true;
     } catch (error) {
-      console.error(`存储数据失败 [${key}]:`, error);
+      console.error(createError(ERROR_CODES.STORAGE_SET_FAILED, `存储数据失败 [${key}]`, error));
       return false;
     }
   }
@@ -171,7 +172,7 @@ class StorageManager {
   async importData(data: ExportData): Promise<boolean> {
     try {
       if (!validateImportData(data)) {
-        throw new Error('导入数据结构不合法');
+        throw createError(ERROR_CODES.STORAGE_IMPORT_INVALID, '导入数据结构不合法');
       }
 
       const normalizedCompanies = (data.companies || []).map(c => this.normalizeDates(c, ['createdAt', 'updatedAt']));
@@ -190,7 +191,7 @@ class StorageManager {
       const results = await Promise.all(operations);
       return results.every(Boolean);
     } catch (error) {
-      console.error('导入数据失败:', error);
+  console.error(createError(ERROR_CODES.STORAGE_IMPORT_FAILED, '导入数据失败', error));
       return false;
     }
   }

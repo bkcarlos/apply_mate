@@ -3,6 +3,7 @@ import type { InterviewProcess, InterviewFilterParams, DashboardStats } from '@/
 import { storageManager, STORAGE_KEYS } from '@/utils/storage';
 import { generateId, formatDate } from '@/utils';
 import { useCompanyStore } from '@/stores/company';
+import { createError, ERROR_CODES } from '@/utils/errors';
 
 export const useInterviewStore = defineStore('interview', {
   state: () => ({
@@ -109,10 +110,11 @@ export const useInterviewStore = defineStore('interview', {
       
       try {
         const interviews = await storageManager.get<InterviewProcess[]>(STORAGE_KEYS.INTERVIEW_PROCESSES);
-        this.interviews = interviews || [];
+    this.interviews = interviews || [];
       } catch (error) {
-        this.error = '加载面试数据失败';
-        console.error('加载面试数据失败:', error);
+    const appErr = createError(ERROR_CODES.STORE_SAVE_FAILED, '加载面试数据失败', error);
+    this.error = appErr.message;
+    console.error(appErr);
       } finally {
         this.loading = false;
       }
@@ -123,8 +125,9 @@ export const useInterviewStore = defineStore('interview', {
         await storageManager.set(STORAGE_KEYS.INTERVIEW_PROCESSES, this.interviews);
         return true;
       } catch (error) {
-        this.error = '保存面试数据失败';
-        console.error('保存面试数据失败:', error);
+    const appErr = createError(ERROR_CODES.STORE_SAVE_FAILED, '保存面试数据失败', error);
+    this.error = appErr.message;
+    console.error(appErr);
         return false;
       }
     },
@@ -145,14 +148,14 @@ export const useInterviewStore = defineStore('interview', {
       } else {
         // 回滚操作
         this.interviews.pop();
-        throw new Error('添加面试流程失败');
+    throw createError(ERROR_CODES.STORE_SAVE_FAILED, '添加面试流程失败');
       }
     },
 
     async updateInterview(id: string, updates: Partial<InterviewProcess>) {
       const index = this.interviews.findIndex(interview => interview.id === id);
       if (index === -1) {
-        throw new Error('面试流程不存在');
+    throw createError(ERROR_CODES.STORE_ENTITY_NOT_FOUND, '面试流程不存在', undefined, { id });
       }
 
       const originalInterview = { ...this.interviews[index] };
@@ -171,14 +174,14 @@ export const useInterviewStore = defineStore('interview', {
       } else {
         // 回滚操作
         this.interviews[index] = originalInterview;
-        throw new Error('更新面试流程失败');
+    throw createError(ERROR_CODES.STORE_SAVE_FAILED, '更新面试流程失败');
       }
     },
 
     async deleteInterview(id: string) {
       const index = this.interviews.findIndex(interview => interview.id === id);
       if (index === -1) {
-        throw new Error('面试流程不存在');
+    throw createError(ERROR_CODES.STORE_ENTITY_NOT_FOUND, '面试流程不存在', undefined, { id });
       }
 
       const deletedInterview = this.interviews.splice(index, 1)[0];
@@ -187,7 +190,7 @@ export const useInterviewStore = defineStore('interview', {
       if (!success) {
         // 回滚操作
         this.interviews.splice(index, 0, deletedInterview);
-        throw new Error('删除面试流程失败');
+    throw createError(ERROR_CODES.STORE_SAVE_FAILED, '删除面试流程失败');
       }
       
       return true;
@@ -243,7 +246,7 @@ export const useInterviewStore = defineStore('interview', {
         const success = await this.saveInterviews();
         
         if (!success) {
-          throw new Error('批量更新失败');
+            throw createError(ERROR_CODES.STORE_SAVE_FAILED, '批量更新失败');
         }
         
         return true;
@@ -262,7 +265,7 @@ export const useInterviewStore = defineStore('interview', {
         const success = await this.saveInterviews();
         
         if (!success) {
-          throw new Error('批量删除失败');
+            throw createError(ERROR_CODES.STORE_SAVE_FAILED, '批量删除失败');
         }
         
         return true;
@@ -288,7 +291,7 @@ export const useInterviewStore = defineStore('interview', {
         const success = await this.saveInterviews();
         
         if (!success) {
-          throw new Error('导入失败');
+            throw createError(ERROR_CODES.STORE_SAVE_FAILED, '导入失败');
         }
         
   return { imported: toAdd.length };
@@ -359,7 +362,7 @@ export const useInterviewStore = defineStore('interview', {
         this.interviews = [];
         return await this.saveInterviews();
       } catch (error) {
-        console.error('清空面试数据失败:', error);
+    console.error('清空面试数据失败:', error);
         return false;
       }
     },

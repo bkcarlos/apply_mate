@@ -3,6 +3,7 @@ import type { InterviewRound } from '@/types';
 import { storageManager, STORAGE_KEYS } from '@/utils/storage';
 import { generateId } from '@/utils';
 import { ROUND_STATUS } from '@/constants';
+import { createError, ERROR_CODES } from '@/utils/errors';
 
 export const useRoundStore = defineStore('round', {
   state: () => ({
@@ -105,8 +106,9 @@ export const useRoundStore = defineStore('round', {
           status: (legacyMap[r.status as string] as any) || r.status,
         }));
       } catch (error) {
-        this.error = '加载面试轮次数据失败';
-        console.error('加载面试轮次数据失败:', error);
+  const appErr = createError(ERROR_CODES.STORE_SAVE_FAILED, '加载面试轮次数据失败', error);
+  this.error = appErr.message;
+  console.error(appErr);
       } finally {
         this.loading = false;
       }
@@ -117,8 +119,9 @@ export const useRoundStore = defineStore('round', {
         await storageManager.set(STORAGE_KEYS.INTERVIEW_ROUNDS, this.rounds);
         return true;
       } catch (error) {
-        this.error = '保存面试轮次数据失败';
-        console.error('保存面试轮次数据失败:', error);
+  const appErr = createError(ERROR_CODES.STORE_SAVE_FAILED, '保存面试轮次数据失败', error);
+  this.error = appErr.message;
+  console.error(appErr);
         return false;
       }
     },
@@ -134,28 +137,28 @@ export const useRoundStore = defineStore('round', {
       const success = await this.saveRounds();
       if (success) return newRound;
       this.rounds.pop();
-      throw new Error('添加面试轮次失败');
+  throw createError(ERROR_CODES.STORE_SAVE_FAILED, '添加面试轮次失败');
     },
 
     async updateRound(id: string, updates: Partial<InterviewRound>) {
       const index = this.rounds.findIndex(round => round.id === id);
-      if (index === -1) throw new Error('面试轮次不存在');
+  if (index === -1) throw createError(ERROR_CODES.STORE_ENTITY_NOT_FOUND, '面试轮次不存在', undefined, { id });
       const originalRound = { ...this.rounds[index] };
       this.rounds[index] = { ...this.rounds[index], ...updates, id, updatedAt: new Date() };
       const success = await this.saveRounds();
       if (success) return this.rounds[index];
       this.rounds[index] = originalRound;
-      throw new Error('更新面试轮次失败');
+  throw createError(ERROR_CODES.STORE_SAVE_FAILED, '更新面试轮次失败');
     },
 
     async deleteRound(id: string) {
       const index = this.rounds.findIndex(round => round.id === id);
-      if (index === -1) throw new Error('面试轮次不存在');
+  if (index === -1) throw createError(ERROR_CODES.STORE_ENTITY_NOT_FOUND, '面试轮次不存在', undefined, { id });
       const deletedRound = this.rounds.splice(index, 1)[0];
       const success = await this.saveRounds();
       if (!success) {
         this.rounds.splice(index, 0, deletedRound);
-        throw new Error('删除面试轮次失败');
+  throw createError(ERROR_CODES.STORE_SAVE_FAILED, '删除面试轮次失败');
       }
       return true;
     },
@@ -165,7 +168,7 @@ export const useRoundStore = defineStore('round', {
       try {
         this.rounds = this.rounds.filter(round => round.processId !== processId);
         const success = await this.saveRounds();
-        if (!success) throw new Error('删除面试轮次失败');
+  if (!success) throw createError(ERROR_CODES.STORE_SAVE_FAILED, '删除面试轮次失败');
         return true;
       } catch (error) {
         this.rounds = originalRounds;
@@ -183,7 +186,7 @@ export const useRoundStore = defineStore('round', {
             }
         });
         const success = await this.saveRounds();
-        if (!success) throw new Error('批量更新失败');
+  if (!success) throw createError(ERROR_CODES.STORE_SAVE_FAILED, '批量更新失败');
         return true;
       } catch (error) {
         this.rounds = originalRounds;
@@ -234,7 +237,7 @@ export const useRoundStore = defineStore('round', {
         const toAdd = normalized.map(r => existingIds.has(r.id) ? { ...r, id: generateId() } : r);
         this.rounds.push(...toAdd);
         const success = await this.saveRounds();
-        if (!success) throw new Error('导入失败');
+  if (!success) throw createError(ERROR_CODES.STORE_SAVE_FAILED, '导入失败');
         return { imported: toAdd.length };
       } catch (error) {
         this.rounds = originalRounds;

@@ -11,6 +11,9 @@ export const ROUND_STATUS = {
 
 export type RoundStatusValue = typeof ROUND_STATUS[keyof typeof ROUND_STATUS];
 
+export const isRoundStatus = (val: any): val is RoundStatusValue =>
+  Object.values(ROUND_STATUS).includes(val as any);
+
 // 面试流程状态（保留中文枚举供已有数据兼容，建议逐步英文化并用映射显示）
 export const INTERVIEW_STATUS = {
   APPLYING: '投递中',

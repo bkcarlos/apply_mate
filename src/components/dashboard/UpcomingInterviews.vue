@@ -115,6 +115,7 @@ import { useRoundStore } from '@/stores/round'
 import { useInterviewStore } from '@/stores/interview'
 import { useCompanyStore } from '@/stores/company'
 import { formatDate, getRelativeTime } from '@/utils'
+import { mapRoundStatusToLabel } from '@/utils/statusMapping'
 import type { InterviewRound } from '@/types'
 
 interface Props {
@@ -202,18 +203,7 @@ const getStatusType = (status: string): 'primary' | 'success' | 'info' | 'warnin
   }
 }
 
-const getStatusText = (status: string): string => {
-  switch (status) {
-    case 'scheduled':
-      return t('upcomingInterviews.statusMap.scheduled')
-    case 'completed':
-      return t('upcomingInterviews.statusMap.completed')
-    case 'cancelled':
-      return t('upcomingInterviews.statusMap.cancelled')
-    default:
-      return status
-  }
-}
+const getStatusText = (status: string): string => mapRoundStatusToLabel(status, t)
 
 const goToDetail = (processId: string) => {
   router.push(`/interviews/${processId}`)

@@ -282,14 +282,16 @@ export const useInterviewStore = defineStore('interview', {
       const originalInterviews = [...this.interviews];
       
       try {
-        this.interviews.push(...interviews);
+  const existingIds = new Set(this.interviews.map(i => i.id));
+  const toAdd = interviews.map(i => existingIds.has(i.id) ? { ...i, id: generateId() } : i);
+  this.interviews.push(...toAdd);
         const success = await this.saveInterviews();
         
         if (!success) {
           throw new Error('导入失败');
         }
         
-        return { imported: interviews.length };
+  return { imported: toAdd.length };
       } catch (error) {
         // 回滚操作
         this.interviews = originalInterviews;

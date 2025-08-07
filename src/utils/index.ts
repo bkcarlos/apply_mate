@@ -135,8 +135,15 @@ export const deepClone = <T>(obj: T): T => {
 /**
  * 格式化货币
  */
-export const formatCurrency = (amount: number, currency = '¥'): string => {
-  return `${currency}${amount.toLocaleString()}`;
+const currencyFormatterCache = new Map<string, Intl.NumberFormat>();
+export const formatCurrency = (amount: number, currency = 'CNY', locale = 'zh-CN', minimumFractionDigits = 0): string => {
+  const key = `${locale}-${currency}-${minimumFractionDigits}`;
+  let fmt = currencyFormatterCache.get(key);
+  if (!fmt) {
+    fmt = new Intl.NumberFormat(locale, { style: 'currency', currency, minimumFractionDigits });
+    currencyFormatterCache.set(key, fmt);
+  }
+  return fmt.format(amount);
 };
 
 /**

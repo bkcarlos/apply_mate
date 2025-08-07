@@ -119,16 +119,16 @@ class StorageManager {
   async getStorageSize(): Promise<number> {
     try {
       const keys = await this.keys();
-      let totalSize = 0;
-      
-      for (const key of keys) {
-        const value = await this.get(key);
-        if (value) {
-          totalSize += JSON.stringify(value).length;
+      // 并行获取，提升性能
+      const values = await Promise.all(keys.map(k => this.get(k)));
+      return values.reduce<number>((sum, v) => {
+        if (!v) return sum;
+        try {
+          return sum + JSON.stringify(v).length;
+        } catch {
+          return sum;
         }
-      }
-      
-      return totalSize;
+      }, 0);
     } catch (error) {
       console.error('计算存储大小失败:', error);
       return 0;
@@ -170,16 +170,25 @@ class StorageManager {
    */
   async importData(data: ExportData): Promise<boolean> {
     try {
+      if (!validateImportData(data)) {
+        throw new Error('导入数据结构不合法');
+      }
+
+      const normalizedCompanies = (data.companies || []).map(c => this.normalizeDates(c, ['createdAt', 'updatedAt']));
+      const normalizedProcesses = (data.interviewProcesses || []).map(p => this.normalizeDates(p, ['createdAt', 'updatedAt']));
+      const normalizedRounds = (data.interviewRounds || []).map(r => this.normalizeDates(r, ['scheduledTime', 'createdAt', 'updatedAt']));
+      const normalizedProfile = this.normalizeDates(data.userProfile, ['createdAt', 'updatedAt']);
+
       const operations = [
-        this.set(STORAGE_KEYS.COMPANIES, data.companies),
-        this.set(STORAGE_KEYS.INTERVIEW_PROCESSES, data.interviewProcesses),
-        this.set(STORAGE_KEYS.INTERVIEW_ROUNDS, data.interviewRounds),
-        this.set(STORAGE_KEYS.USER_PROFILE, data.userProfile),
-        this.set(STORAGE_KEYS.APP_VERSION, data.version)
+        this.set(STORAGE_KEYS.COMPANIES, normalizedCompanies),
+        this.set(STORAGE_KEYS.INTERVIEW_PROCESSES, normalizedProcesses),
+        this.set(STORAGE_KEYS.INTERVIEW_ROUNDS, normalizedRounds),
+        this.set(STORAGE_KEYS.USER_PROFILE, normalizedProfile),
+        this.set(STORAGE_KEYS.APP_VERSION, data.version || APP_VERSION)
       ];
 
       const results = await Promise.all(operations);
-      return results.every(result => result === true);
+      return results.every(Boolean);
     } catch (error) {
       console.error('导入数据失败:', error);
       return false;
@@ -220,6 +229,22 @@ class StorageManager {
       console.error('初始化默认数据失败:', error);
     }
   }
+
+  /**
+   * 规范化对象中的日期字段：如果是字符串且可被 Date 解析则转为 Date
+   */
+  private normalizeDates<T extends Record<string, any>>(obj: T, dateKeys: string[]): T {
+    if (!obj || typeof obj !== 'object') return obj;
+    const cloned: Record<string, any> = { ...obj };
+    dateKeys.forEach(k => {
+      const v = cloned[k];
+      if (typeof v === 'string' || typeof v === 'number') {
+        const d = new Date(v);
+        if (!isNaN(d.getTime())) cloned[k] = d;
+      }
+    });
+    return cloned as T;
+  }
 }
 
 // 创建单例实例
@@ -228,9 +253,15 @@ export const storageManager = new StorageManager();
 // 数据验证工具函数
 export const validateImportData = (data: any): data is ExportData => {
   if (!data || typeof data !== 'object') return false;
-  
   const requiredFields = ['version', 'exportDate', 'companies', 'interviewProcesses', 'interviewRounds', 'userProfile'];
-  return requiredFields.every(field => field in data);
+  if (!requiredFields.every(f => f in data)) return false;
+  if (!Array.isArray(data.companies) || !Array.isArray(data.interviewProcesses) || !Array.isArray(data.interviewRounds)) return false;
+  // 粗略结构校验（必填字段最小集）
+  const companyShapeOk = data.companies.every((c: any) => c && typeof c === 'object' && 'name' in c);
+  const processShapeOk = data.interviewProcesses.every((p: any) => p && typeof p === 'object' && 'companyId' in p && 'position' in p);
+  const roundsShapeOk = data.interviewRounds.every((r: any) => r && typeof r === 'object' && 'processId' in r && 'scheduledTime' in r);
+  if (!companyShapeOk || !processShapeOk || !roundsShapeOk) return false;
+  return true;
 };
 
 // 文件下载工具函数

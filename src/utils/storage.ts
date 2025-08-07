@@ -1,5 +1,6 @@
 import localforage from 'localforage';
 import type { Company, InterviewProcess, InterviewRound, UserProfile, ExportData } from '@/types';
+import { APP_VERSION } from '@/constants';
 
 // 配置 localforage
 localforage.config({
@@ -147,7 +148,7 @@ class StorageManager {
       ]);
 
       return {
-        version: '1.4.0',
+        version: APP_VERSION,
         exportDate: new Date(),
         companies: companies || [],
         interviewProcesses: interviewProcesses || [],
@@ -214,7 +215,7 @@ class StorageManager {
         });
       }
 
-      await this.set(STORAGE_KEYS.APP_VERSION, '1.4.0');
+      await this.set(STORAGE_KEYS.APP_VERSION, APP_VERSION);
     } catch (error) {
       console.error('初始化默认数据失败:', error);
     }

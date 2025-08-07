@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import type { InterviewProcess, InterviewFilterParams, DashboardStats } from '@/types';
 import { storageManager, STORAGE_KEYS } from '@/utils/storage';
 import { generateId, formatDate } from '@/utils';
+import { useCompanyStore } from '@/stores/company';
 
 export const useInterviewStore = defineStore('interview', {
   state: () => ({
@@ -72,11 +73,16 @@ export const useInterviewStore = defineStore('interview', {
     },
 
     getOfferComparisons: (state) => {
+      const companyStore = useCompanyStore();
+      const companyMap = companyStore.companies.reduce((acc: Record<string, string>, c) => {
+        acc[c.id] = c.name;
+        return acc;
+      }, {} as Record<string, string>);
       return state.interviews
         .filter(interview => interview.status === '已发Offer' && interview.offeredSalary)
         .map(interview => ({
           id: interview.id,
-          companyName: interview.companyId, // 需要从company store获取公司名称
+          companyName: companyMap[interview.companyId] || interview.companyId,
           position: interview.position,
           monthlySalary: interview.offeredSalary!.base,
           baseAnnualSalary: interview.offeredSalary!.base * 12,

@@ -3,6 +3,7 @@ import { createPinia } from 'pinia';
 import ElementPlus from 'element-plus';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
+import { APP_VERSION } from '@/constants';
 
 import App from './App.vue';
 import router from './router';
@@ -36,6 +37,6 @@ app.mount('#app');
 // 开发环境配置
 if (import.meta.env.DEV) {
   console.log('🚀 Apply Mate 开发模式启动');
-  console.log('📱 版本: 1.4.0');
+  console.log('📱 版本:', APP_VERSION);
   console.log('🎨 主题: 橙色系年轻趣味风格');
 }

@@ -276,7 +276,7 @@ const generateTestData = async () => {
       
       // 导入到各个store
       console.log('💾 保存数据到存储...')
-      await companyStore.importCompanies(testData.companies)
+      await companyStore.importCompanies(testData.companies, { mode: 'replace' })
       await interviewStore.importInterviews(testData.interviews)
       await roundStore.importRounds(testData.rounds)
       

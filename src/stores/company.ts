@@ -157,31 +157,92 @@ export const useCompanyStore = defineStore('company', {
       this.error = null;
     },
 
-    // 批量操作
-    async importCompanies(companies: Company[]) {
+    // 批量操作 (增强: 支持 mode)
+    /**
+     * 导入公司数据
+     * @param companies 待导入公司列表
+     * @param options.mode 导入模式:
+     *  - append(默认): 追加, 按名称去重
+     *  - replace: 全量替换, 不做去重
+     *  - merge: 同名合并(更新已有的非空字段, 不覆盖已有非空值)
+     */
+    async importCompanies(companies: Company[], options?: { mode?: 'append' | 'replace' | 'merge' }) {
+      const mode = options?.mode || 'append';
       const originalCompanies = [...this.companies];
-      
+
       try {
-        // 去重处理：如果已存在相同名称的公司，则跳过
-        const existingNames = new Set(this.companies.map(c => c.name.toLowerCase()));
-        const newCompanies = companies.filter(c => !existingNames.has(c.name.toLowerCase()));
-        
-        this.companies.push(...newCompanies);
-        const success = await this.saveCompanies();
-        
-        if (!success) {
-          throw new Error('导入失败');
+        if (mode === 'replace') {
+          this.companies = [...companies];
+          const success = await this.saveCompanies();
+          if (!success) throw new Error('导入失败');
+          return { imported: companies.length, skipped: 0, mode };
         }
-        
-        return {
-          imported: newCompanies.length,
-          skipped: companies.length - newCompanies.length,
-        };
+
+        if (mode === 'append') {
+          const existingNames = new Map(this.companies.map(c => [c.name.toLowerCase(), true] as const));
+          let imported = 0; let skipped = 0;
+          companies.forEach(c => {
+            const key = c.name.toLowerCase();
+            if (!existingNames.has(key)) {
+              this.companies.push(c);
+              existingNames.set(key, true);
+              imported++;
+            } else {
+              skipped++;
+            }
+          });
+          return await this._finalizeImport(originalCompanies, imported, skipped, mode);
+        }
+
+        if (mode === 'merge') {
+          const nameMap = new Map(this.companies.map(c => [c.name.toLowerCase(), c] as const));
+          let imported = 0; let merged = 0; let skipped = 0;
+          companies.forEach(c => {
+            const key = c.name.toLowerCase();
+            const existing = nameMap.get(key);
+            if (!existing) {
+              this.companies.push(c);
+              nameMap.set(key, c);
+              imported++;
+            } else {
+              let changed = false;
+              const mergedObj: Company = { ...existing };
+              (Object.keys(c) as (keyof Company)[]).forEach(k => {
+                const newVal = c[k];
+                if (newVal !== undefined && newVal !== null && (existing as any)[k] == null) {
+                  (mergedObj as any)[k] = newVal;
+                  changed = true;
+                }
+              });
+              if (changed) {
+                const idx = this.companies.findIndex(cc => cc.id === existing.id);
+                if (idx !== -1) {
+                  this.companies[idx] = { ...mergedObj, updatedAt: new Date() };
+                  merged++;
+                }
+              } else {
+                skipped++;
+              }
+            }
+          });
+          const success = await this.saveCompanies();
+          if (!success) throw new Error('导入失败');
+          return { imported, merged, skipped, mode } as any;
+        }
       } catch (error) {
-        // 回滚操作
         this.companies = originalCompanies;
         throw error;
       }
+    },
+
+    // 内部复用: 处理 append 模式的最终保存与返回
+    async _finalizeImport(original: Company[], imported: number, skipped: number, mode: string) {
+      const success = await this.saveCompanies();
+      if (!success) {
+        this.companies = original;
+        throw new Error('导入失败');
+      }
+      return { imported, skipped, mode };
     },
 
     async exportCompanies(): Promise<Company[]> {

@@ -23,19 +23,20 @@
         </template>
         
         <el-form-item :label="$t('interviewFormView.labels.company')" prop="companyId">
-          <el-select 
-            v-model="form.companyId" 
+          <el-autocomplete
+            v-model="companyName"
+            :fetch-suggestions="fetchCompanySuggestions"
             :placeholder="$t('interviewFormView.placeholders.company')"
-            filterable
             style="width: 100%"
+            value-key="name"
+            clearable
+            @select="handleCompanySelect"
+            @clear="form.companyId = ''"
           >
-            <el-option
-              v-for="company in companies"
-              :key="company.id"
-              :label="company.name"
-              :value="company.id"
-            />
-          </el-select>
+            <template #suffix>
+              <span v-if="!form.companyId && companyName" class="new-company-hint">将自动新建</span>
+            </template>
+          </el-autocomplete>
         </el-form-item>
         
         <el-form-item :label="$t('interviewFormView.labels.position')" prop="position">
@@ -108,7 +109,7 @@
 
       <el-card style="margin-top: 20px;">
         <template #header>
-          <span>{{ $t('interviewFormView.cardTitles.remarks') }}</span>
+          <span>{{ $t('interviewFormView.cardTitles.remarksCard') }}</span>
         </template>
         
         <el-form-item :label="$t('interviewFormView.labels.remarks')">
@@ -143,7 +144,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useInterviewStore } from '@/stores/interview';
 import { useCompanyStore } from '@/stores/company';
-import type { InterviewStatus, InterviewConclusion } from '@/types';
+import type { InterviewStatus, InterviewConclusion, Company } from '@/types';
 
 const route = useRoute();
 const router = useRouter();
@@ -170,9 +171,6 @@ const form = reactive({
 });
 
 const rules: FormRules = {
-  companyId: [
-    { required: true, message: t('interviewFormView.validation.companyRequired'), trigger: 'change' }
-  ],
   position: [
     { required: true, message: t('interviewFormView.validation.positionRequired'), trigger: 'blur' }
   ],
@@ -190,21 +188,57 @@ const rules: FormRules = {
   ]
 };
 
-const companies = ref(companyStore.companies);
+const companyName = ref('');
+
+const fetchCompanySuggestions = async (query: string, cb: (results: Company[]) => void) => {
+  if (!query) {
+    cb(companyStore.companies.slice(0, 10));
+    return;
+  }
+  const results = await companyStore.searchCompanies(query);
+  cb(results);
+};
+
+const handleCompanySelect = (item: Company) => {
+  form.companyId = item.id;
+  companyName.value = item.name;
+};
+
+const resolveCompanyId = async (): Promise<string> => {
+  if (form.companyId) return form.companyId;
+  if (!companyName.value.trim()) return '';
+  // 先精确匹配
+  const existing = companyStore.companies.find(
+    c => c.name.toLowerCase() === companyName.value.trim().toLowerCase()
+  );
+  if (existing) return existing.id;
+  // 不存在则自动新建
+  const newCompany = await companyStore.addCompany({ name: companyName.value.trim() });
+  ElMessage.success(`已新建公司「${newCompany.name}」`);
+  return newCompany.id;
+};
 
 const handleSubmit = async () => {
   if (!formRef.value) return;
-  
+
+  // 校验公司名
+  if (!companyName.value.trim()) {
+    ElMessage.warning(t('interviewFormView.validation.companyRequired'));
+    return;
+  }
+
   try {
     await formRef.value.validate();
     loading.value = true;
-    
+
+    const resolvedCompanyId = await resolveCompanyId();
     const data = {
       ...form,
+      companyId: resolvedCompanyId,
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    
+
     if (isEdit.value) {
       const id = route.params.id as string;
       await interviewStore.updateInterview(id, data);
@@ -213,7 +247,7 @@ const handleSubmit = async () => {
       await interviewStore.addInterview(data);
       ElMessage.success(t('interviewFormView.messages.createSuccess'));
     }
-    
+
     router.push('/interviews');
   } catch (error) {
     console.error(t('interviewFormView.messages.saveFailed') + ':', error);
@@ -222,13 +256,17 @@ const handleSubmit = async () => {
   }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await companyStore.loadCompanies();
   const id = route.params.id as string;
   if (id) {
     isEdit.value = true;
     const interview = interviewStore.getInterviewById(id);
     if (interview) {
       Object.assign(form, interview);
+      // 回填公司名
+      const company = companyStore.getCompanyById(interview.companyId);
+      if (company) companyName.value = company.name;
     }
   }
 });
@@ -259,6 +297,12 @@ onMounted(() => {
     }
   }
   
+  .new-company-hint {
+    font-size: 11px;
+    color: $primary-orange;
+    white-space: nowrap;
+  }
+
   .interview-form-content {
     max-width: 800px;
     

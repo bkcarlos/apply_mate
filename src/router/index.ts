@@ -95,6 +95,16 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: '/offer-comparison',
+    name: 'OfferComparison',
+    component: () => import('@/views/OfferComparison.vue'),
+    meta: {
+      title: 'Offer 对比',
+      icon: 'Trophy',
+      showInNav: false,
+    },
+  },
+  {
     path: '/settings',
     name: 'Settings',
     component: Settings,

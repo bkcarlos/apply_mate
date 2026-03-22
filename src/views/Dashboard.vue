@@ -315,7 +315,7 @@ const clearTestData = async () => {
     clearingData.value = true
     
     // 清除所有测试数据
-    clearAllTestData()
+    await clearAllTestData()
     
     // 重置store状态
     companyStore.companies = []

@@ -226,7 +226,7 @@ const goToCalendar = () => {
 }
 
 const goToAnalysis = () => {
-  router.push('/analysis')
+  router.push('/offer-comparison')
 }
 
 // 测试数据生成和清除

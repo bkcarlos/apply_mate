@@ -96,65 +96,110 @@
         <div class="section-header">
           <h3>工作条件对比</h3>
         </div>
-        <div class="conditions-table-wrap">
-          <table class="conditions-table">
-            <thead>
-              <tr>
-                <th class="label-col">维度</th>
-                <th v-for="offer in offers" :key="offer.id">
-                  <span class="th-dot" :style="{ background: getColor(offer.id) }" />
-                  {{ offer.companyName }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td class="label-col">城市</td>
-                <td v-for="offer in offers" :key="offer.id">{{ offer.city || '—' }}</td>
-              </tr>
-              <tr>
-                <td class="label-col">远程</td>
-                <td v-for="offer in offers" :key="offer.id">
-                  <el-tag :type="remoteTagType(offer.remote)" size="small">{{ remoteLabel(offer.remote) }}</el-tag>
-                </td>
-              </tr>
-              <tr>
-                <td class="label-col">工作时间</td>
-                <td v-for="offer in offers" :key="offer.id">{{ offer.workHours || '—' }}</td>
-              </tr>
-              <tr>
-                <td class="label-col">试用期</td>
-                <td v-for="offer in offers" :key="offer.id">
+        <div class="salary-breakdown-grid conditions-grid" :style="conditionsGridStyle">
+
+          <!-- 城市 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">城市</div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <span class="cond-val">{{ offer.city || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 远程 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">远程</div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <el-tag :type="remoteTagType(offer.remote)" size="small">{{ remoteLabel(offer.remote) }}</el-tag>
+              </div>
+            </div>
+          </div>
+
+          <!-- 工作时间 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">工作时间</div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <span class="cond-val">{{ offer.workHours || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 试用期 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">试用期</div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <span class="cond-val">
                   {{ offer.probationMonths ? `${offer.probationMonths}个月` : '—' }}
-                  <span v-if="offer.probationRatio < 1" class="text-muted">
-                    ({{ Math.round(offer.probationRatio * 100) }}%)
-                  </span>
-                </td>
-              </tr>
-              <tr>
-                <td class="label-col">公积金基数</td>
-                <td v-for="offer in offers" :key="offer.id">
-                  <el-tag :type="scoreTagType(offer.insuranceScore)" size="small">
-                    {{ scoreLabel(offer.insuranceScore) }}
-                  </el-tag>
-                </td>
-              </tr>
-              <tr>
-                <td class="label-col">年假</td>
-                <td v-for="offer in offers" :key="offer.id">
-                  {{ offer.annualLeaveDays ? `${offer.annualLeaveDays}天` : '—' }}
-                </td>
-              </tr>
-              <tr>
-                <td class="label-col">公司阶段</td>
-                <td v-for="offer in offers" :key="offer.id">{{ offer.companyStage || '—' }}</td>
-              </tr>
-              <tr>
-                <td class="label-col">入职时间</td>
-                <td v-for="offer in offers" :key="offer.id">{{ offer.startDate || '—' }}</td>
-              </tr>
-            </tbody>
-          </table>
+                  <span v-if="offer.probationRatioPct < 100" class="cond-muted">({{ offer.probationRatioPct }}%)</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 年假 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">年假 <span class="breakdown-unit">天</span></div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row cond-row--bar">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <div class="cond-bar-wrap">
+                  <div class="cond-bar" :style="{ width: `${Math.min((offer.annualLeaveDays / 30) * 100, 100)}%`, background: getColor(offer.id) }" />
+                </div>
+                <span class="cond-val cond-val--sm">{{ offer.annualLeaveDays || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 公积金基数 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">公积金基数</div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <el-tag :type="scoreTagType(offer.insuranceScore)" size="small">{{ scoreLabel(offer.insuranceScore) }}</el-tag>
+              </div>
+            </div>
+          </div>
+
+          <!-- 公司阶段 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">公司阶段</div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <span class="cond-val">{{ offer.companyStage || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 入职时间 -->
+          <div class="breakdown-card">
+            <div class="breakdown-title">入职时间</div>
+            <div class="cond-rows">
+              <div v-for="offer in offers" :key="offer.id" class="cond-row">
+                <span class="cond-dot" :style="{ background: getColor(offer.id) }" />
+                <span class="cond-name">{{ offer.companyName }}</span>
+                <span class="cond-val">{{ offer.startDate || '—' }}</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -164,7 +209,7 @@
           <h3>福利维度雷达</h3>
           <span class="section-desc">1–5分</span>
         </div>
-        <div ref="benefitChartRef" class="chart-container" />
+        <div ref="benefitChartRef" class="chart-container chart-container--radar" />
       </section>
 
       <!-- 综合评分雷达 -->
@@ -173,7 +218,7 @@
           <h3>综合评分雷达</h3>
           <span class="section-desc">主观打分 1–5分</span>
         </div>
-        <div ref="overallChartRef" class="chart-container" />
+        <div ref="overallChartRef" class="chart-container chart-container--radar" />
       </section>
     </template>
 
@@ -498,6 +543,13 @@ const removeOffer = (id: string) => {
 const remoteLabel = (v: string) => ({ no: '不支持', hybrid: '混合', full: '全远程' }[v] || v)
 const miniChartHeight = computed(() => `${Math.max(60, offers.value.length * 36)}px`)
 
+// 工作条件网格列数：offer 越多行越高，减少列数保持可读性
+const conditionsGridStyle = computed(() => {
+  const n = offers.value.length
+  const cols = n <= 2 ? 4 : n <= 4 ? 3 : n <= 6 ? 2 : 1
+  return { gridTemplateColumns: `repeat(${cols}, 1fr)` }
+})
+
 const remoteTagType = (v: string) =>({ no: 'info', hybrid: 'warning', full: 'success' }[v] || 'info') as any
 const scoreLabel = (v: number) => ['', '较差', '一般', '良好', '优秀', '极佳'][v] || '—'
 const scoreTagType = (v: number): any => v >= 4 ? 'success' : v >= 3 ? 'warning' : 'danger'
@@ -533,19 +585,20 @@ const initCharts = async () => {
   const colors = offers.value.map(o => getColor(o.id))
 
   // 迷你横向柱状图公共配置生成
+  const isMobile = window.innerWidth < 768
   const miniBarOption = (data: number[], unit: string, fmt?: (v: number) => string) => ({
     tooltip: {
       trigger: 'axis',
       formatter: (p: any) => `${p[0].name}<br/>${p[0].marker}${fmt ? fmt(p[0].value) : p[0].value + unit}`
     },
-    grid: { left: 8, right: 40, top: 8, bottom: 8, containLabel: true },
+    grid: { left: 4, right: isMobile ? 50 : 44, top: 4, bottom: 4, containLabel: true },
     xAxis: { type: 'value', show: false },
-    yAxis: { type: 'category', data: names, axisLabel: { fontSize: 11, width: 60, overflow: 'truncate' } },
+    yAxis: { type: 'category', data: names, axisLabel: { fontSize: isMobile ? 10 : 11, width: isMobile ? 48 : 64, overflow: 'truncate' } },
     series: [{
       type: 'bar',
       data: data.map((v, i) => ({ value: v, itemStyle: { color: COLORS[i % COLORS.length] } })),
-      label: { show: true, position: 'right', fontSize: 11, formatter: (p: any) => fmt ? fmt(p.value) : `${p.value}${unit}` },
-      barMaxWidth: 18,
+      label: { show: true, position: 'right', fontSize: isMobile ? 10 : 11, formatter: (p: any) => fmt ? fmt(p.value) : `${p.value}${unit}` },
+      barMaxWidth: isMobile ? 14 : 18,
     }],
   })
 
@@ -561,8 +614,8 @@ const initCharts = async () => {
   if (bonusChartRef.value) {
     bonusChart = echarts.init(bonusChartRef.value)
     bonusChart.setOption(miniBarOption(
-      offers.value.map(o => o.bonusMonths), '个月',
-      v => v > 0 ? `${v}个月` : '无'
+      offers.value.map(o => o.bonusMonths), '月',
+      v => v > 0 ? `${v}月` : '无'
     ))
   }
 
@@ -592,20 +645,34 @@ const initCharts = async () => {
 
   requestAnimationFrame(() => { totalChart?.resize() })
 
+  const radarRadius = isMobile ? '36%' : '68%'
+  const radarCenter: [string, string] = isMobile ? ['45%', '48%'] : ['50%', '50%']
+  const radarNameStyle = isMobile ? { fontSize: 10 } : {}
+
   // 3. 福利雷达图
   if (benefitChartRef.value) {
     benefitChart = echarts.init(benefitChartRef.value)
     benefitChart.setOption({
-      legend: { data: names, bottom: 0 },
+      legend: { data: names, bottom: 0, textStyle: { fontSize: isMobile ? 10 : 12 } },
       radar: {
-        indicator: [
-          { name: '公积金基数', max: 5 },
-          { name: '商业医保', max: 5 },
-          { name: '年假天数', max: 5 },
-          { name: '补贴', max: 5 },
-          { name: '医疗健康', max: 5 },
-        ],
-        radius: '60%',
+        indicator: isMobile
+          ? [
+              { name: '公积金', max: 5 },
+              { name: '医保', max: 5 },
+              { name: '年假', max: 5 },
+              { name: '补贴', max: 5 },
+              { name: '健康', max: 5 },
+            ]
+          : [
+              { name: '公积金基数', max: 5 },
+              { name: '商业医保', max: 5 },
+              { name: '年假天数', max: 5 },
+              { name: '补贴', max: 5 },
+              { name: '医疗健康', max: 5 },
+            ],
+        radius: radarRadius,
+        center: radarCenter,
+        axisName: { ...radarNameStyle },
       },
       series: [{
         type: 'radar',
@@ -630,16 +697,26 @@ const initCharts = async () => {
   if (overallChartRef.value) {
     overallChart = echarts.init(overallChartRef.value)
     overallChart.setOption({
-      legend: { data: names, bottom: 0 },
+      legend: { data: names, bottom: 0, textStyle: { fontSize: isMobile ? 10 : 12 } },
       radar: {
-        indicator: [
-          { name: '薪资满意度', max: 5 },
-          { name: '发展空间', max: 5 },
-          { name: '工作强度', max: 5 },
-          { name: '福利', max: 5 },
-          { name: '团队文化', max: 5 },
-        ],
-        radius: '60%',
+        indicator: isMobile
+          ? [
+              { name: '薪资', max: 5 },
+              { name: '发展', max: 5 },
+              { name: '强度', max: 5 },
+              { name: '福利', max: 5 },
+              { name: '文化', max: 5 },
+            ]
+          : [
+              { name: '薪资满意度', max: 5 },
+              { name: '发展空间', max: 5 },
+              { name: '工作强度', max: 5 },
+              { name: '福利', max: 5 },
+              { name: '团队文化', max: 5 },
+            ],
+        radius: radarRadius,
+        center: radarCenter,
+        axisName: { ...radarNameStyle },
       },
       series: [{
         type: 'radar',
@@ -746,6 +823,10 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: $spacing-lg;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: $spacing-md;
+  }
 }
 
 .page-title {
@@ -760,6 +841,10 @@ onBeforeUnmount(() => {
   -webkit-overflow-scrolling: touch;
   margin-bottom: $spacing-lg;
   padding-bottom: $spacing-xs;
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: $spacing-md;
+  }
 }
 
 .offer-cards {
@@ -769,8 +854,12 @@ onBeforeUnmount(() => {
 }
 
 .offer-card {
-  width: 220px;
+  width: 200px;
   flex-shrink: 0;
+
+  @media (max-width: $breakpoint-md) {
+    width: 170px;
+  }
   border: 1px solid $border-light;
   border-top: 3px solid $primary-orange;
   border-radius: $border-radius-lg;
@@ -890,6 +979,12 @@ onBeforeUnmount(() => {
   padding: $spacing-lg;
   margin-bottom: $spacing-md;
   box-shadow: $shadow-light;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-md $spacing-sm;
+    margin-bottom: $spacing-sm;
+    border-radius: $border-radius-md;
+  }
 }
 
 .section-header {
@@ -908,6 +1003,14 @@ onBeforeUnmount(() => {
     font-size: $font-size-xs;
     color: $color-text-secondary;
   }
+
+  @media (max-width: $breakpoint-md) {
+    margin-bottom: $spacing-sm;
+
+    h3 {
+      font-size: $font-size-base;
+    }
+  }
 }
 
 .chart-container {
@@ -915,6 +1018,18 @@ onBeforeUnmount(() => {
 
   &--short {
     height: 200px;
+  }
+
+  &--radar {
+    height: 420px;
+
+    @media (max-width: $breakpoint-md) {
+      height: 300px;
+    }
+  }
+
+  @media (max-width: $breakpoint-md) {
+    height: 240px;
   }
 }
 
@@ -929,6 +1044,7 @@ onBeforeUnmount(() => {
 
   @media (max-width: $breakpoint-md) {
     grid-template-columns: 1fr;
+    gap: $spacing-sm;
   }
 }
 
@@ -936,6 +1052,10 @@ onBeforeUnmount(() => {
   background: $bg-light;
   border-radius: $border-radius-md;
   padding: $spacing-sm $spacing-md;
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-xs $spacing-sm;
+  }
 
   .breakdown-title {
     font-size: $font-size-sm;
@@ -957,7 +1077,85 @@ onBeforeUnmount(() => {
   min-height: 60px;
 }
 
-// 工作条件表格
+// 工作条件横向卡片网格（列数由 JS 计算，媒体查询覆盖小屏）
+.conditions-grid {
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.cond-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cond-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: $font-size-xs;
+
+  &--bar {
+    flex-wrap: nowrap;
+  }
+}
+
+.cond-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.cond-name {
+  flex: 0 0 auto;
+  max-width: 72px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: $color-text-secondary;
+}
+
+.cond-val {
+  flex: 1;
+  text-align: right;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+
+  &--sm {
+    flex: 0 0 auto;
+    min-width: 20px;
+    text-align: right;
+  }
+}
+
+.cond-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: $border-light;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cond-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+.cond-muted {
+  color: $color-text-secondary;
+  font-weight: $font-weight-normal;
+  margin-left: 2px;
+}
+
+// 工作条件表格（旧，保留兼容）
 .conditions-table-wrap {
   overflow-x: auto;
 }

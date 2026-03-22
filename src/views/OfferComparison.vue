@@ -18,7 +18,8 @@
             <div class="offer-color-dot" :style="{ background: getColor(offer.id) }" />
             <div class="offer-info">
               <div class="company-name">{{ offer.companyName }}</div>
-              <div class="position">{{ offer.position }}<template v-if="offer.level"> · {{ offer.level }}</template></div>
+              <div class="position">{{ offer.position }}</div>
+              <div class="level">{{ offer.level || '\u00a0' }}</div>
             </div>
             <div class="offer-actions">
               <el-button :icon="Edit" circle size="small" @click="openEditDialog(offer)" />
@@ -798,6 +799,14 @@ onBeforeUnmount(() => {
     font-size: $font-size-xs;
     color: $color-text-secondary;
     margin-top: 2px;
+  }
+
+  .level {
+    font-size: $font-size-xs;
+    color: $color-text-secondary;
+    opacity: 0.7;
+    margin-top: 1px;
+    line-height: 1.4;
   }
 }
 

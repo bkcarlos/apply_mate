@@ -25,7 +25,7 @@
 
     <div class="interview-stats">
       <el-row :gutter="16">
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalInterviews }}</div>
@@ -34,7 +34,7 @@
             <ph-calendar class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ scheduledInterviews }}</div>
@@ -43,7 +43,7 @@
             <ph-clock class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ completedInterviews }}</div>
@@ -52,7 +52,7 @@
             <ph-check-circle class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ successRate }}%</div>
@@ -65,17 +65,18 @@
     </div>
 
     <el-card class="interview-table-card">
+      <div style="overflow-x: auto">
       <el-table
         :data="filteredInterviews"
         v-loading="loading"
         stripe
-        style="width: 100%"
+        style="width: 100%; min-width: 700px"
       >
         <el-table-column :label="$t('interviewList.table.company')" width="180">
           <template #default="{ row }">
             <div class="company-info">
-              <div class="company-name">{{ row.company?.name || $t('interviewList.unknownCompany') }}</div>
-              <div class="company-type">{{ row.company?.type || '' }}</div>
+              <div class="company-name">{{ getCompanyName(row.companyId) }}</div>
+              <div class="company-type">{{ getCompanyType(row.companyId) }}</div>
             </div>
           </template>
         </el-table-column>
@@ -152,7 +153,8 @@
           </template>
         </el-table-column>
       </el-table>
-      
+      </div>
+
       <div class="table-pagination">
         <el-pagination
           v-model:current-page="currentPage"
@@ -197,6 +199,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import { Search } from '@element-plus/icons-vue'
 import {
@@ -214,6 +217,7 @@ import InterviewDetail from '@/components/InterviewDetail.vue'
 import InterviewForm from '@/components/InterviewForm.vue'
 
 const { t } = useI18n()
+const router = useRouter()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
 
@@ -285,9 +289,22 @@ const formatTime = (dateTime: string) => {
   return dayjs(dateTime).format('HH:mm')
 }
 
-const formatSalary = (salary: string) => {
-  // 简单的薪资格式化
-  return salary
+const formatSalary = (salary: any) => {
+  if (!salary) return ''
+  if (typeof salary === 'object' && 'min' in salary && 'max' in salary) {
+    return `${salary.min}k - ${salary.max}k`
+  }
+  return String(salary)
+}
+
+const getCompanyName = (companyId: string) => {
+  const company = companyStore.companies.find(c => c.id === companyId)
+  return company?.name || t('interviewList.unknownCompany')
+}
+
+const getCompanyType = (companyId: string) => {
+  const company = companyStore.companies.find(c => c.id === companyId)
+  return company?.type || ''
 }
 
 const formatStatus = (status: string) => {
@@ -333,8 +350,7 @@ const getStatusTagType = (status: string): 'primary' | 'success' | 'info' | 'war
 }
 
 const viewInterview = (interview: InterviewRound) => {
-  selectedInterview.value = interview
-  showDetailDialog.value = true
+  router.push(`/interviews/${interview.id}`)
 }
 
 const editInterview = (interview: InterviewRound) => {

@@ -5,7 +5,7 @@
     </div>
 
     <el-row :gutter="24">
-      <el-col :span="16">
+      <el-col :xs="24" :md="16">
         <!-- 个人信息设置 -->
         <el-card class="settings-card">
           <template #header>
@@ -21,12 +21,12 @@
             @submit.prevent="saveUserProfile"
           >
             <el-row :gutter="16">
-              <el-col :span="12">
+              <el-col :xs="24" :sm="12">
                 <el-form-item :label="$t('settings.profile.name')">
                   <el-input v-model="userProfile.name" :placeholder="$t('settings.profile.namePlaceholder')" />
                 </el-form-item>
               </el-col>
-              <el-col :span="12">
+              <el-col :xs="24" :sm="12">
                 <el-form-item :label="$t('settings.profile.email')">
                   <el-input v-model="userProfile.email" :placeholder="$t('settings.profile.emailPlaceholder')" />
                 </el-form-item>
@@ -34,12 +34,12 @@
             </el-row>
             
             <el-row :gutter="16">
-              <el-col :span="12">
+              <el-col :xs="24" :sm="12">
                 <el-form-item :label="$t('settings.profile.phone')">
                   <el-input v-model="userProfile.phone" :placeholder="$t('settings.profile.phonePlaceholder')" />
                 </el-form-item>
               </el-col>
-              <el-col :span="12">
+              <el-col :xs="24" :sm="12">
                 <el-form-item :label="$t('settings.profile.location')">
                   <el-input v-model="userProfile.location" :placeholder="$t('settings.profile.locationPlaceholder')" />
                 </el-form-item>
@@ -172,7 +172,7 @@
         </el-card>
       </el-col>
 
-      <el-col :span="8">
+      <el-col :xs="24" :md="8">
         <!-- 使用统计 -->
         <el-card class="stats-card">
           <template #header>
@@ -380,7 +380,6 @@ const saveUserProfile = async () => {
 }
 
 const saveSystemSettings = () => {
-  // TODO: 保存系统设置到本地存储
   localStorage.setItem('systemSettings', JSON.stringify(systemSettings.value))
   ElMessage.success(t('messages.saveSuccess'))
 }

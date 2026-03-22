@@ -26,7 +26,7 @@
 
     <div class="company-stats">
       <el-row :gutter="16">
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalCompanies }}</div>
@@ -35,7 +35,7 @@
             <ph-buildings class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ activeCompanies }}</div>
@@ -44,7 +44,7 @@
             <ph-paper-plane-tilt class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ offerCompanies }}</div>
@@ -53,7 +53,7 @@
             <ph-trophy class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ averageRating.toFixed(1) }}</div>

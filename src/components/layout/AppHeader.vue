@@ -6,7 +6,9 @@
         <div class="logo">
           <img src="/src/assets/images/logo.svg" alt="ApplyMate Logo" class="logo-image" />
         </div>
-        <h1 class="brand-name">{{ $t('header.brandName') }}</h1>
+        <h1 class="brand-name">
+          <span class="brand-apply">apply</span><span class="brand-mate">mate</span>
+        </h1>
       </div>
     </div>
     
@@ -49,7 +51,7 @@
         </el-tooltip>
         
         <el-tooltip :content="$t('header.todayInterviews')" placement="bottom">
-          <el-badge :value="todayInterviewsCount" :hidden="todayInterviewsCount === 0">
+          <el-badge :value="todayInterviewsCount" :hidden="todayInterviewsCount === 0" class="hidden-on-bottom-nav">
             <el-button
               :icon="Calendar"
               circle
@@ -57,9 +59,9 @@
             />
           </el-badge>
         </el-tooltip>
-        
+
         <el-tooltip :content="$t('header.notifications')" placement="bottom">
-          <el-badge :value="notificationCount" :hidden="notificationCount === 0">
+          <el-badge :value="notificationCount" :hidden="notificationCount === 0" class="hidden-on-bottom-nav">
             <el-button
               :icon="Bell"
               circle
@@ -267,10 +269,21 @@ const handleCommand = (command: string) => {
       font-family: $font-family-heading;
       font-size: $font-size-2xl;
       font-weight: $font-weight-bold;
-      color: $primary-orange;
       margin: 0;
-      
-      @media (max-width: 480px) {
+      letter-spacing: -0.5px;
+      line-height: 1;
+
+      .brand-apply {
+        color: #2d2d2d;
+        font-weight: 500;
+      }
+
+      .brand-mate {
+        color: $primary-orange;
+        font-weight: 800;
+      }
+
+      @media (max-width: $breakpoint-sm) {
         display: none;
       }
     }
@@ -370,41 +383,41 @@ const handleCommand = (command: string) => {
   }
 }
 
-// 响应式处理 - 保持所有内容始终显示
+// 响应式处理
 @media (max-width: $breakpoint-md) {
   .app-header {
     padding: 0 $spacing-sm;
   }
-  
+
+  // 底部导航接管，隐藏顶部中间导航和快捷按钮
   .header-center {
-    .header-menu {
-      :deep(.el-menu-item) {
-        padding: 0 $spacing-sm;
-        margin: 0 2px;
-        display: flex !important;
-        visibility: visible !important;
-        
-        .el-icon {
-          font-size: 14px;
-        }
-        
-        span {
-          font-size: $font-size-xs;
-          display: inline !important;
+    display: none;
+  }
+
+  .hidden-on-bottom-nav {
+    display: none !important;
+  }
+
+  .header-right {
+    gap: $spacing-xs;
+
+    .quick-actions {
+      gap: 4px;
+
+      .el-button:not(.is-circle) {
+        padding: 8px;
+
+        :deep(span:not(.el-icon)) {
+          display: none !important;
         }
       }
     }
   }
-  
-  .header-right {
-    .quick-actions {
-      gap: $spacing-xs;
-      
-      .el-button {
-        padding: $spacing-xs $spacing-sm;
-        font-size: $font-size-xs;
-      }
-    }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .app-header {
+    padding: 0 $spacing-xs;
   }
 }
 </style>

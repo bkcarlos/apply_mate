@@ -174,12 +174,24 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <!-- Offer 对比入口 -->
+    <div class="offer-comparison-entry" @click="router.push('/offer-comparison')">
+      <div class="entry-icon">🏆</div>
+      <div class="entry-text">
+        <div class="entry-title">Offer 多维对比</div>
+        <div class="entry-desc">薪资结构、福利、工作条件、综合评分全维度对比</div>
+      </div>
+      <el-icon class="entry-arrow"><ArrowRight /></el-icon>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { ArrowRight } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import {
   PhDownload,
@@ -196,6 +208,7 @@ import { useInterviewStore } from '@/stores/interview'
 import { useCompanyStore } from '@/stores/company'
 
 const { t } = useI18n()
+const router = useRouter()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
 
@@ -616,11 +629,54 @@ onMounted(async () => {
   .chart-card,
   .table-card {
     margin-bottom: 16px;
-    
+
     .chart-container {
       height: 300px;
       width: 100%;
     }
+  }
+}
+
+.offer-comparison-entry {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  background: $color-white;
+  border: 1px solid $border-light;
+  border-left: 4px solid $primary-orange;
+  border-radius: $border-radius-lg;
+  padding: $spacing-md $spacing-lg;
+  margin-top: $spacing-md;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: $shadow-medium;
+  }
+
+  .entry-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+
+  .entry-text {
+    flex: 1;
+
+    .entry-title {
+      font-weight: $font-weight-medium;
+      font-size: $font-size-base;
+    }
+
+    .entry-desc {
+      font-size: $font-size-xs;
+      color: $color-text-secondary;
+      margin-top: 2px;
+    }
+  }
+
+  .entry-arrow {
+    color: $color-text-secondary;
+    flex-shrink: 0;
   }
 }
 

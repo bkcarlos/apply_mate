@@ -1,5 +1,6 @@
 import type { Company, InterviewProcess, InterviewRound } from '@/types'
 import { generateId } from './index'
+import { storageManager } from './storage'
 
 // 测试公司数据
 export const generateTestCompanies = (): Company[] => {
@@ -269,11 +270,8 @@ export const generateTestRounds = (interviews: InterviewProcess[]): InterviewRou
 }
 
 // 清除所有测试数据
-export const clearAllTestData = () => {
-  localStorage.removeItem('apply-mate-companies')
-  localStorage.removeItem('apply-mate-interview-processes')
-  localStorage.removeItem('apply-mate-interview-rounds')
-  localStorage.removeItem('apply-mate-user-profile')
+export const clearAllTestData = async () => {
+  await storageManager.clear()
 }
 
 // 生成完整的测试数据集

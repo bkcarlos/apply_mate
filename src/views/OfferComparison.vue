@@ -82,9 +82,13 @@
       <section class="chart-section">
         <div class="section-header">
           <h3>年总包对比</h3>
-          <span class="section-desc">含基础薪、年终奖、股票/期权（k/年）</span>
         </div>
-        <div ref="totalChartRef" class="chart-container chart-container--short" />
+        <div class="salary-breakdown-grid salary-breakdown-grid--single">
+          <div class="breakdown-card">
+            <div class="breakdown-title">年总包 <span class="breakdown-unit">含基础薪、年终奖、股权（k/年）</span></div>
+            <div ref="totalChartRef" class="chart-mini" :style="{ height: miniChartHeight }" />
+          </div>
+        </div>
       </section>
 
       <!-- 工作条件对比 -->
@@ -578,25 +582,15 @@ const initCharts = async () => {
     stockChart?.resize()
   })
 
-  // 2. 年总包横向条形图
+  // 2. 年总包（与薪资结构同顺序）
   if (totalChartRef.value) {
     totalChart = echarts.init(totalChartRef.value)
-    const sortedOffers = [...offers.value].sort((a, b) => b.totalAnnual - a.totalAnnual)
-    totalChart.setOption({
-      tooltip: { trigger: 'axis', formatter: '{b}: {c}k' },
-      grid: { left: '3%', right: '8%', top: '5%', bottom: '5%', containLabel: true },
-      xAxis: { type: 'value', name: 'k/年' },
-      yAxis: { type: 'category', data: sortedOffers.map(o => o.companyName || o.position) },
-      series: [{
-        type: 'bar',
-        data: sortedOffers.map((o, i) => ({
-          value: o.totalAnnual,
-          itemStyle: { color: getColor(o.id) },
-        })),
-        label: { show: true, position: 'right', formatter: '{c}k' },
-      }],
-    })
+    totalChart.setOption(miniBarOption(
+      offers.value.map(o => o.totalAnnual), 'k'
+    ))
   }
+
+  requestAnimationFrame(() => { totalChart?.resize() })
 
   // 3. 福利雷达图
   if (benefitChartRef.value) {
@@ -928,6 +922,10 @@ onBeforeUnmount(() => {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: $spacing-md;
+
+  &--single {
+    grid-template-columns: 1fr;
+  }
 
   @media (max-width: $breakpoint-md) {
     grid-template-columns: 1fr;

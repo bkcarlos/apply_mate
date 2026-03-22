@@ -16,12 +16,16 @@
         </router-view>
       </div>
     </el-main>
+
+    <!-- 移动端底部导航 -->
+    <AppBottomNav />
   </el-container>
 </template>
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
 import AppHeader from './AppHeader.vue'
+import AppBottomNav from './AppBottomNav.vue'
 
 // 响应式处理
 const handleResize = () => {
@@ -66,9 +70,13 @@ onUnmounted(() => {
 .main-content {
   min-height: 100%;
   padding: $spacing-lg;
-  
+
   @media (max-width: $breakpoint-md) {
     padding: $spacing-md;
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding-bottom: calc(60px + #{$spacing-md});
   }
 }
 

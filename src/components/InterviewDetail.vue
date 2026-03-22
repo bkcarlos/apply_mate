@@ -153,6 +153,7 @@
 import { computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs'
+import { useRoundStore } from '@/stores/round'
 import type { InterviewRound } from '@/types'
 
 interface Props {
@@ -161,8 +162,7 @@ interface Props {
 
 const props = defineProps<Props>()
 
-// TODO: 后续用于实现store方法
-// const interviewStore = useInterviewStore()
+const roundStore = useRoundStore()
 
 // 计算属性
 const timelineEvents = computed<Array<{
@@ -257,11 +257,7 @@ const getResultTagType = (result: string): 'primary' | 'success' | 'info' | 'war
 
 const markCompleted = async () => {
   try {
-    // TODO: 实现updateRound方法
-    // await interviewStore.updateRound(props.interview.id, {
-    //   status: 'completed',
-    //   updatedAt: new Date().toISOString()
-    // })
+    await roundStore.completeRound(props.interview.id)
     ElMessage.success('已标记为完成')
   } catch (error) {
     ElMessage.error('操作失败')
@@ -270,11 +266,7 @@ const markCompleted = async () => {
 
 const cancelInterview = async () => {
   try {
-    // TODO: 实现updateRound方法
-    // await interviewStore.updateRound(props.interview.id, {
-    //   status: 'cancelled',
-    //   updatedAt: new Date().toISOString()
-    // })
+    await roundStore.cancelRound(props.interview.id)
     ElMessage.success('面试已取消')
   } catch (error) {
     ElMessage.error('操作失败')

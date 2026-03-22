@@ -16,7 +16,7 @@
     <!-- 统计卡片区域 -->
     <div class="dashboard-stats">
       <el-row :gutter="16">
-        <el-col :span="6" v-for="stat in stats" :key="stat.key">
+        <el-col :xs="12" :sm="12" :md="6" v-for="stat in stats" :key="stat.key">
           <el-card class="stat-card" :class="{ clickable: true }" @click="handleCardClick(stat.key)">
             <div class="stat-content">
               <div class="stat-number">{{ stat.value }}</div>
@@ -32,7 +32,7 @@
     <!-- 主要内容区域 -->
     <el-row :gutter="16">
       <!-- 近期面试安排 -->
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="content-card">
           <template #header>
             <div class="card-header">
@@ -48,7 +48,7 @@
       </el-col>
       
       <!-- Offer薪资对比 -->
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="content-card">
           <template #header>
             <div class="card-header">

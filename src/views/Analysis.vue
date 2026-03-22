@@ -23,7 +23,7 @@
     <!-- 总览统计 -->
     <div class="overview-stats">
       <el-row :gutter="16">
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalApplications }}</div>
@@ -37,7 +37,7 @@
             <ph-paper-plane-tilt class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalInterviews }}</div>
@@ -51,7 +51,7 @@
             <ph-calendar class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ totalOffers }}</div>
@@ -65,7 +65,7 @@
             <ph-trophy class="stat-icon" />
           </el-card>
         </el-col>
-        <el-col :span="6">
+        <el-col :xs="12" :sm="12" :md="6">
           <el-card class="stat-card">
             <div class="stat-content">
               <div class="stat-number">{{ overallSuccessRate }}%</div>
@@ -84,7 +84,7 @@
 
     <!-- 图表分析 -->
     <el-row :gutter="16">
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="chart-card">
           <template #header>
             <span>{{ $t('analysis.charts.applicationTrend') }}</span>
@@ -93,7 +93,7 @@
         </el-card>
       </el-col>
       
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="chart-card">
           <template #header>
             <span>{{ $t('analysis.charts.interviewStatus') }}</span>
@@ -104,7 +104,7 @@
     </el-row>
 
     <el-row :gutter="16">
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="chart-card">
           <template #header>
             <span>{{ $t('analysis.charts.companyType') }}</span>
@@ -113,7 +113,7 @@
         </el-card>
       </el-col>
       
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="chart-card">
           <template #header>
             <span>{{ $t('analysis.charts.industryDistribution') }}</span>
@@ -136,7 +136,7 @@
 
     <!-- 详细分析表格 -->
     <el-row :gutter="16">
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="table-card">
           <template #header>
             <span>{{ $t('analysis.tables.companyStats') }}</span>
@@ -155,7 +155,7 @@
         </el-card>
       </el-col>
       
-      <el-col :span="12">
+      <el-col :xs="24" :md="12">
         <el-card class="table-card">
           <template #header>
             <span>{{ $t('analysis.tables.industryStats') }}</span>
@@ -178,7 +178,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 import {
@@ -199,8 +199,11 @@ const { t } = useI18n()
 const interviewStore = useInterviewStore()
 const companyStore = useCompanyStore()
 
-// 响应式数据
-const dateRange = ref<[string, string]>(['', ''])
+// 响应式数据 - 直接初始化为近30天，避免 onMounted 赋值触发 picker 弹出
+const dateRange = ref<[string, string]>([
+  dayjs().subtract(30, 'day').format('YYYY-MM-DD'),
+  dayjs().format('YYYY-MM-DD'),
+])
 const applicationTrendChart = ref<HTMLElement>()
 const interviewStatusChart = ref<HTMLElement>()
 const companyTypeChart = ref<HTMLElement>()
@@ -285,8 +288,33 @@ const handleDateRangeChange = (dates: [string, string] | null) => {
 }
 
 const exportData = () => {
-  // TODO: 实现数据导出功能
-  ElMessage.success(t('analysis.exportInProgress'))
+  try {
+    const data = {
+      exportTime: new Date().toISOString(),
+      version: '1.4.0',
+      summary: {
+        totalApplications: totalApplications.value,
+        totalInterviews: totalInterviews.value,
+        totalOffers: totalOffers.value,
+        overallSuccessRate: overallSuccessRate.value,
+      },
+      companies: companyStore.companies,
+      processes: interviewStore.processes,
+      rounds: interviewStore.rounds,
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `apply-mate-analysis-${dayjs().format('YYYY-MM-DD')}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    ElMessage.success(t('analysis.exportInProgress'))
+  } catch (error) {
+    ElMessage.error(t('messages.saveError'))
+  }
 }
 
 const initApplicationTrendChart = () => {
@@ -503,10 +531,6 @@ const initCharts = async () => {
 
 // 生命周期
 onMounted(async () => {
-  // 设置默认日期范围为最近30天
-  const endDate = dayjs().format('YYYY-MM-DD')
-  const startDate = dayjs().subtract(30, 'day').format('YYYY-MM-DD')
-  dateRange.value = [startDate, endDate]
   
   await Promise.all([
     interviewStore.loadProcesses(),

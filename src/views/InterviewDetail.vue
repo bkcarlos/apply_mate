@@ -101,7 +101,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
-import { ElMessage, ElMessageBox, ElLoading } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { ArrowLeft } from '@element-plus/icons-vue';
 import { useInterviewStore } from '@/stores/interview';
 import { useRoundStore } from '@/stores/round';
@@ -172,8 +172,8 @@ const deleteInterview = async () => {
     );
     
     if (interview.value) {
-      // TODO: 实现删除方法
-      // await interviewStore.deleteInterview(interview.value.id);
+      await interviewStore.deleteInterview(interview.value.id);
+      await roundStore.deleteRoundsByProcess(interview.value.id);
       ElMessage.success(t('interview.detail.deleteSuccess'));
       router.push('/interviews');
     }

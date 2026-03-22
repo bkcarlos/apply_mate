@@ -31,6 +31,7 @@
       <el-button @click="goToToday" type="primary" plain>{{ $t('calendar.today') }}</el-button>
     </div>
 
+    <div class="calendar-scroll-wrapper">
     <div class="calendar-grid" :class="`calendar-${viewMode}`">
       <div class="calendar-weekdays">
         <div v-for="day in weekdays" :key="day" class="weekday-header">
@@ -66,6 +67,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
 
     <!-- 面试详情弹框 -->
@@ -131,15 +133,20 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { PhPlus } from '@phosphor-icons/vue'
 import { ArrowLeft, ArrowRight } from '@element-plus/icons-vue'
 import dayjs from 'dayjs'
 import { useCompanyStore } from '@/stores/company'
+import { useInterviewStore } from '@/stores/interview'
 import type { InterviewRound } from '@/types'
 import InterviewForm from '@/components/InterviewForm.vue'
 
 const { t } = useI18n()
+const router = useRouter()
 const companyStore = useCompanyStore()
+const interviewStore = useInterviewStore()
 
 // 响应式数据
 const viewMode = ref<'month' | 'week'>('month')
@@ -383,22 +390,35 @@ const viewInterview = (interview: InterviewRound) => {
 
 const editInterview = () => {
   if (selectedInterview.value) {
-    // TODO: 跳转到编辑页面或打开编辑弹框
-    console.log('编辑面试:', selectedInterview.value)
+    router.push(`/interviews/${selectedInterview.value.processId}/edit`)
   }
   showInterviewDialog.value = false
 }
 
-const handleAddInterview = (data: any) => {
-  console.log('新增面试:', data)
-  showAddDialog.value = false
-  // TODO: 实际添加面试逻辑
+const handleAddInterview = async (data: any) => {
+  try {
+    await interviewStore.addInterview({
+      companyId: data.companyId,
+      position: data.position || '',
+      city: '',
+      status: '投递中',
+      conclusion: '未开始',
+      sourceChannel: '其他',
+      expectedSalary: { min: 0, max: 0 },
+    })
+    ElMessage.success(t('messages.saveSuccess'))
+    showAddDialog.value = false
+  } catch (error) {
+    ElMessage.error(t('messages.saveError'))
+  }
 }
 
 // 生命周期
 onMounted(async () => {
-  // 由于interview store没有loadRounds方法，我们只加载公司数据
-  await companyStore.loadCompanies()
+  await Promise.all([
+    companyStore.loadCompanies(),
+    interviewStore.loadInterviews(),
+  ])
 })
 </script>
 
@@ -439,10 +459,16 @@ onMounted(async () => {
     }
   }
   
+  .calendar-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .calendar-grid {
     border: 1px solid var(--border-color-lighter);
     border-radius: 8px;
     overflow: hidden;
+    min-width: 560px;
     
     .calendar-weekdays {
       display: grid;

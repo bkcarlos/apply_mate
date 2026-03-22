@@ -18,7 +18,7 @@
             <div class="offer-color-dot" :style="{ background: getColor(offer.id) }" />
             <div class="offer-info">
               <div class="company-name">{{ offer.companyName }}</div>
-              <div class="position">{{ offer.position }} · {{ offer.level }}</div>
+              <div class="position">{{ offer.position }}<template v-if="offer.level"> · {{ offer.level }}</template></div>
             </div>
             <div class="offer-actions">
               <el-button :icon="Edit" circle size="small" @click="openEditDialog(offer)" />

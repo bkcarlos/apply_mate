@@ -17,7 +17,11 @@
           <div class="offer-card-header">
             <div class="offer-color-dot" :style="{ background: getColor(offer.id) }" />
             <div class="offer-info">
-              <div class="company-name">{{ offer.companyName }}</div>
+              <div class="company-name">
+                <span v-if="offer.city" class="city-tag">{{ offer.city }}</span>
+                <span v-if="offer.city" class="city-sep"> · </span>
+                {{ offer.companyName }}
+              </div>
               <div class="position">{{ offer.position }}</div>
               <div class="level">{{ offer.level || '\u00a0' }}</div>
             </div>
@@ -36,8 +40,8 @@
               <span class="stat-label">年总包</span>
             </div>
             <div class="stat">
-              <span class="stat-value">{{ offer.city }}</span>
-              <span class="stat-label">城市</span>
+              <span class="stat-value">{{ offer.bonusMonths > 0 ? offer.bonusMonths : '—' }}</span>
+              <span class="stat-label">年终(月)</span>
             </div>
           </div>
           <el-tag v-if="offer.deadline" size="small" type="warning" class="deadline-tag">
@@ -793,6 +797,16 @@ onBeforeUnmount(() => {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    .city-tag {
+      color: $color-text-secondary;
+      font-weight: $font-weight-normal;
+    }
+
+    .city-sep {
+      color: $color-text-secondary;
+      opacity: 0.5;
+    }
   }
 
   .position {

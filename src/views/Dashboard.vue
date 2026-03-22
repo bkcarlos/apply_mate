@@ -142,7 +142,7 @@ import {
 import { useInterviewStore } from '@/stores/interview'
 import { useRoundStore } from '@/stores/round'
 import { useCompanyStore } from '@/stores/company'
-import { generateCompleteTestData, clearAllTestData } from '@/utils/testData'
+import { generateCompleteTestData } from '@/utils/testData'
 // import DashboardCard from '@/components/dashboard/DashboardCard.vue'
 import UpcomingInterviews from '@/components/dashboard/UpcomingInterviews.vue'
 import OfferChart from '@/components/dashboard/OfferChart.vue'
@@ -313,20 +313,16 @@ const clearTestData = async () => {
     )
     
     clearingData.value = true
-    
-    // 清除所有测试数据
-    await clearAllTestData()
-    
-    // 重置store状态
-    companyStore.companies = []
-    interviewStore.interviews = []
-    
+
+    await companyStore.clearAll()
+    await interviewStore.clearAll()
+    await roundStore.clearAll()
+
     ElMessage.success(t('dashboard.testDataCleared'))
-    
-    // 刷新页面数据
+
     setTimeout(() => {
       window.location.reload()
-    }, 1000)
+    }, 800)
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error(t('dashboard.testDataClearingFailed'))

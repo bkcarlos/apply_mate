@@ -57,13 +57,25 @@
     </div>
 
     <template v-if="offers.length >= 1">
-      <!-- 薪资结构对比 -->
+      <!-- 薪资各项独立对比 -->
       <section class="chart-section">
         <div class="section-header">
           <h3>薪资结构对比</h3>
-          <span class="section-desc">月均薪资（k/月）</span>
         </div>
-        <div ref="salaryChartRef" class="chart-container" />
+        <div class="salary-breakdown-grid">
+          <div class="breakdown-card">
+            <div class="breakdown-title">月基础薪 <span class="breakdown-unit">k/月</span></div>
+            <div ref="baseChartRef" class="chart-mini" :style="{ height: miniChartHeight }" />
+          </div>
+          <div class="breakdown-card">
+            <div class="breakdown-title">年终奖 <span class="breakdown-unit">月数</span></div>
+            <div ref="bonusChartRef" class="chart-mini" :style="{ height: miniChartHeight }" />
+          </div>
+          <div class="breakdown-card">
+            <div class="breakdown-title">股权/期权 <span class="breakdown-unit">k/年</span></div>
+            <div ref="stockChartRef" class="chart-mini" :style="{ height: miniChartHeight }" />
+          </div>
+        </div>
       </section>
 
       <!-- 年总包对比 -->
@@ -480,18 +492,24 @@ const removeOffer = (id: string) => {
 
 // ─── 辅助标签 ──────────────────────────────────────────────────────────
 const remoteLabel = (v: string) => ({ no: '不支持', hybrid: '混合', full: '全远程' }[v] || v)
-const remoteTagType = (v: string) => ({ no: 'info', hybrid: 'warning', full: 'success' }[v] || 'info') as any
+const miniChartHeight = computed(() => `${Math.max(60, offers.value.length * 36)}px`)
+
+const remoteTagType = (v: string) =>({ no: 'info', hybrid: 'warning', full: 'success' }[v] || 'info') as any
 const scoreLabel = (v: number) => ['', '较差', '一般', '良好', '优秀', '极佳'][v] || '—'
 const scoreTagType = (v: number): any => v >= 4 ? 'success' : v >= 3 ? 'warning' : 'danger'
 
 // ─── 图表 ─────────────────────────────────────────────────────────────
-const salaryChartRef = ref<HTMLElement>()
+const baseChartRef  = ref<HTMLElement>()
+const bonusChartRef = ref<HTMLElement>()
+const stockChartRef = ref<HTMLElement>()
 const totalChartRef = ref<HTMLElement>()
 const benefitChartRef = ref<HTMLElement>()
 const overallChartRef = ref<HTMLElement>()
 
-let salaryChart: echarts.ECharts | null = null
-let totalChart: echarts.ECharts | null = null
+let baseChart:    echarts.ECharts | null = null
+let bonusChart:   echarts.ECharts | null = null
+let stockChart:   echarts.ECharts | null = null
+let totalChart:   echarts.ECharts | null = null
 let benefitChart: echarts.ECharts | null = null
 let overallChart: echarts.ECharts | null = null
 
@@ -500,7 +518,9 @@ const initCharts = async () => {
   if (offers.value.length === 0) return
 
   // 销毁旧实例
-  salaryChart?.dispose()
+  baseChart?.dispose()
+  bonusChart?.dispose()
+  stockChart?.dispose()
   totalChart?.dispose()
   benefitChart?.dispose()
   overallChart?.dispose()
@@ -508,48 +528,55 @@ const initCharts = async () => {
   const names = offers.value.map(o => o.companyName || o.position)
   const colors = offers.value.map(o => getColor(o.id))
 
-  // 1. 薪资结构分组柱状图
-  if (salaryChartRef.value) {
-    salaryChart = echarts.init(salaryChartRef.value)
-    salaryChart.setOption({
-      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      legend: { data: ['月基础薪', '月均年终', '月均股票'], bottom: 0 },
-      grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
-      xAxis: { type: 'category', data: names },
-      yAxis: { type: 'value', name: 'k/月', nameTextStyle: { color: '#909399' } },
-      series: [
-        {
-          name: '月基础薪',
-          type: 'bar',
-          stack: 'salary',
-          data: offers.value.map(o => o.baseMonthlySalary),
-          itemStyle: { color: '#FF6B35' },
-        },
-        {
-          name: '月均年终',
-          type: 'bar',
-          stack: 'salary',
-          data: offers.value.map(o => Math.round(o.baseMonthlySalary * o.bonusMonths / 12 * 10) / 10),
-          itemStyle: { color: '#FFAA70' },
-        },
-        {
-          name: '月均股票',
-          type: 'bar',
-          stack: 'salary',
-          data: offers.value.map(o => Math.round(o.stockAnnual / 12 * 10) / 10),
-          itemStyle: { color: '#FFD4B8' },
-          label: {
-            show: true,
-            position: 'top',
-            formatter: (p: any) => {
-              const total = offers.value[p.dataIndex].totalAnnual
-              return total ? `${total}k/年` : ''
-            },
-          },
-        },
-      ],
-    })
+  // 迷你横向柱状图公共配置生成
+  const miniBarOption = (data: number[], unit: string, fmt?: (v: number) => string) => ({
+    tooltip: {
+      trigger: 'axis',
+      formatter: (p: any) => `${p[0].name}<br/>${p[0].marker}${fmt ? fmt(p[0].value) : p[0].value + unit}`
+    },
+    grid: { left: 8, right: 40, top: 8, bottom: 8, containLabel: true },
+    xAxis: { type: 'value', show: false },
+    yAxis: { type: 'category', data: names, axisLabel: { fontSize: 11, width: 60, overflow: 'truncate' } },
+    series: [{
+      type: 'bar',
+      data: data.map((v, i) => ({ value: v, itemStyle: { color: COLORS[i % COLORS.length] } })),
+      label: { show: true, position: 'right', fontSize: 11, formatter: (p: any) => fmt ? fmt(p.value) : `${p.value}${unit}` },
+      barMaxWidth: 18,
+    }],
+  })
+
+  // 1a. 月基础薪
+  if (baseChartRef.value) {
+    baseChart = echarts.init(baseChartRef.value)
+    baseChart.setOption(miniBarOption(
+      offers.value.map(o => o.baseMonthlySalary), 'k'
+    ))
   }
+
+  // 1b. 年终奖
+  if (bonusChartRef.value) {
+    bonusChart = echarts.init(bonusChartRef.value)
+    bonusChart.setOption(miniBarOption(
+      offers.value.map(o => o.bonusMonths), '个月',
+      v => v > 0 ? `${v}个月` : '无'
+    ))
+  }
+
+  // 1c. 股权/期权
+  if (stockChartRef.value) {
+    stockChart = echarts.init(stockChartRef.value)
+    stockChart.setOption(miniBarOption(
+      offers.value.map(o => o.stockAnnual), 'k',
+      v => v > 0 ? `${v}k` : '无'
+    ))
+  }
+
+  // 迷你图宽高在首次渲染时可能为 0，用 rAF 补一次 resize
+  requestAnimationFrame(() => {
+    baseChart?.resize()
+    bonusChart?.resize()
+    stockChart?.resize()
+  })
 
   // 2. 年总包横向条形图
   if (totalChartRef.value) {
@@ -635,7 +662,9 @@ const initCharts = async () => {
 }
 
 const handleResize = () => {
-  salaryChart?.resize()
+  baseChart?.resize()
+  bonusChart?.resize()
+  stockChart?.resize()
   totalChart?.resize()
   benefitChart?.resize()
   overallChart?.resize()
@@ -699,7 +728,9 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
-  salaryChart?.dispose()
+  baseChart?.dispose()
+  bonusChart?.dispose()
+  stockChart?.dispose()
   totalChart?.dispose()
   benefitChart?.dispose()
   overallChart?.dispose()
@@ -891,6 +922,41 @@ onBeforeUnmount(() => {
   &--short {
     height: 200px;
   }
+}
+
+.salary-breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.breakdown-card {
+  background: $bg-light;
+  border-radius: $border-radius-md;
+  padding: $spacing-sm $spacing-md;
+
+  .breakdown-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-text-primary;
+    margin-bottom: $spacing-xs;
+
+    .breakdown-unit {
+      font-size: $font-size-xs;
+      color: $color-text-secondary;
+      font-weight: $font-weight-normal;
+      margin-left: 4px;
+    }
+  }
+}
+
+.chart-mini {
+  height: 32px; // 每条 offer 32px，由 echarts 自动适配
+  min-height: 60px;
 }
 
 // 工作条件表格

@@ -17,21 +17,21 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { House, Calendar, Document, OfficeBuilding, DataAnalysis } from '@element-plus/icons-vue'
+import { House, Calendar, Document, Histogram } from '@element-plus/icons-vue'
 
 const route = useRoute()
 
 const navItems = [
-  { key: 'dashboard', path: '/dashboard', icon: House },
-  { key: 'calendar',  path: '/calendar',  icon: Calendar },
+  { key: 'dashboard',  path: '/dashboard',  icon: House },
+  { key: 'calendar',   path: '/calendar',   icon: Calendar },
   { key: 'interviews', path: '/interviews', icon: Document },
-  { key: 'companies', path: '/companies', icon: OfficeBuilding },
-  { key: 'analysis',  path: '/analysis',  icon: DataAnalysis },
+  { key: 'analysis',   path: '/analysis',   icon: Histogram },
 ]
 
 const isActive = (item: typeof navItems[0]) => {
   if (item.path === '/interviews') return route.path.startsWith('/interviews')
-  return route.path === item.path || route.path === '/' && item.path === '/dashboard'
+  if (item.path === '/analysis') return route.path.startsWith('/analysis')
+  return route.path === item.path || (route.path === '/' && item.path === '/dashboard')
 }
 </script>
 

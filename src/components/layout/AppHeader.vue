@@ -92,6 +92,10 @@
               <el-icon><Setting /></el-icon>
               {{ $t('nav.settings') }}
             </el-dropdown-item>
+            <el-dropdown-item command="companies">
+              <el-icon><OfficeBuilding /></el-icon>
+              {{ $t('nav.companies') }}
+            </el-dropdown-item>
             <el-dropdown-item divided command="about">
               <el-icon><InfoFilled /></el-icon>
               {{ $t('nav.about') }}
@@ -113,7 +117,8 @@ import {
   Bell,
   User,
   Setting,
-  InfoFilled
+  InfoFilled,
+  OfficeBuilding
 } from '@element-plus/icons-vue'
 import { useInterviewStore } from '@/stores/interview'
 import { useRoundStore } from '@/stores/round'
@@ -143,12 +148,6 @@ const menuItems = ref([
     path: '/interviews',
     key: 'interviews',
     icon: 'Document'
-  },
-  {
-    name: 'CompanyList',
-    path: '/companies',
-    key: 'companies',
-    icon: 'OfficeBuilding'
   },
   {
     name: 'Analysis',
@@ -212,6 +211,9 @@ const handleCommand = (command: string) => {
       break
     case 'settings':
       router.push('/settings')
+      break
+    case 'companies':
+      router.push('/companies')
       break
     case 'about':
       ElMessageBox.alert(

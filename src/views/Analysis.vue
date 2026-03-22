@@ -651,7 +651,7 @@ onMounted(async () => {
   transition: box-shadow 0.2s ease;
 
   &:hover {
-    box-shadow: $shadow-medium;
+    box-shadow: $shadow-base;
   }
 
   .entry-icon {

@@ -345,6 +345,11 @@
 import { ref, computed, nextTick, watch, onMounted, onBeforeUnmount } from 'vue'
 import { Plus, Edit, Delete } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
+import { useInterviewStore } from '@/stores/interview'
+import { useCompanyStore } from '@/stores/company'
+
+const interviewStore = useInterviewStore()
+const companyStore = useCompanyStore()
 
 // ─── 颜色 ────────────────────────────────────────────────────────────
 const COLORS = ['#FF6B35', '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EF4444']
@@ -353,6 +358,7 @@ const getColor = (id: string) => COLORS[offers.value.findIndex(o => o.id === id)
 // ─── 数据模型 ─────────────────────────────────────────────────────────
 interface OfferItem {
   id: string
+  processId?: string   // 关联的 InterviewProcess.id，自动导入时填写
   companyName: string
   position: string
   level: string
@@ -632,7 +638,56 @@ const handleResize = () => {
 
 watch(() => offers.value, () => initCharts(), { deep: true })
 
-onMounted(() => {
+const importFromStore = async () => {
+  await interviewStore.loadInterviews()
+  await companyStore.loadCompanies()
+
+  const existingProcessIds = new Set(offers.value.map(o => o.processId).filter(Boolean))
+  const offerProcesses = interviewStore.interviews.filter(p => p.status === '已发Offer')
+
+  const newItems: OfferItem[] = []
+  for (const process of offerProcesses) {
+    if (existingProcessIds.has(process.id)) continue
+    const company = companyStore.getCompanyById(process.companyId)
+    const s = process.offeredSalary
+    newItems.push({
+      id: `imported-${process.id}`,
+      processId: process.id,
+      companyName: company?.name ?? '未知公司',
+      position: process.position,
+      level: '',
+      city: process.city,
+      baseMonthlySalary: s?.base ?? process.expectedSalary?.min ?? 0,
+      bonusMonths: s?.bonus ?? 0,
+      stockAnnual: 0,
+      totalAnnual: s?.total ?? 0,
+      remote: 'no',
+      workHours: '弹性',
+      probationMonths: 3,
+      probationRatioPct: 100,
+      insuranceScore: 3,
+      medicalScore: 3,
+      annualLeaveDays: 10,
+      subsidyScore: 3,
+      salaryScore: 3,
+      growthScore: 3,
+      worklifeScore: 3,
+      cultureScore: 3,
+      companyStage: company?.type ?? '',
+      deadline: '',
+      startDate: '',
+      note: process.remarks ?? '',
+    })
+  }
+
+  if (newItems.length > 0) {
+    offers.value = [...offers.value, ...newItems]
+    saveOffers(offers.value)
+  }
+}
+
+onMounted(async () => {
+  await importFromStore()
   initCharts()
   window.addEventListener('resize', handleResize)
 })

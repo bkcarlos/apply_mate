@@ -153,35 +153,33 @@ export const generateTestCompanies = (): Company[] => {
 // 测试面试流程数据
 export const generateTestInterviews = (companies: Company[]): InterviewProcess[] => {
   const interviews: InterviewProcess[] = []
-  const statuses = ['投递中', '评估中', '面试中', '已发Offer', '已拒绝', '已结束']
+  // 至少保证前3家公司有 Offer，其余随机
+  const offerCompanyIds = new Set(companies.slice(0, 3).map(c => c.id))
+  const nonOfferStatuses = ['投递中', '评估中', '面试中', '已拒绝', '已结束']
   const conclusions = ['未开始', '进行中', '通过', '未通过', '待定']
   const channels = ['Boss直聘', '拉勾网', '智联招聘', '猎聘', '内推', '官网投递']
   const positions = [
-    '前端开发工程师',
-    '后端开发工程师',
-    '全栈开发工程师',
-    'React开发工程师',
-    'Vue.js开发工程师',
-    'Node.js开发工程师',
-    '高级前端工程师',
-    '高级后端工程师',
-    '技术专家',
-    '架构师'
+    '前端开发工程师', '后端开发工程师', '全栈开发工程师',
+    'React开发工程师', 'Vue.js开发工程师', 'Node.js开发工程师',
+    '高级前端工程师', '高级后端工程师', '技术专家', '架构师'
   ]
-  
-  // 为每个公司生成1-3个面试流程
+
   companies.forEach(company => {
     const interviewCount = Math.floor(Math.random() * 3) + 1
-    
+
     for (let i = 0; i < interviewCount; i++) {
-      const status = statuses[Math.floor(Math.random() * statuses.length)]
+      // 保证指定公司的第一条流程是 Offer
+      const forceOffer = offerCompanyIds.has(company.id) && i === 0
+      const status = forceOffer
+        ? '已发Offer'
+        : nonOfferStatuses[Math.floor(Math.random() * nonOfferStatuses.length)]
       const conclusion = conclusions[Math.floor(Math.random() * conclusions.length)]
       const position = positions[Math.floor(Math.random() * positions.length)]
       const channel = channels[Math.floor(Math.random() * channels.length)]
-      
+
       const baseDate = new Date()
       baseDate.setDate(baseDate.getDate() - Math.floor(Math.random() * 30))
-      
+
       const interview: InterviewProcess = {
         id: generateId(),
         companyId: company.id,
@@ -191,28 +189,34 @@ export const generateTestInterviews = (companies: Company[]): InterviewProcess[]
         conclusion: conclusion as any,
         sourceChannel: channel,
         expectedSalary: {
-          min: Math.floor(Math.random() * 10 + 15), // 15-25k
-          max: Math.floor(Math.random() * 15 + 20)  // 20-35k
+          min: Math.floor(Math.random() * 10 + 15),  // 15-25k/月
+          max: Math.floor(Math.random() * 15 + 20)   // 20-35k/月
         },
         createdAt: baseDate,
         updatedAt: baseDate,
         remarks: `通过${channel}投递的${position}职位，目前状态：${status}`
       }
-      
-      // 为已发Offer的面试添加薪资信息
+
       if (status === '已发Offer') {
+        const base = Math.floor(Math.random() * 10 + 20)   // 20-30k/月
+        const bonusMonths = Math.floor(Math.random() * 6 + 2) // 2-8个月
+        const stockAnnual = Math.random() > 0.5
+          ? Math.floor(Math.random() * 20 + 10)  // 10-30k/年（如有期权折现）
+          : 0
+        // 年包 = 月薪 × 12 + 年终奖 + 股权
+        const total = base * 12 + bonusMonths * base + stockAnnual
         interview.offeredSalary = {
-          base: Math.floor(Math.random() * 10 + 20), // 20-30k
-          bonus: Math.floor(Math.random() * 6 + 2), // 2-8个月
-          total: Math.floor(Math.random() * 50 + 300), // 300-350k年包
-          options: Math.random() > 0.5 ? '有期权' : undefined
+          base,
+          bonus: bonusMonths,
+          total,
+          options: stockAnnual > 0 ? `期权约${stockAnnual}k/年` : undefined
         }
       }
-      
+
       interviews.push(interview)
     }
   })
-  
+
   return interviews
 }
 

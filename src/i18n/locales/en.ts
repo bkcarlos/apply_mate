@@ -818,7 +818,8 @@ export default {
     cardTitles: {
       basicInfo: 'Basic Information',
       salaryInfo: 'Salary Information',
-      remarks: 'Remarks'
+      remarks: 'Remarks',
+      remarksCard: 'Remarks'
     },
     
     // Form Labels

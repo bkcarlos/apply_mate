@@ -273,7 +273,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import {
@@ -543,36 +543,44 @@ const clearAllData = async () => {
   }
 }
 
-// 生命周期
-onMounted(async () => {
-  // 加载用户资料
-  await userStore.loadProfile()
-  if (userStore.profile) {
-    userProfile.value = {
-      name: userStore.profile.id || '',
-      email: '',
-      phone: '',
-      location: '',
-      jobDirection: '',
-      expectedSalary: userStore.profile.currentMonthlySalary?.toString() || '',
-      experience: '',
-      createdAt: userStore.profile.createdAt?.toISOString() || new Date().toISOString()
-    }
+// 从 store 填充用户配置表单
+const syncProfileFromStore = () => {
+  if (!userStore.profile) return
+  const createdAt = userStore.profile.createdAt
+  userProfile.value = {
+    name: userStore.profile.id || '',
+    email: '',
+    phone: '',
+    location: '',
+    jobDirection: '',
+    expectedSalary: userStore.profile.currentMonthlySalary?.toString() || '',
+    experience: '',
+    createdAt: createdAt instanceof Date ? createdAt.toISOString() : new Date().toISOString()
   }
-  
+}
+
+// 生命周期
+onMounted(() => {
   // 加载系统设置
   const savedSettings = localStorage.getItem('systemSettings')
   if (savedSettings) {
-    systemSettings.value = { ...systemSettings.value, ...JSON.parse(savedSettings) }
+    try {
+      systemSettings.value = { ...systemSettings.value, ...JSON.parse(savedSettings) }
+    } catch {
+      localStorage.removeItem('systemSettings')
+    }
   }
-  
-  // 加载其他数据
-  await Promise.all([
-    interviewStore.loadProcesses(),
-    interviewStore.loadRounds(),
-    companyStore.loadCompanies()
-  ])
+
+  // 如果 store 已由 App.vue 初始化完成，直接同步；否则等待
+  if (userStore.profile) {
+    syncProfileFromStore()
+  }
 })
+
+// 响应式监听：当 App.vue 完成初始化后自动同步
+watch(() => userStore.profile, (profile) => {
+  if (profile) syncProfileFromStore()
+}, { immediate: false })
 </script>
 
 <style scoped lang="scss">
